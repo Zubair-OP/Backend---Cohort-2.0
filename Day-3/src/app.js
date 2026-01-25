@@ -40,8 +40,13 @@ app.put('/notes/:id', (req, res) => {
 })
 
 app.patch('/notes/:id', (req, res) => {
-    notes[ req.params.id ].description = req.body.description
-    res.send("Note patched successfully")
+    const id = parseInt(req.params.id);
+    if (id >= 0 && id < notes.length) {
+        notes[id].description = req.body.description;
+        res.send("Note patched successfully");
+    } else {
+        res.status(404).send("Note not found");
+    }
 })
 
 
