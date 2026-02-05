@@ -1,0 +1,111 @@
+.album-card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.album-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    border-color: rgba(236, 72, 153, 0.3);
+    /* Pink hint for albums */
+}
+
+/* Add a "stack" effect visual with a pseudo element */
+.album-card::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    /* offset to create stack look, but needs z-index fix or layout adjustment */
+    /* Simplified stack effect handled by shadow/border or simpler design for now */
+    display: none;
+}
+
+.album-cover-container {
+    height: 220px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.album-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.album-card:hover .album-cover {
+    transform: scale(1.08);
+    /* Slower, smoother zoom */
+}
+
+.album-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.photo-count {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.count-icon {
+    font-size: 1rem;
+}
+
+.album-content {
+    padding: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.album-title {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    color: white;
+    font-weight: 700;
+}
+
+.album-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.album-author {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.author-icon {
+    font-size: 1rem;
+    color: var(--secondary-color);
+}

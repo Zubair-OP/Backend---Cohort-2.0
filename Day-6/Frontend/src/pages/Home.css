@@ -1,0 +1,49 @@
+.home-page {
+    min-height: 100vh;
+}
+
+.hero-section {
+    padding: 6rem 0 4rem;
+    text-align: center;
+    background: radial-gradient(circle at top center, rgba(99, 102, 241, 0.15), transparent 70%);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.main-content {
+    padding-bottom: 4rem;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+}

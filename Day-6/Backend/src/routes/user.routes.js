@@ -20,6 +20,4 @@ router.get("/", authMiddleware, getAllposts);
 router.get("/getAllalbum", authMiddleware, getAllAlbums);
 router.delete("/delete-post/:id", authMiddleware, deletePost);
 
-
-
 module.exports = router;
