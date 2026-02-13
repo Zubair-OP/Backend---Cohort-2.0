@@ -28,6 +28,8 @@ const createPost = async (req, res) => {
             imageFileId: Uploadimage.fileId,
             owner: req.user.id 
         });
+
+        
         res.status(201).json({ message: "Post created successfully",
             post: {
             title: newPost.title,
