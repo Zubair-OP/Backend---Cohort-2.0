@@ -92,9 +92,32 @@ const login = async (req,res) =>{
     })
 }
 
+const getme = async (req,res) =>{
+    const user = req.user.id;
+
+    const isValidUser = await userModel.findById(user)
+
+    if(!isValidUser){
+        return res.status(404).json({
+            message : "User not found"
+        })
+    }
+
+    return res.status(200).json({
+        message : "User found",
+        user: {
+            email: isValidUser.email,
+            name: isValidUser.name,
+            bio: isValidUser.bio,
+            profileImage: isValidUser.profileImage
+        }
+    })
+}
+
 
 
 module.exports = {
     Register,
-    login
+    login,
+    getme
 }
