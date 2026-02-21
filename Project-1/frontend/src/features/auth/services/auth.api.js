@@ -2,8 +2,8 @@ import axios from "axios";
 
 
 const Api = axios.create({
-    baseURL:"http://localhost:3000/api/auth",
-    withCredentials:true
+    baseURL: "http://localhost:3000/api/auth",
+    withCredentials: true
 })
 
 export async function register(name, email, password) {
@@ -13,23 +13,22 @@ export async function register(name, email, password) {
             email,
             password
         })
-        return response
+        return response.data
     } catch (error) {
         console.log("Error during registration:", error)
         throw error
     }
 }
 
-export async function login(email, password) {
+export async function login(name, password) {
     try {
         const response = await Api.post("/login", {
-            email,
+            name,
             password
         })
-        return response
+        return response.data
     } catch (error) {
         console.log("Error during logging in:", error)
         throw error
     }
 }
-
