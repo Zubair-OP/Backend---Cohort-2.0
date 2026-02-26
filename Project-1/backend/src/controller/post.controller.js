@@ -1,4 +1,6 @@
 const postModel = require('../model/post.model');
+const likeModel = require('../model/like.model');
+const followModel = require('../model/follow.model');
 const { uploadFile } = require('../services/storage.service');
 
 const createPost = async (req, res) => {
@@ -85,8 +87,37 @@ const getPostDetails = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" })
     }
 }
+
+const getAllposts = async (req, res) => {
+
+    const user = req.user.username
+
+    const allPosts = await postModel.find().populate('user').lean()
+    const posts = await Promise.all(allPosts.map(async post => {
+        const isliked = await likeModel.findOne({ 
+            post: post._id, user: user 
+        })
+        post.isliked = Boolean(isliked)
+
+        const isFollowing = await followModel.findOne({
+            follower: user,
+            followee: post.user?.name
+        })
+        post.isFollowing = Boolean(isFollowing)
+
+        return post
+    }))
+
+    return res.status(200).json({
+        message: "Posts fetched successfully",
+        posts
+    })
+}
+
+
 module.exports = {
     createPost,
     getPost,
-    getPostDetails
+    getPostDetails,
+    getAllposts
 }

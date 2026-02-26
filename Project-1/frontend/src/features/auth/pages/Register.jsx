@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import "../styles/form.scss"
 import { useAuth } from '../hooks/useAuth'
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 const Register = () => {
 
@@ -19,10 +19,9 @@ const Register = () => {
     }
 
 
-    const handelSubmit = (e) =>{
-        e.preventDefault()
-
-        registerUser(name ,email , password)
+    const handelSubmit = async (e) =>{
+        e.preventDefault();
+        await registerUser(name ,email , password);
         navigate("/");
     }
   return (

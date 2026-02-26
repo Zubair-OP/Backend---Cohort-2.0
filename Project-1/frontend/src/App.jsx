@@ -1,18 +1,18 @@
 import AppRoutes from "./AppRoutes"
 import "./style.scss"
 import AuthProvider from "./features/auth/auth.context"
-// import PostProvider from "./features/post/postcontext"
+import { PostProvider } from "./features/posts/Post.context"
 
 
 function App() {
 
   return (
-    <>
-     {/* <PostProvider> */}
+    <>     
       <AuthProvider>
-        <AppRoutes />
+        <PostProvider>
+          <AppRoutes />
+        </PostProvider>
       </AuthProvider>
-    {/* </PostProvider> */}
     </>
   )
 }

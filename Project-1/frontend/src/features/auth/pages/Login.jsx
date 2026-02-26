@@ -16,9 +16,9 @@ const Login = () => {
         return <div className="loading">Loading...</div>
     }
 
-    const handleSubmit = (e) =>{
+    const handleSubmit = async (e) =>{
         e.preventDefault()
-        loginUser(name , password)
+        await loginUser(name , password)
         navigate("/")
     }
   return (

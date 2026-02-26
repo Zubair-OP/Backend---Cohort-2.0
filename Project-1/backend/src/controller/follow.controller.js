@@ -22,12 +22,11 @@ const followController = async (req ,res) =>{
             return res.status(400).json({ message : "You are already following this user" })
         }
 
-        const newFollow = await followModel.create({ follower, followee });
+        const newFollow = await followModel.create({ follower, followee , status : "accepted" });
 
-
-
+        X
         return res.status(201).json({ 
-            message : "User followed successfully", 
+            message : "User followed successfully",
             newFollow 
         })
     } catch (error) {
@@ -47,6 +46,7 @@ const unfollowController = async (req, res) => {
         }
 
         await followModel.findByIdAndDelete(isAlreadyFollowing._id)
+
 
         return res.status(200).json({
             message : `You have unfollowed user ${followee} successfully`
