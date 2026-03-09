@@ -27,8 +27,9 @@ const register = async (req, res) => {
         });
 
         const token = jwt.sign(
-            { id: user._id,
-             username: user.username 
+            {
+                id: user._id,
+                username: user.username
             },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
@@ -44,12 +45,13 @@ const register = async (req, res) => {
             }
         });
     } catch (error) {
+        console.log("Register error:", error);
         return res.status(500).json({ message: 'Internal Server error' });
     }
 }
 
 const login = async (req, res) => {
-    try{
+    try {
         const { username, email, password } = req.body;
 
         const user = await userModel.findOne({
@@ -96,7 +98,7 @@ const logout = async (req, res) => {
         return res.status(400).json({ message: 'No token provided' });
     }
 
-    await redis.set(token , Date.now().toString() , 'EX', 60 * 60);
+    await redis.set(token, Date.now().toString(), 'EX', 60 * 60);
 
     res.clearCookie('token');
 
