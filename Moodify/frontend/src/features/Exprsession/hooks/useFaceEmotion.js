@@ -6,8 +6,8 @@ export function useFaceEmotion() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const landmarkerRef = useRef(null);
-  const animFrameRef = useRef(null);
-  const [emotion, setEmotion] = useState("Detecting...");
+  const [emotion, setEmotion] = useState("Waiting for detection");
+  const [isDetecting, setIsDetecting] = useState(false);
 
   const drawLandmarks = useCallback((ctx, faceLandmarks, width, height) => {
     faceLandmarks.forEach((landmarks) => {
@@ -20,49 +20,53 @@ export function useFaceEmotion() {
     });
   }, []);
 
-  const startDetectionLoop = useCallback(() => {
+  const detectCurrentEmotion = useCallback(async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas) return;
+    if (!video || !canvas || !landmarkerRef.current) {
+      setEmotion("Detector not ready");
+      return null;
+    }
+
+    if (video.readyState < 2) {
+      setEmotion("Camera is still loading");
+      return null;
+    }
+
+    setIsDetecting(true);
 
     const ctx = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    const processFrame = () => {
-      if (!landmarkerRef.current) return;
+    const results = landmarkerRef.current.detectForVideo(video, performance.now());
 
-      const results = landmarkerRef.current.detectForVideo(
-        video,
-        performance.now()
-      );
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (results.faceLandmarks) {
+      drawLandmarks(ctx, results.faceLandmarks, canvas.width, canvas.height);
+    }
 
-      if (results.faceLandmarks) {
-        drawLandmarks(ctx, results.faceLandmarks, canvas.width, canvas.height);
-      }
+    let detected = "No Face ❓";
 
-      if (results.faceBlendshapes && results.faceBlendshapes.length > 0) {
-        const blendshapes = results.faceBlendshapes[0].categories;
-        setEmotion(detectEmotion(blendshapes));
-      } else {
-        setEmotion("No Face ❓");
-      }
+    if (results.faceBlendshapes && results.faceBlendshapes.length > 0) {
+      const blendshapes = results.faceBlendshapes[0].categories;
+      detected = detectEmotion(blendshapes);
+    }
 
-      animFrameRef.current = requestAnimationFrame(processFrame);
-    };
-
-    processFrame();
+    setEmotion(detected);
+    setIsDetecting(false);
+    return detected;
   }, [drawLandmarks]);
 
   const startCamera = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     videoRef.current.srcObject = stream;
-    videoRef.current.onloadeddata = () => startDetectionLoop();
-  }, [startDetectionLoop]);
+  }, []);
 
   useEffect(() => {
+    const videoElement = videoRef.current;
+
     const init = async () => {
       landmarkerRef.current = await createFaceLandmarker();
       await startCamera();
@@ -71,14 +75,11 @@ export function useFaceEmotion() {
     init();
 
     return () => {
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach((t) => t.stop());
-      }
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
+      if (videoElement?.srcObject) {
+        videoElement.srcObject.getTracks().forEach((track) => track.stop());
       }
     };
   }, [startCamera]);
 
-  return { videoRef, canvasRef, emotion };
+  return { videoRef, canvasRef, emotion, isDetecting, detectCurrentEmotion };
 }

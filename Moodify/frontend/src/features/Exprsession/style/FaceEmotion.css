@@ -3,7 +3,44 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  gap: 20px;
+  min-height: 100svh;
+  box-sizing: border-box;
+  padding: 14px 14px 148px;
+  gap: 14px;
   font-family: sans-serif;
+  overflow: hidden;
+}
+
+.detect-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.detect-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.detect-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.face-emotion-error {
+  margin: 0;
+  color: #dc2626;
+  font-weight: 600;
+  text-align: center;
+}
+
+.face-emotion-player {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
 }
