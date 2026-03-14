@@ -58,6 +58,17 @@ export function usePlayer(songs) {
     setCurrentSongIndex((prev) => (prev + 1) % playlist.length);
   };
 
+  const handlePrev = () => {
+    if (!playlist.length) return;
+    setCurrentSongIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
+  };
+
+  const selectSong = (index) => {
+    if (index >= 0 && index < playlist.length) {
+      setCurrentSongIndex(index);
+    }
+  };
+
   const seekBy = (seconds) => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -90,11 +101,14 @@ export function usePlayer(songs) {
     audioRef,
     isPlaying,
     activeSong,
+    currentSongIndex,
     currentTime,
     duration,
     playbackRate,
     playPause,
     handleNext,
+    handlePrev,
+    selectSong,
     seekBy,
     changeSpeed,
     onSeek,

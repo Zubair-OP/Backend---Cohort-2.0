@@ -1,0 +1,149 @@
+.mood-history {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  transition: border-color 0.3s ease;
+}
+
+.mood-history:hover {
+  border-color: rgba(0, 229, 255, 0.25);
+}
+
+.mood-history__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mood-history__icon {
+  font-size: 17px;
+}
+
+.mood-history__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.mood-history__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mood-history__tab {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #8b8fa3;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mood-history__tab:hover {
+  border-color: rgba(0, 229, 255, 0.3);
+  color: #e8eaed;
+}
+
+.mood-history__tab--active {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: rgba(0, 229, 255, 0.3);
+  color: #00e5ff;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+}
+
+.mood-history__list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(0, 229, 255, 0.1);
+}
+
+.mood-history__list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mood-history__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mood-history__list::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 999px;
+}
+
+.mood-history__empty {
+  color: #5a5e72;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.mood-history__entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.mood-history__entry:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mood-history__timeline-dot {
+  position: absolute;
+  left: -20px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00e5ff;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.mood-history__entry-emoji {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.mood-history__entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mood-history__entry-mood {
+  font-size: 0.8rem;
+  color: #e8eaed;
+  font-weight: 500;
+}
+
+.mood-history__entry-time {
+  font-size: 0.66rem;
+  color: #5a5e72;
+}
+
+.mood-history__entry-songs {
+  color: #00e5ff;
+  font-weight: 500;
+}

@@ -13,9 +13,11 @@ app.use(cors({
 
 const AuthRoutes = require('./routes/auth.routes');
 const SongRoutes = require('./routes/song.routes');
+const MoodHistoryRoutes = require('./routes/moodHistory.routes');
 
 app.use('/api/auth', AuthRoutes);
 app.use('/api/songs', SongRoutes);
+app.use('/api/mood-history', MoodHistoryRoutes);
 
 
 module.exports = app;

@@ -7,6 +7,7 @@ export function useFaceEmotion() {
   const canvasRef = useRef(null);
   const landmarkerRef = useRef(null);
   const [emotion, setEmotion] = useState("Waiting for detection");
+  const [confidence, setConfidence] = useState(0);
   const [isDetecting, setIsDetecting] = useState(false);
 
   const drawLandmarks = useCallback((ctx, faceLandmarks, width, height) => {
@@ -48,13 +49,17 @@ export function useFaceEmotion() {
     }
 
     let detected = "No Face ❓";
+    let detectedConfidence = 0;
 
     if (results.faceBlendshapes && results.faceBlendshapes.length > 0) {
       const blendshapes = results.faceBlendshapes[0].categories;
-      detected = detectEmotion(blendshapes);
+      const result = detectEmotion(blendshapes);
+      detected = result.label;
+      detectedConfidence = result.confidence;
     }
 
     setEmotion(detected);
+    setConfidence(detectedConfidence);
     setIsDetecting(false);
     return detected;
   }, [drawLandmarks]);
@@ -81,5 +86,5 @@ export function useFaceEmotion() {
     };
   }, [startCamera]);
 
-  return { videoRef, canvasRef, emotion, isDetecting, detectCurrentEmotion };
+  return { videoRef, canvasRef, emotion, confidence, isDetecting, detectCurrentEmotion };
 }

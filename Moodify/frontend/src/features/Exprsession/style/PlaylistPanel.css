@@ -1,0 +1,136 @@
+.playlist-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s ease;
+}
+
+.playlist-panel:hover {
+  border-color: rgba(0, 229, 255, 0.25);
+}
+
+.playlist-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.playlist-panel__icon {
+  font-size: 17px;
+}
+
+.playlist-panel__title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.playlist-panel__list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.playlist-panel__list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.playlist-panel__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.playlist-panel__list::-webkit-scrollbar-thumb {
+  background: rgba(0, 229, 255, 0.2);
+  border-radius: 999px;
+}
+
+.playlist-panel__empty {
+  color: #5a5e72;
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.playlist-panel__song {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.playlist-panel__song:hover {
+  background: rgba(0, 229, 255, 0.06);
+  border-color: rgba(0, 229, 255, 0.1);
+}
+
+.playlist-panel__song--active {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: rgba(0, 229, 255, 0.25);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.1);
+}
+
+.playlist-panel__thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.playlist-panel__song-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.playlist-panel__song-title {
+  font-size: 0.78rem;
+  color: #e8eaed;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playlist-panel__song-artist {
+  font-size: 0.66rem;
+  color: #5a5e72;
+}
+
+.playlist-panel__play-icon {
+  font-size: 0.82rem;
+  color: #00e5ff;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.playlist-panel__song:hover .playlist-panel__play-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.playlist-panel__song--active .playlist-panel__play-icon {
+  opacity: 1;
+  color: #00e5ff;
+  filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.4));
+}
