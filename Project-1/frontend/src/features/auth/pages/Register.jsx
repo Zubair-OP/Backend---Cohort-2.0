@@ -14,7 +14,7 @@ const Register = () => {
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("") 
     
-     if (loading) {
+    if (loading) {
         return <div className="loading">Loading...</div>
     }
 
