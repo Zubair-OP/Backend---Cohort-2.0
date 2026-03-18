@@ -1,35 +1,49 @@
-import { useContext } from "react";
-import { authContext } from "../Authcontext.jsx";
-import { login, register } from "../services/auth.api.js";
+import { login, register,getCurrentUser } from '../services/Auth.api'
+import { setError, setLoading ,setUser } from '../auth.slice'
+import { useDispatch } from 'react-redux'
 
 export function useAuth() {
-    const { User, loading, setUser, setloading } = useContext(authContext);
 
-    const handleRegister = async (name, email, password) => {
+    const dispatch = useDispatch()
+
+    const handleRegister = async (username, email, password) => {
         try {
-            setloading(true)
-            const response = await register(name, email, password)
-            setUser(response.user)
+            dispatch(setLoading(true))
+            const response = await register(username, email, password) 
         } catch (error) {
-            console.error("Register error:", error);
-            throw error;
-        } finally {
-            setloading(false)
+            dispatch(setError(error.message) || "Registration failed")
+        }
+         finally {
+            dispatch(setLoading(false))
         }
     }
 
     const handleLogin = async (email, password) => {
         try {
-            setloading(true)
+            dispatch(setLoading(true))
             const response = await login(email, password)
-            setUser(response.user)
+            dispatch(setUser(response.user))
         } catch (error) {
-            console.error("Login error:", error);
-            throw error;
+            dispatch(setError(error.message) || "Login failed")
+        }
+         finally {
+            dispatch(setLoading(false))
+        }
+
+    }
+
+    const fetchCurrentUser = async () => {
+        try {
+            dispatch(setLoading(true))
+            const response = await getCurrentUser()
+            dispatch(setUser(response.user))
+        } catch (error) {
+            dispatch(setError(error.message) || "Failed to fetch current user")
         } finally {
-            setloading(false)
+            dispatch(setLoading(false))
         }
     }
 
-    return { User, loading, handleRegister, handleLogin };
+
+    return { handleRegister, handleLogin, fetchCurrentUser }
 }

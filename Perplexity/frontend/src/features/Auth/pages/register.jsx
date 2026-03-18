@@ -10,10 +10,10 @@ const Register = () => {
     email: '',
     password: ''
   })
-  const [errorMessage, setErrorMessage] = useState('')
+
 
   const navigate = useNavigate()
-  const { handleRegister, loading } = useAuth()
+  const { handleRegister } = useAuth()
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -24,15 +24,12 @@ const Register = () => {
   }
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
-    setErrorMessage('')
-    try {
-      await handleRegister(formData.username, formData.email, formData.password)
-      navigate('/login')
-    } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Signup failed. Please try again.')
-    }
+    event.preventDefault();
+
+    await handleRegister(formData.username, formData.email, formData.password)
+    navigate('/login')
   }
+    
 
   return (
     <section className="auth-page">
@@ -77,10 +74,10 @@ const Register = () => {
             required
           />
 
-          {errorMessage && <p className="auth-error">{errorMessage}</p>}
+  
 
-          <button className="auth-button" type="submit" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+          <button className="auth-button" type="submit">
+            Create Account
           </button>
         </form>
 

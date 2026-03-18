@@ -2,6 +2,7 @@ import expess from 'express';
 const app = expess();
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
+import morgan from 'morgan';
 
 
 app.use(expess.json());
@@ -10,8 +11,11 @@ app.use(cookieParser());
 app.use(expess.static('public'));
 app.use(cors({
     origin: 'http://localhost:5173',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
+
+app.use(morgan('dev'))
 
 // Routes
 import authRoutes from './routes/auth.routes.js';

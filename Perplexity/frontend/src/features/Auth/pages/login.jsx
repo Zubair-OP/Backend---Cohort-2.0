@@ -9,11 +9,10 @@ const Login = () => {
     email: '',
     password: ''
   })
-  const [errorMessage, setErrorMessage] = useState('')
+
+  const { handleLogin } = useAuth()
 
   const navigate = useNavigate()
-  const { handleLogin, loading } = useAuth()
-
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormData((prev) => ({
@@ -24,13 +23,9 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    setErrorMessage('')
-    try {
-      await handleLogin(formData.email, formData.password)
-      navigate('/')
-    } catch (error) {
-      setErrorMessage(error?.response?.data?.message || 'Login failed. Please try again.')
-    }
+
+    await handleLogin(formData.email, formData.password)
+    navigate('/')
   }
 
   return (
@@ -64,10 +59,8 @@ const Login = () => {
             required
           />
 
-          {errorMessage && <p className="auth-error">{errorMessage}</p>}
-
-          <button className="auth-button" type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+          <button className="auth-button" type="submit" >
+            Sign In
           </button>
         </form>
 

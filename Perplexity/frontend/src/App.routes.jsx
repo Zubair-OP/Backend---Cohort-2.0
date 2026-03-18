@@ -1,12 +1,16 @@
 import { createBrowserRouter } from 'react-router';
 import Login from './features/Auth/pages/login';
 import Register from './features/Auth/pages/register';
+import Dashboard from './features/chat/features/pages/Dashboard';
+import Protected from './features/Auth/components/Protected';
 
 
 const AppRoutes = createBrowserRouter([
   {
     path: '/',
-    element: <h1>Welcome to the App</h1>
+    element: <Protected>
+      <Dashboard />
+    </Protected>
   },
   {
     path: '/login',
@@ -14,7 +18,9 @@ const AppRoutes = createBrowserRouter([
   },
   {
     path: '/register',
-    element: <Register />
+    element: <Protected>
+      <Register />
+    </Protected>
   }
 ])
 
