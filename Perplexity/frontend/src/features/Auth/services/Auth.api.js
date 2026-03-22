@@ -36,3 +36,5 @@ export const getCurrentUser = async () => {
     throw error
   }
 }
+
+
