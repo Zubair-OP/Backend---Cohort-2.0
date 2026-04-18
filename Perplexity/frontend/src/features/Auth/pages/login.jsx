@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
+import { useSelector } from 'react-redux'
 import './auth.css'
 
 const Login = () => {
@@ -11,6 +12,7 @@ const Login = () => {
   })
 
   const { handleLogin } = useAuth()
+  const { error, loading } = useSelector((state) => state.auth)
 
   const navigate = useNavigate()
   const handleChange = (event) => {
@@ -24,8 +26,10 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    await handleLogin(formData.email, formData.password)
-    navigate('/')
+    const result = await handleLogin(formData.email, formData.password)
+    if (result.success) {
+      navigate('/')
+    }
   }
 
   return (
@@ -59,7 +63,9 @@ const Login = () => {
             required
           />
 
-          <button className="auth-button" type="submit" >
+          {error && <p className="auth-error">{error}</p>}
+
+          <button className="auth-button" type="submit" disabled={loading}>
             Sign In
           </button>
         </form>

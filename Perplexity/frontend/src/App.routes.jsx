@@ -18,9 +18,7 @@ const AppRoutes = createBrowserRouter([
   },
   {
     path: '/register',
-    element: <Protected>
-      <Register />
-    </Protected>
+    element: <Register />
   }
 ])
 

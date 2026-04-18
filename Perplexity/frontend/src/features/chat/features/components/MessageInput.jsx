@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import {
   PaperAirplaneIcon,
   MicrophoneIcon,
-  PlusCircleIcon,
+  PaperClipIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
 
@@ -97,11 +97,11 @@ const MessageInput = ({ onSend, isLoading }) => {
   const canSend = message.trim().length > 0 && !isLoading;
 
   return (
-    <div className="sticky bottom-0 w-full px-4 pb-4 pt-2 bg-gradient-to-t from-[#0d0d0d] via-[#0d0d0d]/95 to-transparent">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-end gap-2 bg-[#1a1a2e]/80 border border-white/[0.08] rounded-2xl px-4 py-3 shadow-xl shadow-black/30 focus-within:border-white/20 transition-colors duration-200 backdrop-blur-sm">
-          <button className="mb-0.5 p-1 text-[#8e8ea0] hover:text-white transition-colors duration-200 shrink-0">
-            <PlusCircleIcon className="w-5 h-5" />
+    <div className="sticky bottom-0 w-full px-4 md:px-6 pb-4 pt-3 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent">
+      <div className="max-w-[760px] mx-auto">
+        <div className="flex items-center gap-2 rounded-[12px] border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-3 focus-within:border-[#20b2aa]">
+          <button className="flex h-9 w-9 items-center justify-center rounded-full text-[#888888] hover:bg-[#1f1f1f] hover:text-white shrink-0">
+            <PaperClipIcon className="w-5 h-5" />
           </button>
 
           <textarea
@@ -111,14 +111,14 @@ const MessageInput = ({ onSend, isLoading }) => {
             onKeyDown={handleKeyDown}
             placeholder="Ask anything..."
             rows={1}
-            className="flex-1 resize-none bg-transparent text-[#e5e5e5] placeholder-[#555570] text-sm leading-6 outline-none min-h-[24px] max-h-[200px] scrollbar-hide"
+            className="flex-1 resize-none bg-transparent py-2 text-white placeholder-[#555555] text-sm leading-6 outline-none min-h-[40px] max-h-[200px] scrollbar-hide"
           />
 
           <button 
             onClick={toggleListening} 
-            className={`mb-0.5 transition-colors duration-200 flex items-center justify-center shrink-0 w-8 h-8 rounded-full ${
-              isListening ? 'bg-red-500/10 hover:bg-red-500/20' : 
-              'text-[#8e8ea0] hover:text-white hover:bg-white/5'
+            className={`transition-colors duration-150 flex items-center justify-center shrink-0 w-9 h-9 rounded-full ${
+              isListening ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400' : 
+              'text-[#888888] hover:text-white hover:bg-[#1f1f1f]'
             }`}
             title={isListening ? "Stop listening" : "Start Voice Input"}
           >
@@ -150,10 +150,10 @@ const MessageInput = ({ onSend, isLoading }) => {
             onClick={isLoading ? undefined : handleSend}
             disabled={!canSend && !isLoading}
             className={`
-              mb-0.5 p-2 rounded-lg shrink-0 transition-all duration-200
+              w-10 h-10 flex items-center justify-center rounded-full shrink-0 transition-all duration-150
               ${canSend || isLoading
-                ? "bg-white text-black hover:bg-white/90 shadow-md"
-                : "bg-white/[0.06] text-[#555570] cursor-not-allowed"
+                ? "bg-[#20b2aa] text-white hover:opacity-90"
+                : "bg-[#202020] text-[#666666] cursor-not-allowed"
               }
             `}
           >
@@ -165,7 +165,7 @@ const MessageInput = ({ onSend, isLoading }) => {
           </button>
         </div>
 
-        <p className="text-center text-[10px] text-[#555570] mt-2">
+        <p className="text-center text-[10px] text-[#666666] mt-2">
           AI can make mistakes. Consider checking important info.
         </p>
       </div>

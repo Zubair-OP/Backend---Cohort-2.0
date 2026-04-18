@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import './auth.css'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
+import { useSelector } from 'react-redux'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const Register = () => {
 
   const navigate = useNavigate()
   const { handleRegister } = useAuth()
+  const { error, loading } = useSelector((state) => state.auth)
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -26,8 +28,10 @@ const Register = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    await handleRegister(formData.username, formData.email, formData.password)
-    navigate('/login')
+    const result = await handleRegister(formData.username, formData.email, formData.password)
+    if (result.success) {
+      navigate('/login')
+    }
   }
     
 
@@ -74,9 +78,9 @@ const Register = () => {
             required
           />
 
-  
+          {error && <p className="auth-error">{error}</p>}
 
-          <button className="auth-button" type="submit">
+          <button className="auth-button" type="submit" disabled={loading}>
             Create Account
           </button>
         </form>

@@ -96,12 +96,14 @@ export function useChat() {
       dispatch(addMessage({
         role: "assistant",
         content: response.aiMessage?.content || "I couldn't process that response (missing content).",
+        sources: response.aiMessage?.sources || [],
       }));
     } catch (error) {
       console.error("Error sending message:", error);
       dispatch(addMessage({
         role: "assistant",
         content: "Sorry, I encountered an error communicating with the server.",
+        sources: [],
       }));
     } finally {
       dispatch(setIsLoading(false));
