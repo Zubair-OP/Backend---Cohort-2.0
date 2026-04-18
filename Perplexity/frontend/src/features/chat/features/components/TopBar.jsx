@@ -27,7 +27,7 @@ const TopBar = ({ user, sidebarCollapsed, onToggleSidebar }) => {
         )}
         <button className="flex items-center gap-1.5 text-white font-semibold text-base hover:opacity-80 transition-opacity">
           <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-            SigmaGPT
+            Perplexity
           </span>
           <ChevronDownIcon className="w-4 h-4 text-[#8e8ea0]" />
         </button>
