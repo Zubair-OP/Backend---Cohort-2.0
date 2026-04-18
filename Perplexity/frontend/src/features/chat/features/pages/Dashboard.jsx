@@ -4,6 +4,8 @@ import { useChat } from "../hook/useChat";
 import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import ChatWelcome from "../components/ChatWelcome";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import MessageInput from "../components/MessageInput";
 
 const Dashboard = () => {
@@ -12,13 +14,15 @@ const Dashboard = () => {
     sidebarCollapsed, 
     setSidebarCollapsed,
     isLoading, 
+    streamingMessageId,
     messages, 
     currentChatId, 
     chats,
     handleDeleteChat, 
     handleSelectChat, 
     handleNewChat, 
-    handleSend 
+    handleSend,
+    handleStop,
   } = useChat();
 
   return (
@@ -47,14 +51,14 @@ const Dashboard = () => {
           ) : (
             <div className="flex-1 w-full max-w-[760px] mx-auto px-4 md:px-6 py-8 space-y-8">
               {messages.map((msg, i) => (
-                <Message key={i} message={msg} />
+                <Message key={msg.id || msg._id || i} message={msg} />
               ))}
-              {isLoading && <TypingIndicator />}
+              {isLoading && !streamingMessageId && <TypingIndicator />}
             </div>
           )}
         </main>
 
-        <MessageInput onSend={handleSend} isLoading={isLoading} />
+        <MessageInput onSend={handleSend} onStop={handleStop} isLoading={isLoading} />
       </div>
     </div>
   );
@@ -63,6 +67,7 @@ const Dashboard = () => {
 const Message = ({ message }) => {
   const isUser = message.role === "user";
   const sources = getSources(message);
+  const hasSources = sources.length > 0;
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
@@ -77,22 +82,26 @@ const Message = ({ message }) => {
         </div>
       ) : (
         <div className="max-w-[85%] pt-0.5">
-          <div className="mb-3">
-            <div className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#888888]">Sources</div>
-            <div className="flex flex-wrap gap-2">
-              {sources.map((source) => (
-                <div
-                  key={source}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#2a2a2a] bg-[#161616] px-3 py-1.5 text-xs text-[#d6d6d6]"
-                >
-                  <GlobeAltIcon className="w-3.5 h-3.5 text-[#20b2aa]" />
-                  <span>{source}</span>
-                </div>
-              ))}
+          {hasSources && (
+            <div className="mb-3">
+              <div className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-[#888888]">Sources</div>
+              <div className="flex flex-wrap gap-2">
+                {sources.map((source) => (
+                  <div
+                    key={source}
+                    className="inline-flex items-center gap-2 rounded-full border border-[#2a2a2a] bg-[#161616] px-3 py-1.5 text-xs text-[#d6d6d6]"
+                  >
+                    <GlobeAltIcon className="w-3.5 h-3.5 text-[#20b2aa]" />
+                    <span>{source}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="text-sm leading-7 text-[#f3f3f3] whitespace-pre-wrap">
-            {message.content}
+          )}
+          <div className="text-sm leading-7 text-[#f3f3f3] markdown-body">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
           </div>
         </div>
       )}
@@ -130,7 +139,7 @@ function getSources(message) {
     });
   }
 
-  return ["perplexity.ai", "docs.example.com", "research notes"];
+  return [];
 }
 
 export default Dashboard;

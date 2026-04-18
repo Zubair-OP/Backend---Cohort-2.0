@@ -1,15 +1,15 @@
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
-import { HumanMessage, SystemMessage, AIMessage,tool,createAgent } from "langchain"
+import { HumanMessage, SystemMessage, AIMessage, ToolMessage, tool } from "langchain"
 import * as z from "zod";
-import {internetSearch} from "./internet.services.js";
+import {internetSearch, isInternetSearchAvailable} from "./internet.services.js";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY?.trim();
-const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash-lite";
+const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
 function missingApiKeyError() {
-        const error = new Error("Missing GOOGLE_API_KEY in environment.");
-        error.status = 500;
-        return error;
+    const error = new Error("Missing GOOGLE_API_KEY in environment.");
+    error.status = 500;
+    return error;
 }
 
 function wrapAiError(error, context = "AI request failed") {
@@ -19,11 +19,23 @@ function wrapAiError(error, context = "AI request failed") {
         return friendlyError;
 }
 
-const geminiModel = new ChatGoogleGenerativeAI({
-    model: GEMINI_MODEL,
-    apiKey: GOOGLE_API_KEY,
-    temperature: 0.2,
-});
+let geminiModel = null;
+
+function getGeminiModel() {
+    if (!GOOGLE_API_KEY) {
+        throw missingApiKeyError();
+    }
+
+    if (!geminiModel) {
+        geminiModel = new ChatGoogleGenerativeAI({
+            model: GEMINI_MODEL,
+            apiKey: GOOGLE_API_KEY,
+            temperature: 0.2,
+        });
+    }
+
+    return geminiModel;
+}
 
 function toPlainText(result) {
     if (!result) return "";
@@ -51,6 +63,7 @@ function toPlainText(result) {
     return String(result.content ?? "").trim();
 }
 
+
 const searchTool = tool(
     internetSearch,
     {
@@ -62,10 +75,9 @@ const searchTool = tool(
     }
 )
 
-const agent = createAgent({
-    model: geminiModel,
-    tools: [searchTool],
-})
+function getAvailableTools() {
+    return isInternetSearchAvailable() ? [searchTool] : [];
+}
 
 export async function generateResponse(messages) {
     if (!GOOGLE_API_KEY) {
@@ -82,23 +94,155 @@ export async function generateResponse(messages) {
     });
 
     try {
-        const result = await agent.invoke({
-            messages: [
-                new SystemMessage(
-                    "You are a helpful assistant. Give accurate and concise answers. " +
-                    "For acronym questions, provide full form first and then one short explanation."
-                ),
-                ...chatContext,
-            ]
-        });
+        const tools = getAvailableTools();
+        const model = tools.length > 0 ? getGeminiModel().bindTools(tools) : getGeminiModel();
 
-        const response = result.messages[result.messages.length - 1];
+        const messagesToInvoke = [
+            new SystemMessage(
+                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers. ` +
+                "For acronym questions, provide full form first and then one short explanation. " +
+                (isInternetSearchAvailable()
+                    ? "Use the internet search tool only when up-to-date information is necessary."
+                    : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
+            ),
+            ...chatContext,
+        ];
 
-        return toPlainText(response);
+        let result = await model.invoke(messagesToInvoke);
+
+        if (result.tool_calls && result.tool_calls.length > 0) {
+            messagesToInvoke.push(result);
+            for (const tc of result.tool_calls) {
+                if (tc.name === "internet_search") {
+                    try {
+                        const searchOutput = await internetSearch({ query: tc.args.query });
+                        messagesToInvoke.push(new ToolMessage({
+                            tool_call_id: tc.id,
+                            content: searchOutput
+                        }));
+                    } catch (e) {
+                         messagesToInvoke.push(new ToolMessage({
+                            tool_call_id: tc.id,
+                            content: `Internet search failed: ${e.message}`
+                        }));
+                    }
+                }
+            }
+            result = await model.invoke(messagesToInvoke);
+        }
+
+        return toPlainText(result);
     } catch (error) {
         throw wrapAiError(error, `Failed to generate response with model ${GEMINI_MODEL}`);
     }
 
+}
+
+export async function streamResponse(messages, { onToken } = {}) {
+    if (!GOOGLE_API_KEY) {
+        throw missingApiKeyError();
+    }
+
+    const chatContext = messages.map((msg) => {
+        if (msg.role == "user") {
+            return new HumanMessage(msg.content);
+        } else if (msg.role == "ai") {
+            return new AIMessage(msg.content);
+        }
+        return new SystemMessage(msg.content);
+    });
+
+    let fullText = "";
+    let lastCompletedText = "";
+
+    try {
+        const tools = getAvailableTools();
+        const model = tools.length > 0 ? getGeminiModel().bindTools(tools) : getGeminiModel();
+
+        const messagesToStream = [
+            new SystemMessage(
+                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers. ` +
+                "For acronym questions, provide full form first and then one short explanation. " +
+                (isInternetSearchAvailable()
+                    ? "Use the internet search tool only when up-to-date information is necessary."
+                    : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
+            ),
+            ...chatContext,
+        ];
+
+        let stream = await model.stream(messagesToStream);
+        let toolCalls = [];
+
+        async function processStream(incomingStream) {
+            for await (const chunk of incomingStream) {
+                if (chunk.tool_calls && chunk.tool_calls.length > 0) {
+                    toolCalls.push(...chunk.tool_calls);
+                }
+
+                const chunkText = chunk.content;
+                if (chunkText && typeof chunkText === "string") {
+                    // Smooth streaming effect
+                    const chunkSize = 2;
+                    const delayMs = 15;
+                    for (let i = 0; i < chunkText.length; i += chunkSize) {
+                        const slice = chunkText.slice(i, i + chunkSize);
+                        fullText += slice;
+                        onToken?.(slice);
+                        await new Promise(resolve => setTimeout(resolve, delayMs));
+                    }
+                    lastCompletedText = fullText.trim();
+                }
+            }
+        }
+
+        await processStream(stream);
+
+        // If a tool was called, execute it and restart standard generation
+        if (toolCalls.length > 0) {
+            messagesToStream.push(new AIMessage({ content: "", tool_calls: toolCalls }));
+            for (const tc of toolCalls) {
+                if (tc.name === "internet_search") {
+                    try {
+                        onToken?.("\n\n*Searching the internet...*\n\n");
+                        const searchOutput = await internetSearch({ query: tc.args.query });
+                        messagesToStream.push(new ToolMessage({
+                            tool_call_id: tc.id,
+                            content: searchOutput
+                        }));
+                    } catch (e) {
+                         messagesToStream.push(new ToolMessage({
+                            tool_call_id: tc.id,
+                            content: `Internet search failed: ${e.message}`
+                        }));
+                    }
+                }
+            }
+            
+            toolCalls = []; // reset for second pass
+            const followUpStream = await model.stream(messagesToStream);
+            await processStream(followUpStream);
+        }
+
+        const streamedText = fullText.trim();
+        if (streamedText) {
+            return streamedText;
+        }
+
+        if (lastCompletedText) {
+            onToken?.(lastCompletedText);
+            return lastCompletedText;
+        }
+
+        const fallbackText = await generateResponse(messages);
+        if (fallbackText?.trim()) {
+            onToken?.(fallbackText);
+            return fallbackText.trim();
+        }
+
+        return "I could not generate a response right now.";
+    } catch (error) {
+        throw wrapAiError(error, `Failed to stream response with model ${GEMINI_MODEL}`);
+    }
 }
 
 export async function generateChatTitle(message) {
@@ -107,7 +251,7 @@ export async function generateChatTitle(message) {
     }
 
     try {
-        const response = await geminiModel.invoke([
+        const response = await getGeminiModel().invoke([
             new SystemMessage(`
                 You are a helpful assistant that generates concise and descriptive titles for chat conversations.
                 

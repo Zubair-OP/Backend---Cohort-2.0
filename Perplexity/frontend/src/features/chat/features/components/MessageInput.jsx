@@ -6,7 +6,7 @@ import {
   StopIcon,
 } from "@heroicons/react/24/outline";
 
-const MessageInput = ({ onSend, isLoading }) => {
+const MessageInput = ({ onSend, onStop, isLoading }) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef(null);
   const [isListening, setIsListening] = useState(false);
@@ -147,8 +147,9 @@ const MessageInput = ({ onSend, isLoading }) => {
           </button>
 
           <button
-            onClick={isLoading ? undefined : handleSend}
+            onClick={isLoading ? onStop : handleSend}
             disabled={!canSend && !isLoading}
+            title={isLoading ? "Stop generating" : "Send message"}
             className={`
               w-10 h-10 flex items-center justify-center rounded-full shrink-0 transition-all duration-150
               ${canSend || isLoading

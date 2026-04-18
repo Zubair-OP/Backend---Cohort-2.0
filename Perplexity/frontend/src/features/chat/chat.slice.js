@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   sidebarCollapsed: false,
   isLoading: false,
+  streamingMessageId: null,
   messages: [],
   currentChatId: null,
   selectedChat: null,
@@ -19,11 +20,21 @@ export const chatSlice = createSlice({
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    setStreamingMessageId: (state, action) => {
+      state.streamingMessageId = action.payload;
+    },
     setMessages: (state, action) => {
       state.messages = action.payload;
     },
     addMessage: (state, action) => {
       state.messages.push(action.payload);
+    },
+    updateMessageById: (state, action) => {
+      const { id, changes } = action.payload;
+      const message = state.messages.find((item) => item.id === id);
+      if (message) {
+        Object.assign(message, changes);
+      }
     },
     setCurrentChatId: (state, action) => {
       state.currentChatId = action.payload;
@@ -43,8 +54,10 @@ export const chatSlice = createSlice({
 export const { 
   setSidebarCollapsed, 
   setIsLoading, 
+  setStreamingMessageId,
   setMessages, 
   addMessage, 
+  updateMessageById,
   setCurrentChatId, 
   setSelectedChat, 
   setChats,
