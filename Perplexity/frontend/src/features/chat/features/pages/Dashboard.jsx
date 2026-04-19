@@ -7,6 +7,8 @@ import ChatWelcome from "../components/ChatWelcome";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import MessageInput from "../components/MessageInput";
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
 
 const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
@@ -99,7 +101,37 @@ const Message = ({ message }) => {
             </div>
           )}
           <div className="text-sm leading-7 text-[#f3f3f3] markdown-body">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code(props) {
+                  const { children, className, node, ...rest } = props;
+                  const match = /language-(\w+)/.exec(className || '');
+                  if (match && typeof children === 'string') {
+                    try {
+                      const highlighted = hljs.highlight(children.replace(/\n$/, ''), { language: match[1] }).value;
+                      return (
+                        <div className="my-4 rounded-xl border border-[#2a2a2a] bg-[#121212] overflow-hidden">
+                          <div className="flex items-center justify-between px-4 py-2 border-b border-[#2a2a2a] bg-[#1a1a1a]">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{match[1]}</span>
+                          </div>
+                          <pre className="p-4 overflow-x-auto text-sm leading-tight text-[#e0e0e0]">
+                            <code className={className} dangerouslySetInnerHTML={{ __html: highlighted }} />
+                          </pre>
+                        </div>
+                      );
+                    } catch (e) {
+                      // Fallback if language is not supported
+                    }
+                  }
+                  return (
+                    <code {...rest} className="bg-[#2a2a2a] text-[#ff79c6] px-1.5 py-0.5 rounded text-[13px] font-mono">
+                      {children}
+                    </code>
+                  );
+                }
+              }}
+            >
               {message.content}
             </ReactMarkdown>
           </div>

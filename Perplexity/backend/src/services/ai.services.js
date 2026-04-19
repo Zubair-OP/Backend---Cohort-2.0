@@ -99,7 +99,7 @@ export async function generateResponse(messages) {
 
         const messagesToInvoke = [
             new SystemMessage(
-                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers. ` +
+                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers with reasoning. ` +
                 "For acronym questions, provide full form first and then one short explanation. " +
                 (isInternetSearchAvailable()
                     ? "Use the internet search tool only when up-to-date information is necessary."
