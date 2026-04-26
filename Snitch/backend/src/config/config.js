@@ -30,6 +30,18 @@ if (!process.env.IMG_KIT_URL_ENDPOINT) {
   throw new Error("IMG_KIT_URL_ENDPOINT is not defined in environment variables");
 }
 
+if (!process.env.REDIS_HOST) {
+  throw new Error("REDIS_HOST is not defined in environment variables");
+}
+
+if (!process.env.REDIS_PORT) {
+  throw new Error("REDIS_PORT is not defined in environment variables");
+}
+
+if (!process.env.REDIS_PASSWORD) {
+  throw new Error("REDIS_PASSWORD is not defined in environment variables");
+}
+
 export const config = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
@@ -37,5 +49,8 @@ export const config = {
   GOOGLE_CLIENT_SECRET:process.env.GOOGLE_CLIENT_SECRET,
   IMG_KIT_PRIVATE_KEY: process.env.IMG_KIT_PRIVATE_KEY,
   IMG_KIT_PUBLIC_KEY: process.env.IMG_KIT_PUBLIC_KEY,
-  IMG_KIT_URL_ENDPOINT: process.env.IMG_KIT_URL_ENDPOINT
+  IMG_KIT_URL_ENDPOINT: process.env.IMG_KIT_URL_ENDPOINT,
+  REDIS_HOST: process.env.REDIS_HOST,
+  REDIS_PORT: process.env.REDIS_PORT,
+  REDIS_PASSWORD: process.env.REDIS_PASSWORD,
 };

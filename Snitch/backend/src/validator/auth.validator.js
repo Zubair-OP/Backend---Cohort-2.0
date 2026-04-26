@@ -22,8 +22,8 @@ export const registerValidator = [
   body("contact")
     .notEmpty()
     .withMessage("Contact number is required")
-    .isLength({ min: 10, max: 15 })
-    .withMessage("Contact number must be between 10 and 15 characters long"),
+    .isLength({ min: 10, max: 12 })
+    .withMessage("Contact number must be between 10 and 12 characters long"),
   body("isSeller").isBoolean().withMessage("isSeller must be a boolean"),
 
   validateRequest,

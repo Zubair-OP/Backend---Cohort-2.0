@@ -1,6 +1,7 @@
 import usermodel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import redis from "../config/cache.js";
 
 async function tokenResponse(user, res, message) {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -107,7 +108,7 @@ export const googleCallBack = async (req, res) => {
   }
 };
 
-const logout = async (req, res) => {
+export const logout = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -121,7 +122,7 @@ const logout = async (req, res) => {
   return res.status(200).json({ message: "User logged out successfully" });
 };
 
-const getme = async (req, res) => {
+export const getme = async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
 
