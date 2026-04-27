@@ -79,9 +79,9 @@ export const googleCallBack = async (req, res) => {
     const email = emails[0].value;
     const ProfilePic = photos[0].value;
 
-    const user = await userModel.findOne({ email });
+    let user = await usermodel.findOne({ email });
 
-    if (user) {
+    if (!user) {
       user = await usermodel.create({
         fullname: displayName,
         email: email,
@@ -93,7 +93,7 @@ export const googleCallBack = async (req, res) => {
       {
         id: user._id,
       },
-      config.JWT_SECRET,
+      process.env.JWT_SECRET || config.JWT_SECRET,
       {
         expiresIn: "7d",
       },
@@ -124,14 +124,17 @@ export const logout = async (req, res) => {
 
 export const getme = async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id);
+    const user = await usermodel.findById(req.user.id);
 
     return res.status(200).json({
       message: "User retrieved successfully",
       success: true,
       user: {
-        username: user.username,
+        id: user._id,
+        fullname: user.fullname,
         email: user.email,
+        contact: user.contact,
+        role: user.role
       },
     });
   } catch (error) {

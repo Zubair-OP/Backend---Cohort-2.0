@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useAuth } from "../hook/useAuth";
 import { useNavigate } from 'react-router';
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const { handleLogin } = useAuth();
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [formError, setFormError] = useState('');
 
     const [formData, setFormData] = useState({
         email: '',
@@ -15,15 +19,37 @@ const Login = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        setErrors(prev => ({ ...prev, [name]: '' }));
+        setFormError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleLogin({
-            email: formData.email,
-            password: formData.password
-        });
-        navigate("/");
+        try {
+            setIsSubmitting(true);
+            setErrors({});
+            setFormError('');
+            const user = await handleLogin({
+                email: formData.email,
+                password: formData.password
+            });
+
+            toast.success('Signed in successfully.');
+            
+            // Check the user object returned from handleLogin for their role
+            if (user.role === 'seller') {
+                navigate("/Dashboard");
+            } else {
+                navigate("/");
+            }
+        } catch (error) {
+            console.error("Login failed:", error);
+            setErrors(error.fieldErrors || {});
+            setFormError(error.message || 'Unable to sign in.');
+            toast.error(error.message || 'Unable to sign in.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const inputStyle = {
@@ -138,7 +164,13 @@ const Login = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.email ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.email}
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Password */}
@@ -167,12 +199,25 @@ const Login = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.password ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.password}
+                                    </p>
+                                ) : null}
                             </div>
+
+                            {formError ? (
+                                <p className="text-[11px] leading-5" style={{ color: '#b64848' }}>
+                                    {formError}
+                                </p>
+                            ) : null}
 
                             {/* Sign In Button */}
                             <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 mt-3"
                                 style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
                                 onMouseEnter={e => {
@@ -184,7 +229,7 @@ const Login = () => {
                                     e.currentTarget.style.color = '#fbf9f6';
                                 }}
                             >
-                                Sign In
+                                {isSubmitting ? 'Signing In...' : 'Sign In'}
                             </button>
 
                             {/* Divider */}

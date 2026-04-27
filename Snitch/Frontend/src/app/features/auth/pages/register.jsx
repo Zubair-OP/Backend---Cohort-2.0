@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useAuth } from "../hook/useAuth";
 import { useNavigate } from 'react-router';
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
+import { toast } from 'react-toastify';
 
 const Register = () => {
     const { handleRegister } = useAuth();
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [formError, setFormError] = useState('');
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -18,18 +22,25 @@ const Register = () => {
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        setErrors(prev => ({ ...prev, [name]: '' }));
+        setFormError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await handleRegister({
+            setIsSubmitting(true);
+            setErrors({});
+            setFormError('');
+            const response = await handleRegister({
                 email: formData.email,
                 contact: formData.contactNumber,
                 password: formData.password,
                 isSeller: formData.isSeller,
                 fullname: formData.fullName
             });
+
+            toast.success(response?.message || 'Account created successfully.');
 
             if (formData.isSeller === true) {
                 navigate("/Dashboard");
@@ -38,7 +49,11 @@ const Register = () => {
             }
         } catch (error) {
             console.error("Registration failed:", error);
-            // Allow the backend errors to be handled properly instead of crashing the page
+            setErrors(error.fieldErrors || {});
+            setFormError(error.message || 'Unable to create account.');
+            toast.error(error.message || 'Unable to create account.');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -154,7 +169,13 @@ const Register = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.fullName ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.fullName}
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Contact Number */}
@@ -178,7 +199,13 @@ const Register = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.contactNumber ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.contactNumber}
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Email */}
@@ -202,7 +229,13 @@ const Register = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.email ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.email}
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Password */}
@@ -226,7 +259,13 @@ const Register = () => {
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
+                                    disabled={isSubmitting}
                                 />
+                                {errors.password ? (
+                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                        {errors.password}
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Register as Seller — minimal checkbox */}
@@ -242,6 +281,7 @@ const Register = () => {
                                         checked={formData.isSeller}
                                         onChange={handleChange}
                                         className="peer sr-only"
+                                        disabled={isSubmitting}
                                     />
                                     {/* Custom checkbox */}
                                     <div
@@ -266,9 +306,16 @@ const Register = () => {
                                 </span>
                             </label>
 
+                            {formError ? (
+                                <p className="text-[11px] leading-5" style={{ color: '#b64848' }}>
+                                    {formError}
+                                </p>
+                            ) : null}
+
                             {/* Sign Up Button */}
                             <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="w-full py-2 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 mt-1"
                                 style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
                                 onMouseEnter={e => {
@@ -280,7 +327,7 @@ const Register = () => {
                                     e.currentTarget.style.color = '#fbf9f6';
                                 }}
                             >
-                                Sign Up
+                                {isSubmitting ? 'Signing Up...' : 'Sign Up'}
                             </button>
 
                             {/* Divider */}

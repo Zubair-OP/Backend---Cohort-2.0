@@ -10,7 +10,7 @@ const upload = multer({
     limits: { fileSize: 7 * 1024 * 1024 },
 })
 
-router.post('/add', authenticateSeller, upload.array('images', 5), addProduct);
+router.post('/add', authenticateSeller, upload.array('images', 7), addProduct);
 router.get('/list',authenticateSeller,getAllProducts)
 router.get('/user-list',getAllProductslist)
 router.get('/details/:id',getProductById)

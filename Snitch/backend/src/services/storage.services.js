@@ -7,11 +7,17 @@ const client = new ImageKit({
     urlEndpoint: config.IMG_KIT_URL_ENDPOINT.trim()
 });
 
+export function uploadImage(fileInput, folder="snitch") {
+  const buffer = Buffer.isBuffer(fileInput) ? fileInput : fileInput?.buffer;
+  const fileName = fileInput?.originalname || 'image.jpg';
 
-export function uploadImage(buffer, folder="snitch") {
+  if (!buffer) {
+    throw new Error('A valid image buffer is required for upload.');
+  }
+
   return client.upload({
     file: buffer.toString('base64'),
-    fileName: 'image.jpg',
+    fileName,
     folder,
   });
 }

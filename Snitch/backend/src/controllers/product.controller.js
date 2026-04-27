@@ -13,9 +13,7 @@ export const addProduct = async (req, res) => {
 
     const images = await Promise.all(
       files.map(async (image) => {
-        const uploadedImage = await uploadImage({
-          buffer: image.buffer,
-        });
+        const uploadedImage = await uploadImage(image);
 
         return {
           url: uploadedImage.url,
