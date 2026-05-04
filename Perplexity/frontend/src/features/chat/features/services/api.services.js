@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "http://localhost:3000/api",
+    baseURL: "https://perplexity-ues0.onrender.com/api",
     withCredentials: true,
 });
 
@@ -18,7 +18,7 @@ export const sendMessage = async (message, chatId) => {
  * @param {AbortSignal} signal      - AbortController signal for "Stop generating"
  */
 export const streamMessage = async (message, chatId, handlers = {}, signal = null) => {
-    const response = await fetch("http://localhost:3000/api/chats/message/stream", {
+    const response = await fetch("https://perplexity-ues0.onrender.com/api/chats/message/stream", {
         method: "POST",
         credentials: "include",
         headers: {
