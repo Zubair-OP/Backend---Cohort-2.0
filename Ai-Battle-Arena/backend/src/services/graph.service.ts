@@ -84,6 +84,5 @@ export default async function (problem: string) {
     const result = await graph.invoke({
         problem: problem
     })
-
     return result
 }
