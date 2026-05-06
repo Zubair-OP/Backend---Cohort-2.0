@@ -3,6 +3,8 @@ import {
   createProduct,
   getProductById,
   getallProductslistUser,
+  addVariant,
+  updateVariantStock,
 } from "../services/product.Api";
 
 import {
