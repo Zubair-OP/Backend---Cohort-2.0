@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://backend-cohort-2-0-hftg.onrender.com",
+  baseURL: "https://backend-cohort-2-0-1-lawp.onrender.com",
   withCredentials: true,
 });
 
