@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const Api = axios.create({
-  baseURL: "https://perplexity-ues0.onrender.com",
+  baseURL: "https://perplexity-2-pb86.onrender.com",
   withCredentials: true,
 })
 
