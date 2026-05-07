@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_API_URL || "https://perplexity-2-pb86.onrender.com";
+
 const API = axios.create({
-    baseURL: "https://perplexity-2-pb86.onrender.com/api",
+    baseURL: `${BASE_URL}/api`,
     withCredentials: true,
 });
 
@@ -18,7 +20,7 @@ export const sendMessage = async (message, chatId) => {
  * @param {AbortSignal} signal      - AbortController signal for "Stop generating"
  */
 export const streamMessage = async (message, chatId, handlers = {}, signal = null) => {
-    const response = await fetch("https://perplexity-2-pb86.onrender.com/api/chats/message/stream", {
+    const response = await fetch(`${BASE_URL}/api/chats/message/stream`, {
         method: "POST",
         credentials: "include",
         headers: {

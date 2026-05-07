@@ -1,13 +1,13 @@
-import { ChatGoogleGenerativeAI } from '@langchain/google-genai'
+import { ChatGroq } from '@langchain/groq'
 import { HumanMessage, SystemMessage, AIMessage, ToolMessage, tool } from "langchain"
 import * as z from "zod";
 import {internetSearch, isInternetSearchAvailable} from "./internet.services.js";
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY?.trim();
-const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
+const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile";
 
 function missingApiKeyError() {
-    const error = new Error("Missing GOOGLE_API_KEY in environment.");
+    const error = new Error("Missing GROQ_API_KEY in environment.");
     error.status = 500;
     return error;
 }
@@ -19,22 +19,22 @@ function wrapAiError(error, context = "AI request failed") {
         return friendlyError;
 }
 
-let geminiModel = null;
+let groqModel = null;
 
-function getGeminiModel() {
-    if (!GOOGLE_API_KEY) {
+function getGroqModel() {
+    if (!GROQ_API_KEY) {
         throw missingApiKeyError();
     }
 
-    if (!geminiModel) {
-        geminiModel = new ChatGoogleGenerativeAI({
-            model: GEMINI_MODEL,
-            apiKey: GOOGLE_API_KEY,
+    if (!groqModel) {
+        groqModel = new ChatGroq({
+            model: GROQ_MODEL,
+            apiKey: GROQ_API_KEY,
             temperature: 0.2,
         });
     }
 
-    return geminiModel;
+    return groqModel;
 }
 
 function toPlainText(result) {
@@ -80,7 +80,7 @@ function getAvailableTools() {
 }
 
 export async function generateResponse(messages) {
-    if (!GOOGLE_API_KEY) {
+    if (!GROQ_API_KEY) {
         throw missingApiKeyError();
     }
 
@@ -95,7 +95,7 @@ export async function generateResponse(messages) {
 
     try {
         const tools = getAvailableTools();
-        const model = tools.length > 0 ? getGeminiModel().bindTools(tools) : getGeminiModel();
+        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
 
         const messagesToInvoke = [
             new SystemMessage(
@@ -133,13 +133,13 @@ export async function generateResponse(messages) {
 
         return toPlainText(result);
     } catch (error) {
-        throw wrapAiError(error, `Failed to generate response with model ${GEMINI_MODEL}`);
+        throw wrapAiError(error, `Failed to generate response with model ${GROQ_MODEL}`);
     }
 
 }
 
 export async function streamResponse(messages, { onToken } = {}) {
-    if (!GOOGLE_API_KEY) {
+    if (!GROQ_API_KEY) {
         throw missingApiKeyError();
     }
 
@@ -157,7 +157,7 @@ export async function streamResponse(messages, { onToken } = {}) {
 
     try {
         const tools = getAvailableTools();
-        const model = tools.length > 0 ? getGeminiModel().bindTools(tools) : getGeminiModel();
+        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
 
         const messagesToStream = [
             new SystemMessage(
@@ -241,17 +241,17 @@ export async function streamResponse(messages, { onToken } = {}) {
 
         return "I could not generate a response right now.";
     } catch (error) {
-        throw wrapAiError(error, `Failed to stream response with model ${GEMINI_MODEL}`);
+        throw wrapAiError(error, `Failed to stream response with model ${GROQ_MODEL}`);
     }
 }
 
 export async function generateChatTitle(message) {
-    if (!GOOGLE_API_KEY) {
+    if (!GROQ_API_KEY) {
         throw missingApiKeyError();
     }
 
     try {
-        const response = await getGeminiModel().invoke([
+        const response = await getGroqModel().invoke([
             new SystemMessage(`
                 You are a helpful assistant that generates concise and descriptive titles for chat conversations.
                 
@@ -265,7 +265,7 @@ export async function generateChatTitle(message) {
 
         return toPlainText(response);
     } catch (error) {
-        throw wrapAiError(error, `Failed to generate chat title with model ${GEMINI_MODEL}`);
+        throw wrapAiError(error, `Failed to generate chat title with model ${GROQ_MODEL}`);
     }
 
 }
