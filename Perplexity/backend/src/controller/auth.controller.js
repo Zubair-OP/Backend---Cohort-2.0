@@ -14,9 +14,26 @@ function getCookieOptions() {
     };
 }
 
+function getBackendUrl(req) {
+    return process.env.BACKEND_URL || `${req.protocol}://${req.get("host")}`;
+}
+
+function getFrontendUrl(value) {
+    const fallbackUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+    try {
+        const url = new URL(value || fallbackUrl);
+        return url.origin;
+    } catch {
+        return fallbackUrl;
+    }
+}
+
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        const verificationUrlBase = getBackendUrl(req);
+        const frontendUrl = getFrontendUrl(req.get("origin"));
 
         const normalizedEmail = email.toLowerCase().trim();
         const IsUserAlreadyExists = await userModel.findOne({
@@ -41,7 +58,9 @@ export const register = async (req, res) => {
 
         const emailVerificationToken = jwt.sign({
         email: user.email,
+        frontendUrl,
         }, process.env.JWT_SECRET)
+        const verificationUrl = `${verificationUrlBase}/api/auth/verify-email?token=${emailVerificationToken}`;
 
         let emailSent = false;
         try {
@@ -49,12 +68,20 @@ export const register = async (req, res) => {
                 to: user.email,
                 subject: "Welcome to Perplexity!",
                 html: `
-                    <p>Hi ${username},</p>
-                    <p>Thank you for registering at <strong>Perplexity</strong>. We're excited to have you on board!</p>
-                    <p>Please verify your email address by clicking the link below:</p>
-                    <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
-                    <p>If you did not create an account, please ignore this email.</p>
-                    <p>Best regards,<br>The Perplexity Team</p>
+                    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; color: #1f2937;">
+                        <h2 style="margin-bottom: 16px;">Welcome to Perplexity, ${username}!</h2>
+                        <p style="margin-bottom: 16px;">Thank you for registering. Please verify your email address to activate your account.</p>
+                        <div style="margin: 24px 0;">
+                            <a href="${verificationUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600;">
+                                Verify Email
+                            </a>
+                        </div>
+                        <p style="margin-bottom: 8px;">If the button does not work, copy and paste this link into your browser:</p>
+                        <p style="word-break: break-all; margin-bottom: 16px;">
+                            <a href="${verificationUrl}" style="color: #2563eb;">${verificationUrl}</a>
+                        </p>
+                        <p style="margin-bottom: 0;">If you did not create an account, you can safely ignore this email.</p>
+                    </div>
                 `,
             });
             emailSent = true;
@@ -103,10 +130,15 @@ export const verifyEmail = async (req, res) => {
         user.verified = true;
         await user.save();
     
+        const loginUrl = `${getFrontendUrl(decoded.frontendUrl)}/login`;
         const html = `
-            <h1>Email Verified Successfully!</h1>
-            <p>Your email has been verified. You can now log in to your account.</p>
-            <a href="http://localhost:3000/login">Go to Login</a>
+            <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 40px auto; padding: 24px; color: #1f2937; text-align: center;">
+                <h1 style="margin-bottom: 16px;">Email Verified Successfully</h1>
+                <p style="margin-bottom: 24px;">Your email has been verified. You can now log in to your account.</p>
+                <a href="${loginUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600;">
+                    Go to Login
+                </a>
+            </div>
         `;
         return res.send(html);
     } catch (error) {
@@ -209,4 +241,3 @@ export const logout = async (req, res) => {
         message: 'Logout successful'
     });
 }
-

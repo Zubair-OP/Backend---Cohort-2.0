@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "https://perplexity-2-pb86.onrender.com";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const API = axios.create({
     baseURL: `${BASE_URL}/api`,

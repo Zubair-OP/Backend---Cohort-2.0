@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const Api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://perplexity-2-pb86.onrender.com",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
   withCredentials: true,
 })
 
@@ -38,11 +38,9 @@ export const getCurrentUser = async () => {
     const response = await Api.get("/api/auth/get-me")
     return response.data
   } catch (error) {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 404) {
       return { user: null }
     }
     throw new Error(getApiErrorMessage(error, "Failed to fetch current user"))
   }
 }
-
-

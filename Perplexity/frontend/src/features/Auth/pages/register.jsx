@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import './auth.css'
-import { useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
 import { useSelector } from 'react-redux'
 
@@ -11,9 +10,9 @@ const Register = () => {
     email: '',
     password: ''
   })
+  const [registrationComplete, setRegistrationComplete] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
-
-  const navigate = useNavigate()
   const { handleRegister } = useAuth()
   const { error, loading } = useSelector((state) => state.auth)
 
@@ -30,7 +29,13 @@ const Register = () => {
 
     const result = await handleRegister(formData.username, formData.email, formData.password)
     if (result.success) {
-      navigate('/login')
+      setRegisteredEmail(formData.email)
+      setRegistrationComplete(true)
+      setFormData({
+        username: '',
+        email: '',
+        password: ''
+      })
     }
   }
     
@@ -39,7 +44,11 @@ const Register = () => {
     <section className="auth-page">
       <div className="auth-card">
         <h1 className="auth-title">Create Account</h1>
-        <p className="auth-subtitle">Join and get started</p>
+        <p className="auth-subtitle">
+          {registrationComplete
+            ? `Verification email sent to ${registeredEmail}. Please verify first, then sign in.`
+            : 'Join and get started'}
+        </p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <label className="auth-label" htmlFor="register-username">Username</label>
@@ -79,9 +88,14 @@ const Register = () => {
           />
 
           {error && <p className="auth-error">{error}</p>}
+          {registrationComplete && !error && (
+            <p className="auth-success">
+              We have sent a verification email to {registeredEmail}. Stay on this page until you verify your email.
+            </p>
+          )}
 
           <button className="auth-button" type="submit" disabled={loading}>
-            Create Account
+            {registrationComplete ? 'Send Again With New Account' : 'Create Account'}
           </button>
         </form>
 

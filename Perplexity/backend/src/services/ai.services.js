@@ -19,6 +19,7 @@ function wrapAiError(error, context = "AI request failed") {
         return friendlyError;
 }
 
+
 let groqModel = null;
 
 function getGroqModel() {

@@ -7,11 +7,10 @@ import { initSocket } from './src/sockets/server.socket.js';
 
 const httpserver = http.createServer(app);
 initSocket(httpserver)
-const PORT = Number(process.env.PORT) || 3000;
 
 connectDB();
 
-httpserver.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+httpserver.listen(3000, () => {
+  console.log(`Server is running on port 3000`);
 });
 

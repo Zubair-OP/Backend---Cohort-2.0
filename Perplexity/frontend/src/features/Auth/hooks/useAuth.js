@@ -42,6 +42,7 @@ export function useAuth() {
     const fetchCurrentUser = async () => {
         try {
             dispatch(setLoading(true))
+            dispatch(setError(null))
             const response = await getCurrentUser()
             dispatch(setUser(response.user || null))
             dispatch(setError(null))

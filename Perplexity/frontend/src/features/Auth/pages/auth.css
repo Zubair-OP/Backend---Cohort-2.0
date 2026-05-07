@@ -111,6 +111,13 @@
   font-size: 0.84rem;
 }
 
+.auth-success {
+  margin: 8px 0 0;
+  color: #8fe3d7;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
 .auth-footer {
   margin-top: 22px;
   color: var(--auth-text-muted);
