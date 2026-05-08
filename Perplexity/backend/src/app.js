@@ -20,8 +20,10 @@ app.use(morgan('dev'))
 // Routes
 import authRoutes from './routes/auth.routes.js';
 import chatRoutes from './routes/chat.routes.js';
+import transcribeRoutes from './routes/transcribe.routes.js';
 
 app.use('/api/chats', chatRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/transcribe', transcribeRoutes);
 
 export default app;

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useVoiceRecorder } from "../hook/useVoiceRecorder.js";
 import {
   PaperAirplaneIcon,
   MicrophoneIcon,
@@ -9,130 +9,36 @@ import {
 
 const MessageInput = ({ onSend, onStop, isLoading }) => {
   const [message, setMessage] = useState("");
-  const [speechError, setSpeechError] = useState("");
-  const [speechStatus, setSpeechStatus] = useState("");
   const textareaRef = useRef(null);
-  const typedPrefixRef = useRef("");
 
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-    isMicrophoneAvailable,
-  } = useSpeechRecognition();
+  const handleTranscript = useCallback((text) => {
+    if (!text) return;
+    setMessage((prev) => {
+      const base = prev.trim();
+      return base ? `${base} ${text}` : text;
+    });
+  }, []);
+
+  const { recording, transcribing, error, toggle } = useVoiceRecorder({
+    onTranscript: handleTranscript,
+  });
 
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
-
     ta.style.height = "auto";
     ta.style.height = `${Math.min(ta.scrollHeight, 200)}px`;
   }, [message]);
 
-  useEffect(() => {
-    if (!browserSupportsSpeechRecognition) {
-      setSpeechError("Voice input is not supported in this browser. Please use Chrome or Edge.");
-      return;
-    }
-
-    if (isMicrophoneAvailable === false) {
-      setSpeechError("Microphone access is blocked. Allow microphone permission and try again.");
-      return;
-    }
-
-    if (!listening) {
-      setSpeechStatus("");
-      return;
-    }
-
-    const nextMessage = [typedPrefixRef.current.trim(), transcript.trim()]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-
-    setMessage(nextMessage);
-    setSpeechError("");
-    setSpeechStatus(transcript.trim() ? "Voice detected." : "Listening... start speaking.");
-  }, [transcript, listening, browserSupportsSpeechRecognition, isMicrophoneAvailable]);
-
-  useEffect(() => {
-    return () => {
-      SpeechRecognition.stopListening();
-    };
-  }, []);
-
-  const handleStartListening = async () => {
-    if (!browserSupportsSpeechRecognition) {
-      setSpeechError("Voice input is not supported in this browser. Please use Chrome or Edge.");
-      return;
-    }
-
-    if (isMicrophoneAvailable === false) {
-      setSpeechError("Microphone access is blocked. Allow microphone permission and try again.");
-      return;
-    }
-
-    typedPrefixRef.current = message.trim();
-    resetTranscript();
-    setSpeechError("");
-    setSpeechStatus("Listening... start speaking.");
-
-    try {
-      await SpeechRecognition.startListening({
-        continuous: true,
-        language: "en-US",
-      });
-    } catch (error) {
-      console.error("Voice input could not start:", error);
-      setSpeechStatus("");
-      setSpeechError("Voice input could not start. Please try again.");
-    }
-  };
-
-  const handleStopListening = async () => {
-    try {
-      await SpeechRecognition.stopListening();
-      setSpeechStatus(transcript.trim() ? "Voice captured." : "");
-    } catch (error) {
-      console.error("Voice input could not stop:", error);
-    }
-  };
-
-  const toggleListening = async () => {
-    if (listening) {
-      await handleStopListening();
-      return;
-    }
-
-    await handleStartListening();
-  };
-
   const handleInput = (event) => {
-    const nextValue = event.target.value;
-    setMessage(nextValue);
-    setSpeechError("");
-
-    if (!listening) {
-      typedPrefixRef.current = nextValue.trim();
-    }
+    setMessage(event.target.value);
   };
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const trimmed = message.trim();
     if (!trimmed || isLoading) return;
-
-    if (listening) {
-      await handleStopListening();
-    }
-
     onSend?.(trimmed);
     setMessage("");
-    setSpeechError("");
-    setSpeechStatus("");
-    typedPrefixRef.current = "";
-    resetTranscript();
-
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
@@ -146,6 +52,24 @@ const MessageInput = ({ onSend, onStop, isLoading }) => {
   };
 
   const canSend = message.trim().length > 0 && !isLoading;
+
+  const statusText =
+    error === "permission-denied"
+      ? "Microphone access blocked. Allow permission and try again."
+      : error === "not-supported"
+      ? "Voice recording is not supported in this browser."
+      : error === "transcription-failed"
+      ? "Transcription failed. Please try again."
+      : error === "mic-error"
+      ? "Could not access microphone. Check your device."
+      : transcribing
+      ? "Transcribing your voice..."
+      : recording
+      ? "Recording... click mic again to stop."
+      : "AI can make mistakes. Consider checking important info.";
+
+  const isError = Boolean(error);
+  const isStatus = !error && (recording || transcribing);
 
   return (
     <div className="sticky bottom-0 w-full px-4 md:px-6 pb-4 pt-3 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent">
@@ -170,18 +94,24 @@ const MessageInput = ({ onSend, onStop, isLoading }) => {
 
           <button
             type="button"
-            onClick={toggleListening}
-            disabled={!browserSupportsSpeechRecognition}
+            onClick={toggle}
+            disabled={transcribing}
             className={`transition-colors duration-150 flex items-center justify-center shrink-0 w-9 h-9 rounded-full ${
-              listening
+              recording
                 ? "bg-red-500/10 hover:bg-red-500/20 text-red-400"
-                : browserSupportsSpeechRecognition
-                  ? "text-[#888888] hover:text-white hover:bg-[#1f1f1f]"
-                  : "text-[#555555] cursor-not-allowed"
+                : transcribing
+                ? "text-[#555555] cursor-not-allowed"
+                : "text-[#888888] hover:text-white hover:bg-[#1f1f1f]"
             }`}
-            title={listening ? "Stop voice input" : "Start voice input"}
+            title={
+              recording
+                ? "Stop recording"
+                : transcribing
+                ? "Transcribing..."
+                : "Start voice input"
+            }
           >
-            {listening ? (
+            {recording ? (
               <div className="flex items-center gap-[2px] h-4 justify-center">
                 <style>{`
                   @keyframes soundWave {
@@ -200,6 +130,8 @@ const MessageInput = ({ onSend, onStop, isLoading }) => {
                 <div className="w-[2.5px] bg-red-500 rounded-full bar-4"></div>
                 <div className="w-[2.5px] bg-red-500 rounded-full bar-5"></div>
               </div>
+            ) : transcribing ? (
+              <div className="w-4 h-4 border-2 border-[#20b2aa] border-t-transparent rounded-full animate-spin" />
             ) : (
               <MicrophoneIcon className="w-5 h-5" />
             )}
@@ -226,10 +158,16 @@ const MessageInput = ({ onSend, onStop, isLoading }) => {
           </button>
         </div>
 
-        <p className={`text-center text-[10px] mt-2 ${
-          speechError ? "text-[#ff8d8d]" : speechStatus ? "text-[#8fe3d7]" : "text-[#666666]"
-        }`}>
-          {speechError || speechStatus || "AI can make mistakes. Consider checking important info."}
+        <p
+          className={`text-center text-[10px] mt-2 ${
+            isError
+              ? "text-[#ff8d8d]"
+              : isStatus
+              ? "text-[#8fe3d7]"
+              : "text-[#666666]"
+          }`}
+        >
+          {statusText}
         </p>
       </div>
     </div>

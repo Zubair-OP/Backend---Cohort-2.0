@@ -4,7 +4,10 @@ import * as z from "zod";
 import {internetSearch, isInternetSearchAvailable} from "./internet.services.js";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
-const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "llama-3.3-70b-versatile";
+const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "meta-llama/llama-4-scout-17b-16e-instruct";
+
+// Keep only last N messages to avoid token limit errors on long conversations
+const MAX_HISTORY_MESSAGES = 12;
 
 function missingApiKeyError() {
     const error = new Error("Missing GROQ_API_KEY in environment.");
@@ -80,12 +83,13 @@ function getAvailableTools() {
     return isInternetSearchAvailable() ? [searchTool] : [];
 }
 
-export async function generateResponse(messages) {
-    if (!GROQ_API_KEY) {
-        throw missingApiKeyError();
-    }
+function trimMessages(messages) {
+    if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
+    return messages.slice(-MAX_HISTORY_MESSAGES);
+}
 
-    const chatContext = messages.map((msg) => {
+function buildChatContext(messages) {
+    return trimMessages(messages).map((msg) => {
         if (msg.role == "user") {
             return new HumanMessage(msg.content);
         } else if (msg.role == "ai") {
@@ -93,21 +97,29 @@ export async function generateResponse(messages) {
         }
         return new SystemMessage(msg.content);
     });
+}
+
+function buildSystemPrompt() {
+    return new SystemMessage(
+        `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers with reasoning. ` +
+        "For acronym questions, provide full form first and then one short explanation. " +
+        (isInternetSearchAvailable()
+            ? "Use the internet search tool only when up-to-date information is necessary."
+            : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
+    );
+}
+
+export async function generateResponse(messages) {
+    if (!GROQ_API_KEY) {
+        throw missingApiKeyError();
+    }
+
+    const chatContext = buildChatContext(messages);
+    const messagesToInvoke = [buildSystemPrompt(), ...chatContext];
 
     try {
         const tools = getAvailableTools();
         const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
-
-        const messagesToInvoke = [
-            new SystemMessage(
-                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers with reasoning. ` +
-                "For acronym questions, provide full form first and then one short explanation. " +
-                (isInternetSearchAvailable()
-                    ? "Use the internet search tool only when up-to-date information is necessary."
-                    : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
-            ),
-            ...chatContext,
-        ];
 
         let result = await model.invoke(messagesToInvoke);
 
@@ -144,34 +156,12 @@ export async function streamResponse(messages, { onToken } = {}) {
         throw missingApiKeyError();
     }
 
-    const chatContext = messages.map((msg) => {
-        if (msg.role == "user") {
-            return new HumanMessage(msg.content);
-        } else if (msg.role == "ai") {
-            return new AIMessage(msg.content);
-        }
-        return new SystemMessage(msg.content);
-    });
+    const chatContext = buildChatContext(messages);
 
     let fullText = "";
     let lastCompletedText = "";
-
-    try {
-        const tools = getAvailableTools();
-        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
-
-        const messagesToStream = [
-            new SystemMessage(
-                `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers. ` +
-                "For acronym questions, provide full form first and then one short explanation. " +
-                (isInternetSearchAvailable()
-                    ? "Use the internet search tool only when up-to-date information is necessary."
-                    : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
-            ),
-            ...chatContext,
-        ];
-
-        let stream = await model.stream(messagesToStream);
+    const streamPlainText = async (model, messagesToStream) => {
+        const stream = await model.stream(messagesToStream);
         let toolCalls = [];
 
         async function processStream(incomingStream) {
@@ -182,7 +172,6 @@ export async function streamResponse(messages, { onToken } = {}) {
 
                 const chunkText = chunk.content;
                 if (chunkText && typeof chunkText === "string") {
-                    // Smooth streaming effect
                     const chunkSize = 2;
                     const delayMs = 15;
                     for (let i = 0; i < chunkText.length; i += chunkSize) {
@@ -198,7 +187,6 @@ export async function streamResponse(messages, { onToken } = {}) {
 
         await processStream(stream);
 
-        // If a tool was called, execute it and restart standard generation
         if (toolCalls.length > 0) {
             messagesToStream.push(new AIMessage({ content: "", tool_calls: toolCalls }));
             for (const tc of toolCalls) {
@@ -211,18 +199,24 @@ export async function streamResponse(messages, { onToken } = {}) {
                             content: searchOutput
                         }));
                     } catch (e) {
-                         messagesToStream.push(new ToolMessage({
+                        messagesToStream.push(new ToolMessage({
                             tool_call_id: tc.id,
                             content: `Internet search failed: ${e.message}`
                         }));
                     }
                 }
             }
-            
-            toolCalls = []; // reset for second pass
+
             const followUpStream = await model.stream(messagesToStream);
             await processStream(followUpStream);
         }
+    };
+
+    try {
+        const tools = getAvailableTools();
+        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
+        const messagesToStream = [buildSystemPrompt(), ...chatContext];
+        await streamPlainText(model, messagesToStream);
 
         const streamedText = fullText.trim();
         if (streamedText) {
@@ -253,15 +247,11 @@ export async function generateChatTitle(message) {
 
     try {
         const response = await getGroqModel().invoke([
-            new SystemMessage(`
-                You are a helpful assistant that generates concise and descriptive titles for chat conversations.
-                
-                User will provide you with the first message of a chat conversation, and you will generate a title that captures the essence of the conversation in 2-4 words. The title should be clear, relevant, and engaging, giving users a quick understanding of the chat's topic.    
-            `),
-            new HumanMessage(`
-                Generate a title for a chat conversation based on the following first message:
-                "${message}"
-                `)
+            new SystemMessage(
+                "You are a chat title generator. " +
+                "Return ONLY a 2-4 word title for the conversation — no quotes, no punctuation, no explanation, no prefix like 'Title:' or 'Here is a title'."
+            ),
+            new HumanMessage(`First message: "${message}"`)
         ])
 
         return toPlainText(response);
