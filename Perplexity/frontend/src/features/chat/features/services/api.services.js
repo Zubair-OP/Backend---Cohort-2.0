@@ -1,9 +1,8 @@
 import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_PREFIX } from "../../../../config/api";
 
 const API = axios.create({
-    baseURL: `${BASE_URL}/api`,
+    baseURL: API_PREFIX,
     withCredentials: true,
 });
 
@@ -20,7 +19,7 @@ export const sendMessage = async (message, chatId) => {
  * @param {AbortSignal} signal      - AbortController signal for "Stop generating"
  */
 export const streamMessage = async (message, chatId, handlers = {}, signal = null) => {
-    const response = await fetch(`${BASE_URL}/api/chats/message/stream`, {
+    const response = await fetch(`${API_PREFIX}/chats/message/stream`, {
         method: "POST",
         credentials: "include",
         headers: {

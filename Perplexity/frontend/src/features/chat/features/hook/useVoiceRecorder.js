@@ -1,6 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import { API_PREFIX } from "../../../../config/api";
 
 export function useVoiceRecorder({ onTranscript } = {}) {
   const [recording, setRecording] = useState(false);
@@ -41,7 +40,7 @@ export function useVoiceRecorder({ onTranscript } = {}) {
           const form = new FormData();
           form.append("audio", blob, `recording.${ext}`);
 
-          const res = await fetch(`${BASE_URL}/api/transcribe`, {
+          const res = await fetch(`${API_PREFIX}/transcribe`, {
             method: "POST",
             body: form,
             credentials: "include",

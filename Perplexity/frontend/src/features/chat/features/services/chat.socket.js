@@ -1,4 +1,5 @@
 import {io} from 'socket.io-client'
+import { API_BASE_URL } from "../../../../config/api"
 
 let socketInstance = null
 
@@ -7,7 +8,7 @@ export const InitializeSocket = () => {
         return socketInstance
     }
 
-    socketInstance = io('http://localhost:3000', {
+    socketInstance = io(API_BASE_URL, {
         withCredentials: true,
     })
 
