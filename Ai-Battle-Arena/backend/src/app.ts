@@ -4,17 +4,11 @@ import graph from './services/graph.service.js';
 import cors from 'cors';
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
     credentials: true,
 }));
 app.use(express.json());
 
-
-
-app.get('/', async(req,res) => {
-    const result = await graph("What is the capital of France?");
-    res.json(result);
-});
 
 app.post('/ask', async(req,res) => {
     const { problem } = req.body;

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
+import { Link } from 'react-router-dom';
 
 const accentColors = {
   background: '#fbf9f6',
@@ -36,8 +37,9 @@ function ProductCard({ product }) {
   const currency = product?.price?.currency || 'PKR';
 
   return (
+    <Link to={`/seller-product/${product._id}`} style={{ textDecoration: 'none' }}>
     <article
-      className="overflow-hidden border bg-white"
+      className="overflow-hidden border bg-white cursor-pointer transition-shadow hover:shadow-md"
       style={{ borderColor: accentColors.line }}
     >
       <div
@@ -101,6 +103,7 @@ function ProductCard({ product }) {
         </div>
       </div>
     </article>
+    </Link>
   );
 }
 

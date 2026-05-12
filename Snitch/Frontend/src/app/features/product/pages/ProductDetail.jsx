@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProduct } from '../hook/useProduct';
 
@@ -9,11 +9,41 @@ const formatCurrency = (amount, currency = 'PKR') =>
     maximumFractionDigits: 0,
   }).format(Number(amount) || 0);
 
+function getAttributeGroups(variants) {
+  const groups = {};
+  variants.forEach((v) => {
+    if (!v.attributes) return;
+    Object.entries(v.attributes).forEach(([key, value]) => {
+      if (!groups[key]) groups[key] = [];
+      if (!groups[key].includes(value)) groups[key].push(value);
+    });
+  });
+  return groups;
+}
+
+function findMatchingVariant(variants, selectedAttrs, attrKeys) {
+  if (!attrKeys.length || !attrKeys.every((k) => selectedAttrs[k])) return null;
+  return variants.find((v) =>
+    attrKeys.every((k) => v.attributes?.[k] === selectedAttrs[k])
+  ) ?? null;
+}
+
+function isValueAvailable(variants, attrKey, value, selectedAttrs) {
+  return variants.some((v) => {
+    if (v.attributes?.[attrKey] !== value) return false;
+    return Object.entries(selectedAttrs).every(
+      ([k, sel]) => k === attrKey || !sel || v.attributes?.[k] === sel
+    );
+  });
+}
+
 const ProductDetail = () => {
   const { id } = useParams();
   const { handleGetProductById } = useProduct();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
+  const [selectedAttributes, setSelectedAttributes] = useState({});
+  const [selectedNoAttrIdx, setSelectedNoAttrIdx] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -22,7 +52,6 @@ const ProductDetail = () => {
       try {
         setLoading(true);
         setError('');
-
         const productData = await handleGetProductById(id);
         setProduct(productData);
         setSelectedImage(productData?.images?.[0]?.url || '');
@@ -32,11 +61,50 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchProduct();
-    }
+    if (id) fetchProduct();
   }, [id]);
+
+  const variants = product?.variants || [];
+
+  const attributeGroups = useMemo(() => getAttributeGroups(variants), [variants]);
+  const attrKeys = useMemo(() => Object.keys(attributeGroups), [attributeGroups]);
+  const hasVariants = variants.length > 0;
+  const hasAttributes = attrKeys.length > 0;
+
+  const selectedVariant = useMemo(
+    () => findMatchingVariant(variants, selectedAttributes, attrKeys),
+    [variants, selectedAttributes, attrKeys]
+  );
+
+  const noAttrVariants = hasVariants && !hasAttributes ? variants : [];
+  const activeNoAttrVariant = noAttrVariants[selectedNoAttrIdx] ?? null;
+  const activeVariant = selectedVariant || activeNoAttrVariant;
+
+  const displayImages = useMemo(() => {
+    if (activeVariant?.images?.length) return activeVariant.images;
+    return product?.images || [];
+  }, [activeVariant, product]);
+
+  const displayPrice =
+    activeVariant?.price?.amount != null ? activeVariant.price : product?.price;
+
+  const allAttrsSelected = hasAttributes && attrKeys.every((k) => selectedAttributes[k]);
+  const variantNotFound = hasAttributes && allAttrsSelected && !selectedVariant;
+  const isOutOfStock = activeVariant != null && activeVariant.stock === 0;
+  const needsSelection = hasVariants && !activeVariant;
+
+  useEffect(() => {
+    if (displayImages.length) {
+      setSelectedImage(displayImages[0].url);
+    }
+  }, [displayImages]);
+
+  function handleAttributeSelect(key, value) {
+    setSelectedAttributes((prev) => ({
+      ...prev,
+      [key]: prev[key] === value ? '' : value,
+    }));
+  }
 
   if (loading) {
     return (
@@ -81,10 +149,9 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product?.images || [];
-  const mainImage = selectedImage || images?.[0]?.url || '';
-  const amount = product?.price?.amount;
-  const currency = product?.price?.currency || 'PKR';
+  const mainImage = selectedImage || displayImages[0]?.url || '';
+  const amount = displayPrice?.amount;
+  const currency = displayPrice?.currency || 'PKR';
 
   return (
     <>
@@ -114,12 +181,12 @@ const ProductDetail = () => {
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1.04fr_0.96fr] lg:items-start">
+            {/* Image Gallery */}
             <section className="grid gap-3 lg:grid-cols-[74px_minmax(0,1fr)]">
-              {images.length > 1 ? (
+              {displayImages.length > 1 ? (
                 <div className="order-2 flex gap-2 overflow-x-auto lg:order-1 lg:flex-col">
-                  {images.map((image, index) => {
+                  {displayImages.map((image, index) => {
                     const isActive = image?.url === mainImage;
-
                     return (
                       <button
                         key={image?.url || index}
@@ -150,7 +217,7 @@ const ProductDetail = () => {
                 </div>
               ) : null}
 
-              <div className={`order-1 ${images.length > 1 ? 'lg:order-2' : ''}`}>
+              <div className={`order-1 ${displayImages.length > 1 ? 'lg:order-2' : ''}`}>
                 <div className="overflow-hidden rounded-[1.8rem] bg-[#efe6d8] p-3 sm:p-4 lg:p-4">
                   <div className="flex min-h-[280px] max-h-[56vh] items-center justify-center overflow-hidden rounded-[1.2rem] bg-[#f4ede3] lg:min-h-[520px] lg:max-h-[62vh]">
                     {mainImage ? (
@@ -169,6 +236,7 @@ const ProductDetail = () => {
               </div>
             </section>
 
+            {/* Product Info */}
             <section className="border-l-0 border-stone-200/80 pt-0 lg:border-l lg:pl-8">
               <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">The Detail</p>
               <h1
@@ -178,10 +246,131 @@ const ProductDetail = () => {
                 {product?.title || 'Untitled product'}
               </h1>
 
-              <p className="mt-5 text-[11px] font-medium uppercase tracking-[0.22em] text-stone-700">
-                {formatCurrency(amount, currency)}
-              </p>
+              {/* Price */}
+              <div className="mt-5 flex items-baseline gap-3">
+                <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-stone-700">
+                  {formatCurrency(amount, currency)}
+                </p>
+                {activeVariant?.price?.amount != null &&
+                  product?.price?.amount !== activeVariant.price.amount && (
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-stone-400 line-through">
+                      {formatCurrency(product.price.amount, product.price.currency)}
+                    </p>
+                  )}
+              </div>
 
+              {/* Variant Selectors */}
+              {hasVariants && (
+                <div className="mt-7 border-t border-stone-200/80 pt-6 space-y-5">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-stone-300">
+                    Select Options
+                  </p>
+
+                  {/* Attribute-based variants */}
+                  {hasAttributes &&
+                    attrKeys.map((key) => (
+                      <div key={key}>
+                        <div className="mb-2.5 flex items-center justify-between">
+                          <p className="text-[10px] uppercase tracking-[0.22em] text-stone-500 capitalize">
+                            {key}
+                          </p>
+                          {selectedAttributes[key] && (
+                            <p className="text-[10px] uppercase tracking-[0.18em] text-stone-700">
+                              {selectedAttributes[key]}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {attributeGroups[key].map((value) => {
+                            const isSelected = selectedAttributes[key] === value;
+                            const available = isValueAvailable(
+                              variants,
+                              key,
+                              value,
+                              selectedAttributes
+                            );
+                            return (
+                              <button
+                                key={value}
+                                type="button"
+                                onClick={() => handleAttributeSelect(key, value)}
+                                disabled={!available}
+                                className={`px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-all duration-200 ${
+                                  isSelected
+                                    ? 'border border-stone-800 bg-stone-800 text-white'
+                                    : available
+                                    ? 'border border-stone-300 bg-white text-stone-700 hover:border-stone-500'
+                                    : 'cursor-not-allowed border border-stone-200 bg-stone-50 text-stone-300 line-through'
+                                }`}
+                              >
+                                {value}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+
+                  {/* No-attribute variants (simple numbered variants) */}
+                  {noAttrVariants.length > 0 && (
+                    <div>
+                      <p className="mb-2.5 text-[10px] uppercase tracking-[0.22em] text-stone-500">
+                        Variant
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {noAttrVariants.map((v, idx) => {
+                          const isSelected = selectedNoAttrIdx === idx;
+                          return (
+                            <button
+                              key={v._id || idx}
+                              type="button"
+                              onClick={() =>
+                                setSelectedNoAttrIdx(isSelected ? -1 : idx)
+                              }
+                              className={`px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-all duration-200 ${
+                                isSelected
+                                  ? 'border border-stone-800 bg-stone-800 text-white'
+                                  : 'border border-stone-300 bg-white text-stone-700 hover:border-stone-500'
+                              }`}
+                            >
+                              Option {idx + 1}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Selection status */}
+                  {variantNotFound && (
+                    <p className="text-[10px] uppercase tracking-[0.18em] text-amber-600">
+                      This combination is not available
+                    </p>
+                  )}
+
+                  {/* Stock indicator */}
+                  {activeVariant && !variantNotFound && (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          isOutOfStock ? 'bg-rose-400' : 'bg-emerald-400'
+                        }`}
+                      />
+                      <p
+                        className={`text-[10px] uppercase tracking-[0.18em] ${
+                          isOutOfStock ? 'text-rose-500' : 'text-stone-500'
+                        }`}
+                      >
+                        {isOutOfStock
+                          ? 'Out of stock'
+                          : `${activeVariant.stock} in stock`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Description */}
               <div className="mt-7 border-t border-stone-200/80 pt-6">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-stone-300">The Details</p>
                 <p className="mt-4 max-w-md text-[15px] leading-7 text-stone-600">
@@ -189,37 +378,53 @@ const ProductDetail = () => {
                 </p>
               </div>
 
+              {/* Action Buttons */}
               <div className="mt-7 space-y-3">
                 <button
                   type="button"
-                  className="w-full border border-stone-800 bg-stone-800 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition hover:bg-stone-700"
+                  disabled={isOutOfStock || (needsSelection)}
+                  className="w-full border border-stone-800 bg-stone-800 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Add to Cart
+                  {isOutOfStock
+                    ? 'Out of Stock'
+                    : needsSelection
+                    ? 'Select an Option'
+                    : 'Add to Cart'}
                 </button>
                 <button
                   type="button"
-                  className="w-full border border-stone-200 bg-transparent px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-700 transition hover:bg-white/70"
+                  disabled={isOutOfStock || needsSelection}
+                  className="w-full border border-stone-200 bg-transparent px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-700 transition hover:bg-white/70 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Buy Now
                 </button>
               </div>
 
+              {/* Meta Info */}
               <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-stone-200/80 pt-6">
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Shipping</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">Complimentary city-side delivery</p>
+                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
+                    Complimentary city-side delivery
+                  </p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Returns</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">Eligible within 4 days of delivery</p>
+                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
+                    Eligible within 4 days of delivery
+                  </p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Currency</p>
                   <p className="mt-1.5 text-[13px] leading-5 text-stone-600">{currency}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Gallery</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">{images.length} image{images.length === 1 ? '' : 's'}</p>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Variants</p>
+                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
+                    {variants.length > 0
+                      ? `${variants.length} option${variants.length === 1 ? '' : 's'}`
+                      : 'One size'}
+                  </p>
                 </div>
               </div>
             </section>

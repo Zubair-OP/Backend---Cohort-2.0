@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch server.ts"
+    "dev": "tsx watch server.ts",
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "@types/typescript": "^0.4.29",
+    "patch-package": "^8.0.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
@@ -24,6 +26,7 @@
     "@langchain/google": "^0.1.10",
     "@langchain/google-genai": "^2.1.27",
     "@langchain/langgraph": "^1.2.9",
+    "@langchain/mistralai": "^1.0.8",
     "@langchain/openai": "^1.4.4",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

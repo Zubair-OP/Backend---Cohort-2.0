@@ -47,3 +47,33 @@ export async function getallProductslistUser() {
   }
 }
 
+export async function addProductVariant(productId, newProductVariant) {
+  const formData = new FormData();
+
+  (newProductVariant.images || []).forEach((image) => {
+    formData.append('images', image.file);
+  });
+
+  formData.append('stock', newProductVariant.stock);
+  formData.append('priceAmount', newProductVariant.price);
+  formData.append('priceCurrency', newProductVariant.currency || 'PKR');
+  formData.append('attributes', JSON.stringify(newProductVariant.attributes));
+
+  const response = await Api.post(`/variants/${productId}`, formData);
+  return response.data;
+}
+
+export async function updateProductVariant(productId, variantId, data) {
+  const response = await Api.put(`/variants/${productId}/${variantId}`, {
+    stock: data.stock,
+    priceAmount: data.price,
+    priceCurrency: data.currency || 'PKR',
+    attributes: JSON.stringify(data.attributes),
+  });
+  return response.data;
+}
+
+export async function deleteProductVariant(productId, variantId) {
+  const response = await Api.delete(`/variants/${productId}/${variantId}`);
+  return response.data;
+}

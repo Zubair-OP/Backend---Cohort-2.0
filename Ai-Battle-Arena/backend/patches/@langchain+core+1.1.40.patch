@@ -1,0 +1,32 @@
+diff --git a/node_modules/@langchain/core/dist/utils/uuid.cjs b/node_modules/@langchain/core/dist/utils/uuid.cjs
+new file mode 100644
+index 0000000..481b197
+--- /dev/null
++++ b/node_modules/@langchain/core/dist/utils/uuid.cjs
+@@ -0,0 +1,5 @@
++"use strict";
++Object.defineProperty(exports, "__esModule", { value: true });
++exports.v4 = void 0;
++const uuid_1 = require("uuid");
++Object.defineProperty(exports, "v4", { enumerable: true, get: function () { return uuid_1.v4; } });
+diff --git a/node_modules/@langchain/core/dist/utils/uuid.d.cts b/node_modules/@langchain/core/dist/utils/uuid.d.cts
+new file mode 100644
+index 0000000..d71ef18
+--- /dev/null
++++ b/node_modules/@langchain/core/dist/utils/uuid.d.cts
+@@ -0,0 +1 @@
++export { v4 } from "uuid";
+diff --git a/node_modules/@langchain/core/dist/utils/uuid.d.ts b/node_modules/@langchain/core/dist/utils/uuid.d.ts
+new file mode 100644
+index 0000000..d71ef18
+--- /dev/null
++++ b/node_modules/@langchain/core/dist/utils/uuid.d.ts
+@@ -0,0 +1 @@
++export { v4 } from "uuid";
+diff --git a/node_modules/@langchain/core/dist/utils/uuid.js b/node_modules/@langchain/core/dist/utils/uuid.js
+new file mode 100644
+index 0000000..d71ef18
+--- /dev/null
++++ b/node_modules/@langchain/core/dist/utils/uuid.js
+@@ -0,0 +1 @@
++export { v4 } from "uuid";

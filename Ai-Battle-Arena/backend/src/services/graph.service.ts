@@ -1,6 +1,6 @@
 import { StateGraph, START , END , StateSchema, type GraphNode} from "@langchain/langgraph";
 import z from 'zod';
-import { geminiModel } from "./model.services.js";
+import { geminiModel,mistralAIModel } from "./model.services.js";
 import { createAgent, HumanMessage, providerStrategy } from "langchain";
 
 
@@ -16,17 +16,16 @@ const state = new StateSchema({
     })
 })
 
-
 const solutionNode: GraphNode<typeof state> = async (state) => {
 
-    const [solution_1, solution_2] = await Promise.all([
+    const [solution_1, mistralResponse] = await Promise.all([
         geminiModel.invoke(state.problem),
-        geminiModel.invoke(state.problem)
-    ])
+        mistralAIModel.invoke(state.problem)
+    ]);
 
     return {
         solution_1: typeof solution_1 === "string" ? solution_1 : String((solution_1 as any).content),
-        solution_2: typeof solution_2 === "string" ? solution_2 : String((solution_2 as any).content),
+        solution_2: typeof mistralResponse === "string" ? mistralResponse : String((mistralResponse as any).content)
     }
 }
 
