@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import { askAi } from '../services/Ai.Api';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { socket } from '../services/chat.socket';
 
 export function useBattle() {
   const [status, setStatus] = useState('idle');
@@ -11,31 +11,79 @@ export function useBattle() {
   const [currentResponse, setCurrentResponse] = useState(null);
   const [error, setError] = useState(null);
 
-  const handles = useRef([]);
+  // Track whether both models have finished streaming before showing judge
+  const model1DoneRef = useRef(false);
+  const model2DoneRef = useRef(false);
+  const pendingJudge = useRef(null);
 
-  const clearAll = () => {
-    handles.current.forEach(h => { clearTimeout(h); clearInterval(h); });
-    handles.current = [];
-  };
+  const checkBothDone = useCallback(() => {
+    if (model1DoneRef.current && model2DoneRef.current && pendingJudge.current) {
+      setJudgeData(pendingJudge.current);
+      setStatus('complete');
+    }
+  }, []);
 
-  const typeText = (fullText, setter, onDone) => {
-    let index = 0;
-    const chunk = Math.max(1, Math.ceil(fullText.length / 55));
+  useEffect(() => {
+    socket.on('ai_start', () => {
+      setStatus('typing');
+      setCurrentResponse({
+        model1: { name: 'Gemini', provider: 'Google' },
+        model2: { name: 'Mistral', provider: 'Mistral' },
+      });
+    });
 
-    const id = setInterval(() => {
-      index = Math.min(index + chunk, fullText.length);
-      setter(fullText.slice(0, index));
-      if (index >= fullText.length) {
-        clearInterval(id);
-        onDone();
+    socket.on('gemini_token', ({ token }) => {
+      setModel1Text(prev => prev + token);
+    });
+
+    socket.on('mistral_token', ({ token }) => {
+      setModel2Text(prev => prev + token);
+    });
+
+    socket.on('judge_start', () => {
+      // Both models are done streaming by the time judge starts
+      model1DoneRef.current = true;
+      model2DoneRef.current = true;
+      setModel1Done(true);
+      setModel2Done(true);
+      setStatus('judging');
+    });
+
+    socket.on('judge_complete', ({ result }) => {
+      const winner = result.solution_1_score >= result.solution_2_score ? 1 : 2;
+      pendingJudge.current = {
+        winner,
+        model1Score: result.solution_1_score,
+        model2Score: result.solution_2_score,
+        model1Reasoning: result.solution_1_reasoning,
+        model2Reasoning: result.solution_2_reasoning,
+      };
+    });
+
+    socket.on('ai_complete', () => {
+      if (pendingJudge.current) {
+        setJudgeData(pendingJudge.current);
       }
-    }, 22);
+      setStatus('complete');
+    });
 
-    handles.current.push(id);
-  };
+    socket.on('error_message', ({ message }) => {
+      setError(message ?? 'Something went wrong');
+      setStatus('idle');
+    });
 
-  const triggerBattle = useCallback(async (query) => {
-    clearAll();
+    return () => {
+      socket.off('ai_start');
+      socket.off('gemini_token');
+      socket.off('mistral_token');
+      socket.off('judge_start');
+      socket.off('judge_complete');
+      socket.off('ai_complete');
+      socket.off('error_message');
+    };
+  }, [checkBothDone]);
+
+  const triggerBattle = useCallback((query) => {
     setModel1Text('');
     setModel2Text('');
     setModel1Done(false);
@@ -44,58 +92,14 @@ export function useBattle() {
     setCurrentResponse(null);
     setError(null);
     setStatus('loading');
+    model1DoneRef.current = false;
+    model2DoneRef.current = false;
+    pendingJudge.current = null;
 
-    try {
-      const res = await askAi(query);
-      const { solution_1, solution_2, judge } = res.result;
-
-      const model1 = { name: 'Gemini', provider: 'Google' };
-      const model2 = { name: 'Mistral', provider: 'Mistral' };
-      setCurrentResponse({ model1, model2 });
-
-      const winner = judge.solution_1_score >= judge.solution_2_score ? 1 : 2;
-      const mappedJudge = {
-        winner,
-        model1Score: judge.solution_1_score,
-        model2Score: judge.solution_2_score,
-        model1Reasoning: judge.solution_1_reasoning,
-        model2Reasoning: judge.solution_2_reasoning,
-      };
-
-      setStatus('typing');
-
-      let done1 = false;
-      let done2 = false;
-
-      const checkBoth = () => {
-        if (done1 && done2) {
-          const judgeId = setTimeout(() => {
-            setJudgeData(mappedJudge);
-            setStatus('complete');
-          }, 500);
-          handles.current.push(judgeId);
-        }
-      };
-
-      typeText(solution_1, setModel1Text, () => {
-        done1 = true;
-        setModel1Done(true);
-        checkBoth();
-      });
-
-      typeText(solution_2, setModel2Text, () => {
-        done2 = true;
-        setModel2Done(true);
-        checkBoth();
-      });
-    } catch (err) {
-      setError(err.message ?? 'Something went wrong');
-      setStatus('idle');
-    }
+    socket.emit('ask_ai', query);
   }, []);
 
   const reset = useCallback(() => {
-    clearAll();
     setStatus('idle');
     setModel1Text('');
     setModel2Text('');
@@ -104,6 +108,9 @@ export function useBattle() {
     setJudgeData(null);
     setCurrentResponse(null);
     setError(null);
+    model1DoneRef.current = false;
+    model2DoneRef.current = false;
+    pendingJudge.current = null;
   }, []);
 
   return {

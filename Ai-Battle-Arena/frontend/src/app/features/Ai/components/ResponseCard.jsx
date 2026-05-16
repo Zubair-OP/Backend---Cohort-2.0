@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, RotateCcw, Check, Timer } from 'lucide-react';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 const MODEL_STYLES = {
   OpenAI: {
@@ -89,12 +90,8 @@ export function ResponseCard({ model, text, isLoading, isTyping }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.25 }}
-            className="p-5 text-[13.5px] text-zinc-300 leading-[1.75] whitespace-pre-wrap"
           >
-            {text}
-            {isTyping && (
-              <span className="inline-block w-[2px] h-[14px] bg-zinc-400 ml-0.5 align-middle animate-pulse" />
-            )}
+            <MarkdownRenderer text={text} isTyping={isTyping} />
           </motion.div>
         )}
       </div>
