@@ -1,12 +1,7 @@
-
+import Ai from './features/Ai/pages/Ai'
 
 function App() {
-  
-  return (
-    <>
-     <h1>Welcome to the Arena</h1>
-    </>
-  )
+  return <Ai />
 }
 
 export default App

@@ -1,6 +1,6 @@
 import { StateGraph, START , END , StateSchema, type GraphNode} from "@langchain/langgraph";
 import z from 'zod';
-import { geminiModel,mistralAIModel } from "./model.services.js";
+import { geminiModel, mistralAIModel, GroqModel } from "./model.services.js";
 import { createAgent, HumanMessage, providerStrategy } from "langchain";
 
 
@@ -33,7 +33,7 @@ const judgeNode: GraphNode<typeof state> = async (state) => {
     const { problem, solution_1, solution_2 } = state
 
     const judge = createAgent({
-        model: geminiModel,
+        model: GroqModel,
         responseFormat: providerStrategy(z.object({
             solution_1_score: z.number().min(0).max(10),
             solution_2_score: z.number().min(0).max(10),

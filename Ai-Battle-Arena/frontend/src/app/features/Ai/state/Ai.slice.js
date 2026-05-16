@@ -4,7 +4,7 @@ const AiReducer = createSlice({
     name: "ai",
     initialState: {
         result: null,
-        loading: true,
+        loading: false,
         error: null,
     },
     reducers: {

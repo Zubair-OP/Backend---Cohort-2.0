@@ -9,6 +9,6 @@ export const Api = axios.create({
 
 
 export async function askAi(question){
-    const res = await Api.post('/ask', { question });
+    const res = await Api.post('/ask', { problem: question });
     return res.data;
 }
