@@ -31,6 +31,6 @@ export async function sendEmail({ to, subject, html, text }) {
         text,
     });
 
-    console.log("Email sent:", details.response || details.messageId);
+    console.log("Email sended:", details.response || details.messageId);
     return details;
 }
