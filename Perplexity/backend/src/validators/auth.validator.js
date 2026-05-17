@@ -1,4 +1,4 @@
-import { body, query, validationResult } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 
 const usernameValidation = body('username')
     .trim()
@@ -32,10 +32,6 @@ export const registerValidator = [
 export const loginValidator = [
     emailValidation,
     body('password').notEmpty().withMessage('Password is required'),
-];
-
-export const verifyEmailValidator = [
-    query('token').notEmpty().withMessage('Verification token is required'),
 ];
 
 export const handleValidationErrors = (req, res, next) => {

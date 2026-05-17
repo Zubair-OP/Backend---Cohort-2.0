@@ -1,5 +1,4 @@
 import userModel from "../model/user.model.js";
-import {sendEmail} from "../services/mail.services.js";
 import jwt from 'jsonwebtoken';
 
 function getCookieOptions() {
@@ -14,26 +13,9 @@ function getCookieOptions() {
     };
 }
 
-function getBackendUrl(req) {
-    return process.env.BACKEND_URL || `${req.protocol}://${req.get("host")}`;
-}
-
-function getFrontendUrl(value) {
-    const fallbackUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-
-    try {
-        const url = new URL(value || fallbackUrl);
-        return url.origin;
-    } catch {
-        return fallbackUrl;
-    }
-}
-
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        const verificationUrlBase = getBackendUrl(req);
-        const frontendUrl = getFrontendUrl(req.get("origin"));
 
         const normalizedEmail = email.toLowerCase().trim();
         const IsUserAlreadyExists = await userModel.findOne({
@@ -56,46 +38,10 @@ export const register = async (req, res) => {
             password
         });
 
-        const emailVerificationToken = jwt.sign({
-        email: user.email,
-        frontendUrl,
-        }, process.env.JWT_SECRET)
-        const verificationUrl = `${verificationUrlBase}/api/auth/verify-email?token=${emailVerificationToken}`;
-
-        let emailSent = false;
-        try {
-            await sendEmail({
-                to: user.email,
-                subject: "Welcome to Perplexity!",
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; color: #1f2937;">
-                        <h2 style="margin-bottom: 16px;">Welcome to Perplexity, ${username}!</h2>
-                        <p style="margin-bottom: 16px;">Thank you for registering. Please verify your email address to activate your account.</p>
-                        <div style="margin: 24px 0;">
-                            <a href="${verificationUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600;">
-                                Verify Email
-                            </a>
-                        </div>
-                        <p style="margin-bottom: 8px;">If the button does not work, copy and paste this link into your browser:</p>
-                        <p style="word-break: break-all; margin-bottom: 16px;">
-                            <a href="${verificationUrl}" style="color: #2563eb;">${verificationUrl}</a>
-                        </p>
-                        <p style="margin-bottom: 0;">If you did not create an account, you can safely ignore this email.</p>
-                    </div>
-                `,
-            });
-            emailSent = true;
-        } catch (error) {
-            console.error("Registration email failed:", error.message || error);
-        }
-
         res.status(201).json({
             success: true,
-            message: emailSent
-                ? 'User registered successfully. Verification email sent.'
-                : 'User registered successfully, but verification email could not be sent. Please contact support or retry later.',
-            emailSent,
-            user : {
+            message: 'User registered successfully.',
+            user: {
                 id: user._id,
                 username: user.username,
                 email: user.email
@@ -109,43 +55,6 @@ export const register = async (req, res) => {
         });
     }
 }
-
-export const verifyEmail = async (req, res) => {
-    try {
-        const { token } = req.query;
-    
-        if (!token) {
-            return res.status(400).json({ message: 'Invalid or missing token' });
-        }
-    
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-        const user = await userModel.findOne({ email: decoded.email });
-
-
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid token' });
-        }
-            
-        user.verified = true;
-        await user.save();
-    
-        const loginUrl = `${getFrontendUrl(decoded.frontendUrl)}/login`;
-        const html = `
-            <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 40px auto; padding: 24px; color: #1f2937; text-align: center;">
-                <h1 style="margin-bottom: 16px;">Email Verified Successfully</h1>
-                <p style="margin-bottom: 24px;">Your email has been verified. You can now log in to your account.</p>
-                <a href="${loginUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600;">
-                    Go to Login
-                </a>
-            </div>
-        `;
-        return res.send(html);
-    } catch (error) {
-        return res.status(400).json({ message: 'Invalid token' });
-    }
-}
-
 
 export const login = async (req, res) => {
     try {
@@ -168,26 +77,17 @@ export const login = async (req, res) => {
             });
         }
 
-
-        if (!user.verified) {
-            return res.status(403).json({
-                success: false,
-                message: 'Please verify your email before logging in'
-            });
-        }
-    
-
-        const token = jwt.sign({ 
+        const token = jwt.sign({
             id: user._id,
-            username: user.username, 
+            username: user.username,
         }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.cookie('token', token, getCookieOptions());
 
         res.status(200).json({
             success: true,
-            message: 'Login successful', 
-            user : {
+            message: 'Login successful',
+            user: {
                 id: user._id,
                 username: user.username,
                 email: user.email
@@ -202,9 +102,8 @@ export const login = async (req, res) => {
     }
 }
 
-
 export const getme = async (req, res) => {
-    try {  
+    try {
         const userId = req.user.id;
         const user = await userModel.findById(userId);
 
@@ -215,14 +114,13 @@ export const getme = async (req, res) => {
             });
         }
 
-        res.status(200).json({ 
+        res.status(200).json({
             success: true,
             message: 'User details fetched successfully',
             user: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                verified: user.verified
             }
         });
     } catch (error) {
