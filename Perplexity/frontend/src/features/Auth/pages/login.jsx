@@ -28,6 +28,11 @@ const Login = () => {
 
     const result = await handleLogin(formData.email, formData.password)
     if (result.success) {
+      setFormData((prev) => ({
+        ...prev,
+        email: '',
+        password: ''
+      }))
       navigate('/')
     }
   }

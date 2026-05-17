@@ -27,6 +27,12 @@ const Register = () => {
     event.preventDefault()
     const result = await handleRegister(formData.username, formData.email, formData.password)
     if (result.success) {
+      setFormData((prev) => ({
+        ...prev,
+        username: '',
+        email: '',
+        password: ''
+      }))
       navigate('/')
     }
   }
