@@ -33,11 +33,11 @@ const defaultVariantForm = {
 function FormField({ label, error, children }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: ac.muted }}>
+      <label className="text-sm font-medium text-text-primary" style={{ color: ac.muted }}>
         {label}
       </label>
       {children}
-      {error && <p className="text-[11px] leading-5" style={{ color: ac.danger }}>{error}</p>}
+      {error && <p className="text-xs leading-5 text-red-600">{error}</p>}
     </div>
   );
 }
@@ -181,37 +181,28 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      style={{ backgroundColor: 'rgba(27,28,26,0.55)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div
-        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white px-6 py-7 sm:px-8"
-        style={{ borderColor: ac.line, border: `1px solid ${ac.line}` }}
-      >
+      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded border border-border-light bg-white px-6 py-7 md:px-8">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 text-[11px] uppercase tracking-[0.18em] px-3 py-1.5"
-          style={{ color: ac.muted, border: `1px solid ${ac.line}` }}
+          className="absolute right-5 top-5 text-sm text-text-secondary transition-all duration-300 hover:text-black"
         >
           Close
         </button>
 
-        <div className="mb-7 border-b pb-5" style={{ borderColor: ac.line }}>
-          <p className="text-[10px] uppercase tracking-[0.22em] font-medium" style={{ color: ac.accent }}>
-            {isEdit ? 'Edit Variant' : 'Add Variant'}
+        <div className="mb-7 border-b border-border-light pb-5">
+          <p className="text-sm text-text-muted">
+            {isEdit ? 'Edit variant' : 'Add variant'}
           </p>
-          <h2
-            className="mt-1 text-[1.75rem] leading-[1.08]"
-            style={{ fontFamily: "'Cormorant Garamond', serif", color: ac.text }}
-          >
+          <h2 className="mt-2 text-3xl font-medium leading-tight text-text-primary">
             {isEdit ? 'Update variant details' : 'Create a new variant'}
           </h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Stock + Price */}
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField label="Stock" error={errors.stock}>
               <input
@@ -222,7 +213,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 placeholder="0"
-                className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
+                className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
                 style={inputStyle}
                 disabled={submitting}
               />
@@ -236,8 +227,8 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
                 onChange={(e) => updateField('price', e.target.value)}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
-                placeholder={product.price?.amount || '—'}
-                className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
+                placeholder={product.price?.amount || '-'}
+                className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
                 style={inputStyle}
                 disabled={submitting}
               />
@@ -251,66 +242,57 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
               onChange={(e) => updateField('currency', e.target.value.toUpperCase())}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              className="w-full bg-transparent py-2 text-sm uppercase outline-none transition-colors duration-300"
+              className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm uppercase text-text-primary outline-none transition-all duration-300 focus:border-black"
               style={inputStyle}
               disabled={submitting}
             />
           </FormField>
 
-          {/* Attributes */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: ac.muted }}>
-                Attributes
-              </label>
+              <label className="text-sm font-medium text-text-primary">Attributes</label>
               <button
                 type="button"
                 onClick={addAttr}
-                className="text-[10px] uppercase tracking-[0.18em] px-3 py-1.5"
-                style={{ backgroundColor: ac.text, color: ac.background }}
+                className="rounded bg-black px-4 py-2 text-sm text-white transition-all duration-300 hover:bg-gray-800"
               >
-                + Add
+                Add
               </button>
             </div>
 
             {errors.attributes && (
-              <p className="text-[11px]" style={{ color: ac.danger }}>{errors.attributes}</p>
+              <p className="text-xs text-red-600">{errors.attributes}</p>
             )}
 
             {form.attributes.map((attr, idx) => (
-              <div key={idx} className="flex items-end gap-2">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={attr.key}
-                    onChange={(e) => updateAttr(idx, 'key', e.target.value)}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    placeholder="e.g. color"
-                    className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
-                    style={{ ...inputStyle, fontSize: '12px' }}
-                    disabled={submitting}
-                  />
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={attr.value}
-                    onChange={(e) => updateAttr(idx, 'value', e.target.value)}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    placeholder="e.g. red"
-                    className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
-                    style={{ ...inputStyle, fontSize: '12px' }}
-                    disabled={submitting}
-                  />
-                </div>
+              <div key={idx} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                <input
+                  type="text"
+                  value={attr.key}
+                  onChange={(e) => updateAttr(idx, 'key', e.target.value)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="e.g. color"
+                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
+                  style={inputStyle}
+                  disabled={submitting}
+                />
+                <input
+                  type="text"
+                  value={attr.value}
+                  onChange={(e) => updateAttr(idx, 'value', e.target.value)}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="e.g. red"
+                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
+                  style={inputStyle}
+                  disabled={submitting}
+                />
                 {form.attributes.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeAttr(idx)}
-                    className="pb-2 text-[11px] uppercase tracking-[0.12em]"
-                    style={{ color: ac.danger }}
+                    className="text-sm text-red-600 transition-all duration-300 hover:text-red-700"
                     disabled={submitting}
                   >
                     Remove
@@ -320,26 +302,15 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
             ))}
           </div>
 
-          {/* Variant Images */}
           {!isEdit && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] uppercase tracking-[0.18em] font-medium" style={{ color: ac.muted }}>
-                  Variant Images ({imagePreviews.length}/{MAX_VARIANT_IMAGES}) — Optional
-                </label>
-              </div>
+              <label className="text-sm font-medium text-text-primary">
+                Variant Images ({imagePreviews.length}/{MAX_VARIANT_IMAGES})
+              </label>
 
-              <label
-                className="flex cursor-pointer items-center justify-between border px-4 py-3"
-                style={{ borderColor: '#d9d0c2', backgroundColor: '#fcfaf7' }}
-              >
-                <p className="text-[11px] uppercase tracking-[0.16em]" style={{ color: ac.text }}>
-                  Upload images
-                </p>
-                <span
-                  className="px-3 py-1.5 text-[10px] uppercase tracking-[0.2em]"
-                  style={{ backgroundColor: ac.text, color: ac.background }}
-                >
+              <label className="flex cursor-pointer items-center justify-between rounded border border-border-default bg-bg-secondary px-4 py-4">
+                <p className="text-sm text-text-primary">Upload images</p>
+                <span className="rounded bg-black px-4 py-2 text-sm text-white">
                   Browse
                 </span>
                 <input
@@ -354,18 +325,17 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
               </label>
 
               {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {imagePreviews.map((preview) => (
-                    <div key={preview.id} className="relative overflow-hidden border" style={{ borderColor: ac.line }}>
-                      <img src={preview.url} alt="" className="h-20 w-full object-cover" />
+                    <div key={preview.id} className="relative overflow-hidden rounded border border-border-light">
+                      <img src={preview.url} alt="" className="h-24 w-full object-cover" />
                       <button
                         type="button"
                         onClick={() => removeImage(preview.id)}
-                        className="absolute right-1 top-1 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.1em]"
-                        style={{ backgroundColor: 'rgba(27,28,26,0.8)', color: ac.background }}
+                        className="absolute right-2 top-2 rounded bg-black px-2 py-1 text-xs text-white"
                         disabled={submitting}
                       >
-                        ×
+                        X
                       </button>
                     </div>
                   ))}
@@ -378,17 +348,15 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium disabled:opacity-60"
-              style={{ backgroundColor: ac.text, color: ac.background }}
+              className="flex-1 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:opacity-60"
             >
-              {submitting ? (isEdit ? 'Saving…' : 'Adding…') : (isEdit ? 'Save Changes' : 'Add Variant')}
+              {submitting ? (isEdit ? 'Saving...' : 'Adding...') : (isEdit ? 'Save Changes' : 'Add Variant')}
             </button>
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-6 py-3.5 text-[11px] uppercase tracking-[0.22em] font-medium disabled:opacity-60"
-              style={{ border: `1px solid ${ac.line}`, color: ac.muted }}
+              className="rounded border border-black px-8 py-3 text-sm font-normal text-black transition-all duration-300 hover:bg-black hover:text-white disabled:opacity-60"
             >
               Cancel
             </button>
@@ -401,12 +369,9 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
 
 function AttributeChip({ label, value }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em]"
-      style={{ backgroundColor: '#f3efe9', color: ac.text, border: `1px solid ${ac.line}` }}
-    >
-      <span style={{ color: ac.subtle }}>{label}</span>
-      <span style={{ color: ac.text }}>{value}</span>
+    <span className="inline-flex items-center gap-1 rounded border border-border-light bg-bg-secondary px-3 py-1 text-xs text-text-primary">
+      <span className="text-text-muted">{label}</span>
+      <span>{value}</span>
     </span>
   );
 }
@@ -427,42 +392,35 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
       : null;
 
   return (
-    <article
-      className="border bg-white px-5 py-4"
-      style={{ borderColor: ac.line }}
-    >
+    <article className="rounded border border-border-light bg-white px-5 py-4">
       {attrs.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
+        <div className="mb-4 flex flex-wrap gap-2">
           {attrs.map(([k, v]) => (
             <AttributeChip key={k} label={k} value={v} />
           ))}
         </div>
       )}
 
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: ac.subtle }}>
-                Stock
-              </p>
-              <p className="mt-0.5 text-lg font-medium" style={{ color: ac.text }}>
+              <p className="text-sm text-text-muted">Stock</p>
+              <p className="mt-1 text-xl font-medium text-text-primary">
                 {variant.stock ?? 0}
               </p>
             </div>
             {formatted && (
               <div>
-                <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: ac.subtle }}>
-                  Price
-                </p>
-                <p className="mt-0.5 text-lg font-medium" style={{ color: ac.text }}>
+                <p className="text-sm text-text-muted">Price</p>
+                <p className="mt-1 text-xl font-medium text-text-primary">
                   {formatted}
                 </p>
               </div>
             )}
           </div>
           {variant.images?.length > 0 && (
-            <p className="text-[10px] uppercase tracking-[0.14em]" style={{ color: ac.subtle }}>
+            <p className="text-sm text-text-secondary">
               {variant.images.length} image{variant.images.length !== 1 ? 's' : ''}
             </p>
           )}
@@ -472,30 +430,25 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onEdit(variant)}
-            className="px-4 py-2 text-[10px] uppercase tracking-[0.18em]"
-            style={{ border: `1px solid ${ac.line}`, color: ac.muted }}
+            className="rounded border border-black px-4 py-2 text-sm text-black transition-all duration-300 hover:bg-black hover:text-white"
           >
             Edit
           </button>
 
           {confirmDelete ? (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] uppercase tracking-[0.14em]" style={{ color: ac.danger }}>
-                Confirm?
-              </span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-red-600">Confirm?</span>
               <button
                 type="button"
                 onClick={() => { onDelete(variant._id); setConfirmDelete(false); }}
-                className="px-3 py-2 text-[10px] uppercase tracking-[0.18em]"
-                style={{ backgroundColor: ac.danger, color: '#fff' }}
+                className="rounded bg-red-600 px-4 py-2 text-sm text-white"
               >
                 Yes
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="px-3 py-2 text-[10px] uppercase tracking-[0.18em]"
-                style={{ border: `1px solid ${ac.line}`, color: ac.muted }}
+                className="rounded border border-border-default px-4 py-2 text-sm text-text-secondary"
               >
                 No
               </button>
@@ -504,8 +457,7 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => setConfirmDelete(true)}
-              className="px-4 py-2 text-[10px] uppercase tracking-[0.18em]"
-              style={{ border: `1px solid ${ac.danger}`, color: ac.danger }}
+              className="rounded border border-red-600 px-4 py-2 text-sm text-red-600"
             >
               Delete
             </button>
@@ -572,31 +524,20 @@ const SellerproductDetails = () => {
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: ac.background }}
-      >
-        <p className="text-[11px] uppercase tracking-[0.22em]" style={{ color: ac.subtle }}>
-          Loading…
-        </p>
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+        <p className="text-sm text-text-muted">Loading...</p>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div
-        className="min-h-screen flex flex-col items-center justify-center gap-4"
-        style={{ backgroundColor: ac.background }}
-      >
-        <p className="text-[11px] uppercase tracking-[0.22em]" style={{ color: ac.subtle }}>
-          Product not found
-        </p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-bg-primary">
+        <p className="text-sm text-text-muted">Product not found</p>
         <button
           type="button"
           onClick={() => navigate('/Dashboard')}
-          className="px-6 py-2.5 text-[11px] uppercase tracking-[0.22em]"
-          style={{ backgroundColor: ac.text, color: ac.background }}
+          className="rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
         >
           Back to Dashboard
         </button>
@@ -609,72 +550,46 @@ const SellerproductDetails = () => {
 
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet"
-      />
-
-      <div
-        className="min-h-screen px-6 py-8 sm:px-10 lg:px-16"
-        style={{ backgroundColor: ac.background, fontFamily: "'Inter', sans-serif" }}
-      >
-        <div className="mx-auto flex max-w-5xl flex-col gap-8">
-
-          {/* Back */}
+      <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-8">
           <button
             type="button"
             onClick={() => navigate('/Dashboard')}
-            className="self-start text-[10px] uppercase tracking-[0.2em]"
-            style={{ color: ac.muted }}
+            className="self-start text-sm text-text-secondary transition-all duration-300 hover:text-black"
           >
-            ← Dashboard
+            Back to dashboard
           </button>
 
-          {/* Product Overview */}
           <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div
-              className="overflow-hidden border"
-              style={{ borderColor: ac.line, backgroundColor: '#f3efe9' }}
-            >
+            <div className="overflow-hidden rounded border border-border-light bg-bg-secondary">
               {coverImage ? (
                 <img
                   src={coverImage}
                   alt={product.title}
-                  className="h-72 w-full object-cover lg:h-full"
+                  className="h-80 w-full object-cover lg:h-full"
                 />
               ) : (
-                <div
-                  className="flex h-72 items-center justify-center text-[11px] uppercase tracking-[0.18em] lg:h-full"
-                  style={{ color: ac.subtle }}
-                >
+                <div className="flex h-80 items-center justify-center text-sm text-text-muted lg:h-full">
                   No image
                 </div>
               )}
             </div>
 
-            <div
-              className="border bg-white px-6 py-7 sm:px-8 flex flex-col justify-between"
-              style={{ borderColor: ac.line }}
-            >
+            <div className="flex flex-col justify-between rounded border border-border-light bg-white px-6 py-7 md:px-8">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] font-medium" style={{ color: ac.accent }}>
-                  Product Details
-                </p>
-                <h1
-                  className="mt-2 text-[2rem] leading-[1.05] sm:text-[2.4rem]"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", color: ac.text }}
-                >
+                <p className="text-sm text-text-muted">Product details</p>
+                <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
                   {product.title}
                 </h1>
-                <p className="mt-3 text-sm leading-7" style={{ color: ac.muted }}>
+                <p className="mt-4 text-base leading-7 text-text-secondary">
                   {product.description}
                 </p>
               </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-4 border-t pt-5" style={{ borderColor: ac.line }}>
+              <div className="mt-8 grid grid-cols-3 gap-4 border-t border-border-light pt-5">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: ac.subtle }}>Base Price</p>
-                  <p className="mt-1 text-sm font-semibold" style={{ color: ac.text }}>
+                  <p className="text-sm text-text-muted">Base Price</p>
+                  <p className="mt-1 text-base font-medium text-text-primary">
                     {new Intl.NumberFormat('en-PK', {
                       style: 'currency',
                       currency: product.price?.currency || 'PKR',
@@ -683,14 +598,14 @@ const SellerproductDetails = () => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: ac.subtle }}>Images</p>
-                  <p className="mt-1 text-sm font-semibold" style={{ color: ac.text }}>
+                  <p className="text-sm text-text-muted">Images</p>
+                  <p className="mt-1 text-base font-medium text-text-primary">
                     {product.images?.length || 0}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em]" style={{ color: ac.subtle }}>Variants</p>
-                  <p className="mt-1 text-sm font-semibold" style={{ color: ac.text }}>
+                  <p className="text-sm text-text-muted">Variants</p>
+                  <p className="mt-1 text-base font-medium text-text-primary">
                     {variants.length}
                   </p>
                 </div>
@@ -698,20 +613,11 @@ const SellerproductDetails = () => {
             </div>
           </section>
 
-          {/* Variants Section */}
           <section>
-            <div
-              className="flex items-center justify-between border-b pb-4 mb-5"
-              style={{ borderColor: ac.line }}
-            >
+            <div className="mb-5 flex items-center justify-between border-b border-border-light pb-4">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] font-medium" style={{ color: ac.accent }}>
-                  Variants
-                </p>
-                <h2
-                  className="mt-1 text-[1.6rem] leading-[1.06]"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", color: ac.text }}
-                >
+                <p className="text-sm text-text-muted">Variants</p>
+                <h2 className="mt-2 text-2xl font-medium text-text-primary">
                   Manage product variants
                 </h2>
               </div>
@@ -719,29 +625,22 @@ const SellerproductDetails = () => {
               <button
                 type="button"
                 onClick={openAddModal}
-                className="px-5 py-3 text-[11px] uppercase tracking-[0.22em] font-medium whitespace-nowrap"
-                style={{ backgroundColor: ac.text, color: ac.background }}
+                className="rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
               >
-                + Add Variant
+                Add Variant
               </button>
             </div>
 
             {variants.length === 0 ? (
-              <div
-                className="border border-dashed px-6 py-10 text-center"
-                style={{ borderColor: '#d9d0c2' }}
-              >
-                <p className="text-[11px] uppercase tracking-[0.2em]" style={{ color: ac.subtle }}>
-                  No variants yet
-                </p>
-                <p className="mt-2 text-sm" style={{ color: ac.muted }}>
-                  Add size, color, voltage, or any custom attribute combinations.
+              <div className="rounded border border-dashed border-border-default bg-bg-secondary px-6 py-12 text-center">
+                <p className="text-sm text-text-muted">No variants yet</p>
+                <p className="mt-2 text-base text-text-secondary">
+                  Add size, color, or any custom attribute combinations.
                 </p>
                 <button
                   type="button"
                   onClick={openAddModal}
-                  className="mt-5 px-6 py-2.5 text-[11px] uppercase tracking-[0.22em]"
-                  style={{ backgroundColor: ac.text, color: ac.background }}
+                  className="mt-6 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
                 >
                   Create First Variant
                 </button>
@@ -760,7 +659,6 @@ const SellerproductDetails = () => {
               </div>
             )}
           </section>
-
         </div>
       </div>
 

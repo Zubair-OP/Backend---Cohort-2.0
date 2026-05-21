@@ -67,94 +67,43 @@ const Register = () => {
     const handleBlur = (e) => { e.target.style.borderBottomColor = '#d0c5b5'; };
 
     return (
-        <>
-            {/* Google Fonts */}
-            <link
-                href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
-                rel="stylesheet"
-            />
-
-            <div
-                className="min-h-screen flex flex-col lg:flex-row selection:bg-[#C9A96E]/30"
-                style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
-            >
-                {/* ── LEFT: Editorial Image Panel ── */}
-                <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: '#f5f3f0' }}>
+        <div className="flex h-screen bg-bg-primary text-text-primary">
+            <div className="flex w-full">
+                <div className="relative hidden w-[44%] shrink-0 overflow-hidden border-r border-border-light bg-bg-secondary lg:flex">
                     <img
                         src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop"
-                        alt="Snitch Fashion Editorial"
-                        className="absolute inset-0 w-full h-full object-cover object-top"
-                        style={{ filter: 'brightness(0.97)' }}
+                        alt="Snitch register"
+                        className="absolute inset-0 h-screen w-full object-cover object-center"
                     />
-                    <div
-                        className="absolute inset-0"
-                        style={{ background: 'linear-gradient(to top, rgba(27,24,20,0.62) 0%, rgba(27,24,20,0.08) 45%, transparent 100%)' }}
-                    />
-                    <div className="absolute inset-0 p-14 flex flex-col justify-between z-10">
-                        <span
-                            className="text-sm font-medium tracking-[0.35em] uppercase"
-                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
-                        >
-                            Stitch.
-                        </span>
-                        <div>
-                            <p
-                                className="text-5xl xl:text-6xl font-light leading-[1.08] text-white mb-5"
-                                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                            >
-                                Define your<br />
-                                <em>aesthetic.</em>
-                            </p>
-                            <p className="text-sm font-light leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                Join the exclusive movement of creators and brands redefining the modern fashion landscape.
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-transparent" />
+                    <div className="relative z-10 flex h-full flex-col justify-between p-6 xl:p-7">
+                        <div className="flex items-center gap-1 text-sm font-semibold tracking-[0.16em] text-white">
+                            <span className="border border-white px-2 py-1">SN</span>
+                            <span className="border border-white px-2 py-1">ITCH</span>
+                        </div>
+                        <div className="max-w-[230px]">
+                            <p className="text-[11px] uppercase tracking-[0.12em] text-white/80">Create account</p>
+                            <h2 className="mt-2 text-[21px] font-medium leading-[1.2] text-white">
+                                Join Snitch
+                            </h2>
+                            <p className="mt-2 text-[12px] leading-5 text-white/75">
+                                Clean storefront access for customers and sellers.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* ── RIGHT: Form Panel ── */}
-                <div
-                    className="w-full lg:w-1/2 flex items-center justify-center min-h-screen px-8 sm:px-14 lg:px-20 py-6 overflow-y-auto"
-                    style={{ backgroundColor: '#fbf9f6' }}
-                >
-                    <div className="w-full max-w-sm">
-
-                        {/* Mobile brand mark */}
-                        <div className="lg:hidden mb-6">
-                            <span
-                                className="text-sm tracking-[0.35em] uppercase"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
-                            >
-                                Stitch.
-                            </span>
+                <div className="flex flex-1 items-center justify-center px-4 py-4 sm:px-6 md:px-8">
+                    <div className="w-full max-w-[390px] rounded border border-border-light bg-white p-3.5">
+                        <div className="mb-2 flex items-center justify-between">
+                            <div className="flex items-center gap-1 text-xs font-semibold tracking-[0.16em] text-black">
+                                <span className="border border-black px-2 py-1">SN</span>
+                                <span className="border border-black px-2 py-1">ITCH</span>
+                            </div>
                         </div>
-
-                        {/* Header */}
-                        <div className="mb-5">
-                            <p
-                                className="text-[10px] uppercase tracking-[0.22em] mb-2 font-medium"
-                                style={{ color: '#C9A96E' }}
-                            >
-                                Welcome to Stitch
-                            </p>
-                            <h1
-                                className="text-[2.2rem] xl:text-[2.8rem] font-light leading-[1.1]"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
-                            >
-                                Elevate Your Style
-                            </h1>
-                        </div>
-
-                        {/* Form */}
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-[0.85rem]">
-
-                            {/* Full Name */}
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
                             <div className="flex flex-col gap-1">
-                                <label
-                                    htmlFor="reg-fullName"
-                                    className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                    style={{ color: '#7A6E63' }}
-                                >
+                                <label htmlFor="reg-fullName" className="text-[13px] font-medium text-text-primary">
                                     Full Name
                                 </label>
                                 <input
@@ -165,26 +114,21 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="e.g. John Doe"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-8.5 w-full rounded border border-border-default bg-white px-3.5 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.fullName ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.fullName}
                                     </p>
                                 ) : null}
                             </div>
 
-                            {/* Contact Number */}
                             <div className="flex flex-col gap-1">
-                                <label
-                                    htmlFor="reg-contact"
-                                    className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                    style={{ color: '#7A6E63' }}
-                                >
+                                <label htmlFor="reg-contact" className="text-[13px] font-medium text-text-primary">
                                     Contact Number
                                 </label>
                                 <input
@@ -195,26 +139,21 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="+91 98765 43210"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-8.5 w-full rounded border border-border-default bg-white px-3.5 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.contactNumber ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.contactNumber}
                                     </p>
                                 ) : null}
                             </div>
 
-                            {/* Email */}
                             <div className="flex flex-col gap-1">
-                                <label
-                                    htmlFor="reg-email"
-                                    className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                    style={{ color: '#7A6E63' }}
-                                >
+                                <label htmlFor="reg-email" className="text-[13px] font-medium text-text-primary">
                                     Email Address
                                 </label>
                                 <input
@@ -225,26 +164,21 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="hello@example.com"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-8.5 w-full rounded border border-border-default bg-white px-3.5 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.email ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.email}
                                     </p>
                                 ) : null}
                             </div>
 
-                            {/* Password */}
                             <div className="flex flex-col gap-1">
-                                <label
-                                    htmlFor="reg-password"
-                                    className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                    style={{ color: '#7A6E63' }}
-                                >
+                                <label htmlFor="reg-password" className="text-[13px] font-medium text-text-primary">
                                     Password
                                 </label>
                                 <input
@@ -255,25 +189,24 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-8.5 w-full rounded border border-border-default bg-white px-3.5 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.password ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.password}
                                     </p>
                                 ) : null}
                             </div>
 
-                            {/* Register as Seller — minimal checkbox */}
                             <label
                                 htmlFor="reg-isSeller"
-                                className="flex items-center gap-4 cursor-pointer group"
+                                className="flex cursor-pointer items-start gap-3 rounded border border-border-light bg-bg-secondary px-3 py-2"
                             >
-                                <div className="relative flex-shrink-0">
+                                <div className="relative mt-0.5 flex-shrink-0">
                                     <input
                                         id="reg-isSeller"
                                         type="checkbox"
@@ -283,72 +216,55 @@ const Register = () => {
                                         className="peer sr-only"
                                         disabled={isSubmitting}
                                     />
-                                    {/* Custom checkbox */}
                                     <div
-                                        className="w-4 h-4 border transition-all duration-200 flex items-center justify-center peer-checked:border-[#C9A96E]"
+                                        className="flex h-4 w-4 items-center justify-center border transition-all duration-200"
                                         style={{
-                                            borderColor: formData.isSeller ? '#C9A96E' : '#d0c5b5',
-                                            backgroundColor: formData.isSeller ? '#C9A96E' : 'transparent'
+                                            borderColor: formData.isSeller ? '#1A1A1A' : '#D4D4D4',
+                                            backgroundColor: formData.isSeller ? '#1A1A1A' : 'transparent'
                                         }}
                                     >
                                         {formData.isSeller && (
                                             <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none">
-                                                <path d="M2 6l3 3 5-5" stroke="#fbf9f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M2 6l3 3 5-5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                         )}
                                     </div>
                                 </div>
-                                <span
-                                    className="text-[11px] uppercase tracking-[0.15em] transition-colors duration-200"
-                                    style={{ color: formData.isSeller ? '#C9A96E' : '#7A6E63' }}
-                                >
-                                    Register as Seller
-                                </span>
+                                <div>
+                                    <p className="text-[13px] font-medium text-text-primary">Register as Seller</p>
+                                    <p className="mt-0.5 text-[12px] leading-5 text-text-secondary">
+                                        Enable seller access if you want to manage products and inventory.
+                                    </p>
+                                </div>
                             </label>
 
                             {formError ? (
-                                <p className="text-[11px] leading-5" style={{ color: '#b64848' }}>
+                                <p className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
                                     {formError}
                                 </p>
                             ) : null}
 
-                            {/* Sign Up Button */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full py-2 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 mt-1"
-                                style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
-                                onMouseEnter={e => {
-                                    e.currentTarget.style.backgroundColor = '#C9A96E';
-                                    e.currentTarget.style.color = '#1b1c1a';
-                                }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.backgroundColor = '#1b1c1a';
-                                    e.currentTarget.style.color = '#fbf9f6';
-                                }}
+                                className="w-full rounded bg-black px-8 py-2 text-[13px] font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {isSubmitting ? 'Signing Up...' : 'Sign Up'}
                             </button>
 
-                            {/* Divider */}
-                            <div className="flex items-center gap-4">
-                                <div className="flex-1 h-px" style={{ backgroundColor: '#e4e2df' }} />
-                                <span className="text-[10px] uppercase tracking-[0.15em]" style={{ color: '#B5ADA3' }}>or</span>
-                                <div className="flex-1 h-px" style={{ backgroundColor: '#e4e2df' }} />
+                            <div className="flex items-center gap-3">
+                                <div className="h-px flex-1 bg-border-light" />
+                                <span className="text-xs text-text-muted">or</span>
+                                <div className="h-px flex-1 bg-border-light" />
                             </div>
 
-                            {/* Google SSO */}
                             <ContinueWithGoogle />
 
-                            {/* Footer Link */}
-                            <p className="text-center text-[11px]" style={{ color: '#B5ADA3' }}>
+                            <p className="text-center text-[12px] text-text-secondary">
                                 Already have an account?{' '}
                                 <a
                                     href="/login"
-                                    className="transition-colors duration-200"
-                                    style={{ color: '#7A6E63', textDecoration: 'underline', textUnderlineOffset: '3px' }}
-                                    onMouseEnter={e => e.target.style.color = '#C9A96E'}
-                                    onMouseLeave={e => e.target.style.color = '#7A6E63'}
+                                    className="text-text-primary underline underline-offset-4 transition-all duration-300 hover:text-black"
                                 >
                                     Sign in
                                 </a>
@@ -357,7 +273,7 @@ const Register = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../cart/hook/useCart';
 
 const formatCurrency = (amount, currency = 'PKR') =>
   new Intl.NumberFormat('en-PK', {
@@ -17,52 +18,57 @@ function ProductCard({ product, onClick }) {
   const currency = product?.price?.currency || 'PKR';
 
   return (
-    <article
-      onClick={onClick}
-      className="group cursor-pointer overflow-hidden rounded-[1.8rem] border border-stone-200/80 bg-[#fbfaf7] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(46,32,18,0.08)]"
-    >
-      <div className="overflow-hidden bg-[#efe7dc] p-3">
-        <div className="aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-[#f7f3eb]">
-        {coverImage ? (
-          <img
-            src={coverImage}
-            alt={product?.title || 'Product image'}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-xs text-stone-500">
-            No image available
-          </div>
-        )}
+    <article onClick={onClick} className="group cursor-pointer">
+      <div className="overflow-hidden rounded-sm border border-neutral-100 bg-white">
+        <div className="aspect-[3/4] overflow-hidden bg-white">
+          {coverImage ? (
+            <img
+              src={coverImage}
+              alt={product?.title || 'Product'}
+              className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-neutral-50 text-xs text-neutral-400">
+              No image
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="space-y-3 px-5 pb-5 pt-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.24em] text-stone-400">New Arrival</p>
-            <h3
-              className="mt-2 text-[1.8rem] leading-none text-stone-800"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-            >
-              {product?.title || 'Untitled product'}
-            </h3>
-          </div>
-          <p className="pt-1 text-[12px] font-medium uppercase tracking-[0.12em] text-stone-700">
-            {formatCurrency(amount, currency)}
-          </p>
-        </div>
-
-        <p className="line-clamp-2 text-[14px] leading-6 text-stone-500">
-          {product?.description || 'No description added for this product yet.'}
+      <div className="pt-2">
+        <h3 className="line-clamp-1 text-xs font-medium text-neutral-900">
+          {product?.title || 'Untitled'}
+        </h3>
+        <p className="mt-0.5 text-xs text-neutral-500">
+          {formatCurrency(amount, currency)}
         </p>
-
-        <div className="flex items-center justify-between border-t border-stone-200 pt-4 text-[10px] uppercase tracking-[0.22em] text-stone-400">
-          <span>{product?.images?.length || 0} Images</span>
-          <span>View Product</span>
-        </div>
       </div>
     </article>
+  );
+}
+
+function FooterList({ title, items }) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-900">{title}</h3>
+      <div className="space-y-2">
+        {items.map((item) => (
+          <p key={item} className="text-xs text-neutral-500">{item}</p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CartIcon({ className = 'h-5 w-5' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="9" cy="20" r="1.25" />
+      <circle cx="17" cy="20" r="1.25" />
+      <path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H7" />
+    </svg>
   );
 }
 
@@ -71,6 +77,8 @@ const Home = () => {
   const products = useSelector((state) => state.product.products);
   const loading = useSelector((state) => state.product.loading);
   const navigate = useNavigate();
+  const { items } = useCart();
+  const cartCount = items.length;
 
   const handleOpenProduct = (productId) => {
     if (!productId) return;
@@ -85,7 +93,6 @@ const Home = () => {
         toast.error(error?.response?.data?.message || 'Unable to load products.');
       }
     };
-
     loadProducts();
   }, []);
 
@@ -93,157 +100,228 @@ const Home = () => {
   const featuredProduct = products?.[0];
 
   return (
-    <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet"
-      />
+    <div className="min-h-screen bg-white font-sans text-neutral-900 antialiased">
 
-      <div
-        className="min-h-screen bg-[#f7f4ee] text-stone-900"
-        style={{ fontFamily: "'Inter', sans-serif" }}
-      >
-      <nav className="border-b border-stone-200/80">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
-          <div>
-            <p
-              className="text-[1.6rem] tracking-[0.34em] text-stone-800"
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
-            >
-              SNITCH
-            </p>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-stone-400">
-              Curated store
-            </p>
+      {/* Announcement bar */}
+      <div className="bg-neutral-900 text-white">
+        <p className="py-2 text-center text-[11px] font-medium tracking-wide">
+          Acid wash tees are live — discover this week&apos;s new arrivals.
+        </p>
+      </div>
+
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-neutral-100 bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 md:px-6">
+          <div className="flex items-center gap-1 text-sm font-bold tracking-[0.25em] text-black">
+            <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
+            <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
           </div>
-
-          <div className="hidden items-center gap-8 text-[14px] text-stone-500 md:flex">
-            <span>Home</span>
-            <span>Collection</span>
-            <span>Essentials</span>
-            <span>Journal</span>
-          </div>
-
-          <button className="border border-stone-300 bg-[#fbfaf7] px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.22em] text-stone-700 transition hover:bg-white">
-            Cart
+          <button
+            onClick={() => navigate('/cart')}
+            className="relative text-neutral-700 transition-colors hover:text-black"
+          >
+            <CartIcon className="h-[18px] w-[18px]" />
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-0.5 text-[10px] font-semibold text-white">
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
-      </nav>
+      </header>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-[1.15fr_0.85fr] lg:px-10 lg:py-16">
-        <div className="border border-stone-200/80 bg-[#fbfaf7] p-8 sm:p-10">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">Spring editorial</p>
-          <h1
-            className="mt-5 max-w-3xl text-[3.2rem] leading-[0.95] text-stone-800 sm:text-[4.7rem]"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-          >
-            Light, refined pieces for a quieter wardrobe.
-          </h1>
-          <p className="mt-6 max-w-xl text-[15px] leading-7 text-stone-500">
-            Discover a minimal storefront shaped with soft neutrals, premium spacing, and a calmer shopping experience.
-          </p>
+      {/* Hero */}
+      <section className="relative h-[60vh] overflow-hidden sm:h-[70vh] md:h-[80vh]">
+        {featuredProduct?.images?.[0]?.url ? (
+          <img
+            src={featuredProduct.images[0].url}
+            alt={featuredProduct?.title || 'Featured collection'}
+            className="h-full w-full object-cover"
+            fetchpriority="high"
+            decoding="async"
+          />
+        ) : (
+          <div className="h-full w-full bg-neutral-100" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-8 md:px-6 md:pb-10">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-[11px] font-medium uppercase tracking-widest text-white/70">
+              Spring / Summer 2026
+            </p>
+            <h1 className="mt-2 text-2xl font-medium leading-snug text-white md:text-3xl">
+              Clean essentials built<br className="hidden sm:block" /> for everyday wear.
+            </h1>
+          </div>
+        </div>
+      </section>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <div className="border border-stone-200 bg-[#f3ede3] px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400">Products</p>
-              <p className="mt-2 text-xl font-medium text-stone-800">{totalProducts}</p>
+      {/* New Arrivals */}
+      <section className="py-10 md:py-14">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                New Season
+              </p>
+              <h2 className="mt-1 text-sm font-semibold text-neutral-900">New Arrivals</h2>
             </div>
-            <div className="border border-stone-200 bg-[#fbfaf7] px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400">Featured</p>
-              <p className="mt-2 text-[13px] font-medium text-stone-700">
-                {featuredProduct?.title || 'Waiting for first listing'}
+            {totalProducts > 0 && (
+              <span className="text-xs text-neutral-400">
+                {totalProducts} {totalProducts === 1 ? 'product' : 'products'}
+              </span>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i}>
+                  <div className="aspect-[3/4] animate-pulse rounded-sm bg-neutral-100" />
+                  <div className="mt-2 space-y-1.5">
+                    <div className="h-2.5 w-3/4 animate-pulse rounded bg-neutral-200" />
+                    <div className="h-2.5 w-1/3 animate-pulse rounded bg-neutral-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : totalProducts === 0 ? (
+            <div className="rounded border border-dashed border-neutral-200 bg-neutral-50 py-16 text-center">
+              <p className="text-xs text-neutral-400">No products yet</p>
+              <p className="mt-2 text-sm font-medium text-neutral-700">
+                Products will appear here once added by the seller.
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-between border border-stone-200/80 bg-[#efe7dc] p-8 sm:p-10">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">Store note</p>
-            <h2
-              className="mt-5 text-[2.4rem] leading-none text-stone-800"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-            >
-              Premium, light, and product-first.
-            </h2>
-            <p className="mt-5 text-[15px] leading-7 text-stone-600">
-              The palette is deliberately soft and airy so the products feel elevated without a noisy interface.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-4">
-            <div className="border border-stone-200/80 bg-[#fbfaf7] p-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-stone-400">Material direction</p>
-              <p className="mt-2 text-[14px] text-stone-700">Warm ivory, beige surfaces, charcoal typography.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {products.slice(0, 8).map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onClick={() => handleOpenProduct(product._id)}
+                />
+              ))}
             </div>
-            <div className="border border-stone-200/80 bg-[#fbfaf7] p-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-stone-400">Experience</p>
-              <p className="mt-2 text-[14px] text-stone-700">Calm browsing, cleaner cards, and a more premium product focus.</p>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-16 lg:px-10">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">Product Collection</p>
-            <h2
-              className="mt-3 text-[2.6rem] leading-none text-stone-800"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-            >
-              All listed products
-            </h2>
-          </div>
-          <p className="text-[12px] uppercase tracking-[0.2em] text-stone-400">
-            {totalProducts} item{totalProducts === 1 ? '' : 's'}
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="overflow-hidden rounded-[1.8rem] border border-stone-200 bg-[#fbfaf7]"
-              >
-                <div className="p-3">
-                  <div className="aspect-[4/5] animate-pulse rounded-[1.25rem] bg-[#ede6dc]" />
-                </div>
-                <div className="space-y-3 px-5 pb-5">
-                  <div className="h-4 w-20 animate-pulse rounded bg-stone-200" />
-                  <div className="h-8 w-3/4 animate-pulse rounded bg-stone-200" />
-                  <div className="h-12 animate-pulse rounded bg-stone-100" />
+      {/* Featured Banner */}
+      {featuredProduct && (
+        <section className="py-10 md:py-14">
+          <div className="mx-auto max-w-6xl px-4 md:px-6">
+            <div className="grid overflow-hidden rounded-sm border border-neutral-100 lg:grid-cols-2">
+              <div className="aspect-[4/3] lg:aspect-auto lg:min-h-[320px]">
+                {featuredProduct?.images?.[0]?.url ? (
+                  <img
+                    src={featuredProduct.images[0].url}
+                    alt={featuredProduct?.title || 'Featured'}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-neutral-100" />
+                )}
+              </div>
+              <div className="flex items-center bg-neutral-50 px-6 py-8 md:px-10">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                    Featured Drop
+                  </p>
+                  <h2 className="mt-2 text-lg font-semibold leading-snug text-neutral-900 md:text-xl">
+                    Built for a cleaner wardrobe and a lighter everyday rotation.
+                  </h2>
+                  <p className="mt-3 text-xs leading-5 text-neutral-500">
+                    Versatile pieces with understated details, easy layering, and a fit-first point of view.
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        ) : totalProducts === 0 ? (
-          <div className="border border-dashed border-stone-300 bg-[#fbfaf7] px-6 py-16 text-center">
-            <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">No Products Yet</p>
-            <h3
-              className="mt-4 text-[2.4rem] leading-none text-stone-800"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-            >
-              Products listed by the seller will appear here
-            </h3>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-stone-500">
-              Once a seller creates products, this homepage will automatically show them in this collection section.
+        </section>
+      )}
+
+      {/* Best Sellers */}
+      {totalProducts > 0 && (
+        <section className="py-10 md:py-14">
+          <div className="mx-auto max-w-6xl px-4 md:px-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                  Most Wanted
+                </p>
+                <h2 className="mt-1 text-sm font-semibold text-neutral-900">Best Sellers</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {products.slice(0, 4).map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  onClick={() => handleOpenProduct(product._id)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Brand strip */}
+      <section className="border-y border-neutral-100 bg-neutral-50 py-10">
+        <div className="mx-auto max-w-2xl px-4 text-center md:px-6">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            Our Story
+          </p>
+          <p className="mt-3 text-sm font-medium leading-6 text-neutral-800">
+            Snitch is designed around quieter shopping and better everyday staples.
+          </p>
+          <p className="mt-2 text-xs leading-5 text-neutral-500">
+            A clean, product-led experience so every image and fabric story feels more premium.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-neutral-100 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+            <div className="sm:col-span-2 md:col-span-1">
+              <div className="flex items-center gap-1 text-sm font-bold tracking-[0.25em] text-black">
+                <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
+                <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
+              </div>
+              <p className="mt-3 text-xs leading-5 text-neutral-500">
+                A clean, product-first store for modern everyday menswear.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {['Visa', 'Mastercard', 'COD'].map((method) => (
+                  <span key={method} className="rounded border border-neutral-200 px-2 py-1 text-[10px] text-neutral-500">
+                    {method}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <FooterList title="Shop" items={['Shirts', 'Tees', 'Pants', 'Polos']} />
+            <FooterList
+              title="Support"
+              items={['Contact Us', 'Returns', 'Shipping Info', 'Size Guide']}
+            />
+            <FooterList
+              title="Company"
+              items={['About Us', 'Privacy Policy', 'Terms & Conditions']}
+            />
+          </div>
+
+          <div className="mt-8 border-t border-neutral-100 pt-6">
+            <p className="text-[11px] text-neutral-400">
+              &copy; 2026 Snitch. All rights reserved.
             </p>
           </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onClick={() => handleOpenProduct(product._id)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-      </div>
-    </>
+        </div>
+      </footer>
+    </div>
   );
 };
 

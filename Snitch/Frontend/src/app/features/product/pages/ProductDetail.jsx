@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
+import { useCart } from '../../cart/hook/useCart';
 
 const formatCurrency = (amount, currency = 'PKR') =>
   new Intl.NumberFormat('en-PK', {
@@ -39,13 +42,17 @@ function isValueAvailable(variants, attrKey, value, selectedAttrs) {
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
   const { handleGetProductById } = useProduct();
+  const { handleAddItem } = useCart();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [selectedNoAttrIdx, setSelectedNoAttrIdx] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -106,19 +113,46 @@ const ProductDetail = () => {
     }));
   }
 
+  async function handleAddToCart() {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (hasVariants && !activeVariant) return;
+    try {
+      setAddingToCart(true);
+      await handleAddItem(product._id, activeVariant?._id);
+      toast.success('Added to cart! Click to view.', {
+        onClick: () => navigate('/cart'),
+        autoClose: 3000,
+      });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to add to cart.');
+    } finally {
+      setAddingToCart(false);
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-50 px-6 py-10">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
-          <div className="aspect-[4/5] animate-pulse rounded-[2rem] bg-stone-200" />
-          <div className="space-y-4 rounded-[2rem] bg-white p-8 shadow-sm">
-            <div className="h-4 w-24 animate-pulse rounded bg-stone-200" />
-            <div className="h-12 w-3/4 animate-pulse rounded bg-stone-200" />
-            <div className="h-6 w-40 animate-pulse rounded bg-stone-200" />
-            <div className="h-24 animate-pulse rounded bg-stone-100" />
+      <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="space-y-4">
+            <div className="aspect-[4/5] animate-pulse rounded bg-bg-secondary" />
+            <div className="grid grid-cols-4 gap-3">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="aspect-square animate-pulse rounded bg-bg-secondary" />
+              ))}
+            </div>
+          </div>
+          <div className="space-y-4 rounded border border-border-light bg-white p-6">
+            <div className="h-4 w-24 animate-pulse rounded bg-neutral-200" />
+            <div className="h-10 w-3/4 animate-pulse rounded bg-neutral-200" />
+            <div className="h-5 w-32 animate-pulse rounded bg-neutral-200" />
+            <div className="h-24 animate-pulse rounded bg-neutral-100" />
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="h-12 animate-pulse rounded-full bg-stone-200" />
-              <div className="h-12 animate-pulse rounded-full bg-stone-200" />
+              <div className="h-11 animate-pulse rounded bg-neutral-200" />
+              <div className="h-11 animate-pulse rounded bg-neutral-200" />
             </div>
           </div>
         </div>
@@ -128,11 +162,11 @@ const ProductDetail = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-stone-50 px-6 py-16">
-        <div className="mx-auto max-w-3xl rounded-[2rem] border border-rose-100 bg-white p-8 text-center shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-[0.24em] text-rose-400">Error</p>
-          <h2 className="mt-3 text-3xl font-semibold text-stone-900">Product details unavailable</h2>
-          <p className="mt-4 text-sm leading-7 text-stone-600">{error}</p>
+      <div className="min-h-screen bg-bg-primary px-4 py-16 md:px-8">
+        <div className="mx-auto max-w-3xl rounded border border-red-200 bg-red-50 p-8 text-center">
+          <p className="text-sm text-red-500">Error</p>
+          <h2 className="mt-3 text-3xl font-medium text-text-primary">Product details unavailable</h2>
+          <p className="mt-4 text-base leading-7 text-text-secondary">{error}</p>
         </div>
       </div>
     );
@@ -140,10 +174,10 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-stone-50 px-6 py-16">
-        <div className="mx-auto max-w-3xl rounded-[2rem] border border-stone-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-[0.24em] text-amber-500">Not Found</p>
-          <h2 className="mt-3 text-3xl font-semibold text-stone-900">Product not found</h2>
+      <div className="min-h-screen bg-bg-primary px-4 py-16 md:px-8">
+        <div className="mx-auto max-w-3xl rounded border border-border-light bg-white p-8 text-center">
+          <p className="text-sm text-text-muted">Not Found</p>
+          <h2 className="mt-3 text-3xl font-medium text-text-primary">Product not found</h2>
         </div>
       </div>
     );
@@ -154,238 +188,202 @@ const ProductDetail = () => {
   const currency = displayPrice?.currency || 'PKR';
 
   return (
-    <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet"
-      />
+    <div className="min-h-screen bg-bg-primary text-text-primary">
+      <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-8">
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-text-muted">
+          <button type="button" onClick={() => navigate('/')} className="transition-all duration-300 hover:text-black">
+            Home
+          </button>
+          <span>/</span>
+          <span>Product</span>
+          <span>/</span>
+          <span className="text-text-primary">{product?.title || 'Detail'}</span>
+        </div>
 
-      <div
-        className="min-h-screen bg-[#f7f4ee] px-4 py-6 text-stone-900 sm:px-6 lg:px-8 lg:py-5"
-        style={{ fontFamily: "'Inter', sans-serif" }}
-      >
-        <div className="mx-auto flex max-w-7xl flex-col">
-          <div className="mb-5 flex items-center justify-between border-b border-stone-200/80 pb-3 lg:mb-4 lg:pb-2">
-            <div>
-              <p
-                className="text-[1.25rem] tracking-[0.28em] text-stone-700 lg:text-[1.2rem]"
-                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              >
-                SNITCH
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.24em] text-stone-400">Product view</p>
-            </div>
-            <p className="hidden text-[11px] uppercase tracking-[0.2em] text-stone-400 sm:block">
-              Quiet luxury edit
-            </p>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-[1.04fr_0.96fr] lg:items-start">
-            {/* Image Gallery */}
-            <section className="grid gap-3 lg:grid-cols-[74px_minmax(0,1fr)]">
-              {displayImages.length > 1 ? (
-                <div className="order-2 flex gap-2 overflow-x-auto lg:order-1 lg:flex-col">
-                  {displayImages.map((image, index) => {
-                    const isActive = image?.url === mainImage;
-                    return (
-                      <button
-                        key={image?.url || index}
-                        type="button"
-                        onClick={() => setSelectedImage(image?.url || '')}
-                        className={`shrink-0 overflow-hidden border transition ${
-                          isActive
-                            ? 'border-stone-700 bg-white'
-                            : 'border-stone-200 bg-[#f1ece4] hover:border-stone-400'
-                        } rounded-[1.2rem]`}
-                      >
-                        <div className="h-20 w-[4.5rem] bg-[#ede6dc] sm:h-24 sm:w-[5rem] lg:h-[5.4rem] lg:w-[4.5rem]">
-                          {image?.url ? (
-                            <img
-                              src={image.url}
-                              alt={`${product?.title || 'Product'} preview ${index + 1}`}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-[10px] text-stone-400">
-                              Image
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
-
-              <div className={`order-1 ${displayImages.length > 1 ? 'lg:order-2' : ''}`}>
-                <div className="overflow-hidden rounded-[1.8rem] bg-[#efe6d8] p-3 sm:p-4 lg:p-4">
-                  <div className="flex min-h-[280px] max-h-[56vh] items-center justify-center overflow-hidden rounded-[1.2rem] bg-[#f4ede3] lg:min-h-[520px] lg:max-h-[62vh]">
-                    {mainImage ? (
-                      <img
-                        src={mainImage}
-                        alt={product?.title || 'Product image'}
-                        className="max-h-[56vh] w-full object-contain lg:max-h-[62vh]"
-                      />
-                    ) : (
-                      <div className="flex h-[280px] w-full items-center justify-center text-sm text-stone-500 lg:h-[520px]">
-                        No image available
-                      </div>
-                    )}
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+          <section className="space-y-4">
+            <div className="overflow-hidden rounded bg-white border border-border-light">
+              <div className="aspect-[4/5] overflow-hidden bg-white">
+                {mainImage ? (
+                  <img
+                    src={mainImage}
+                    alt={product?.title || 'Product image'}
+                    className="h-full w-full object-contain"
+                    decoding="async"
+                    fetchpriority="high"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-text-muted">
+                    No image available
                   </div>
-                </div>
+                )}
               </div>
-            </section>
+            </div>
 
-            {/* Product Info */}
-            <section className="border-l-0 border-stone-200/80 pt-0 lg:border-l lg:pl-8">
-              <p className="text-[10px] uppercase tracking-[0.28em] text-stone-400">The Detail</p>
-              <h1
-                className="mt-4 max-w-md text-[2.45rem] leading-[0.9] text-stone-800 sm:text-[3.25rem] lg:text-[3.45rem]"
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 500 }}
-              >
+            {displayImages.length > 1 ? (
+              <div className="grid grid-cols-4 gap-3 md:grid-cols-5">
+                {displayImages.slice(0, 5).map((image, index) => {
+                  const isActive = image?.url === mainImage;
+                  return (
+                    <button
+                      key={image?.url || index}
+                      type="button"
+                      onClick={() => setSelectedImage(image?.url || '')}
+                      className={`overflow-hidden rounded border transition-all duration-300 ${
+                        isActive
+                          ? 'border-black'
+                          : 'border-border-light hover:border-black'
+                      }`}
+                    >
+                      <div className="aspect-square overflow-hidden bg-white">
+                        {image?.url ? (
+                          <img
+                            src={image.url}
+                            alt={`${product?.title || 'Product'} preview ${index + 1}`}
+                            className="h-full w-full object-contain"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-text-muted">
+                            Image
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
+
+          <section className="space-y-6">
+            <div className="border-b border-border-light pb-6">
+              <p className="text-sm text-text-muted">New arrival</p>
+              <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
                 {product?.title || 'Untitled product'}
               </h1>
-
-              {/* Price */}
-              <div className="mt-5 flex items-baseline gap-3">
-                <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-stone-700">
+              <div className="mt-4 flex items-center gap-3">
+                <p className="text-xl font-medium text-text-primary">
                   {formatCurrency(amount, currency)}
                 </p>
                 {activeVariant?.price?.amount != null &&
                   product?.price?.amount !== activeVariant.price.amount && (
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-stone-400 line-through">
+                    <p className="text-sm text-text-muted line-through">
                       {formatCurrency(product.price.amount, product.price.currency)}
                     </p>
                   )}
               </div>
+            </div>
 
-              {/* Variant Selectors */}
-              {hasVariants && (
-                <div className="mt-7 border-t border-stone-200/80 pt-6 space-y-5">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-stone-300">
-                    Select Options
+            {hasVariants && (
+              <div className="space-y-6 border-b border-border-light pb-6">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-text-primary">Select options</p>
+                  <p className="text-sm text-text-secondary">
+                    Choose the right combination before adding to cart.
                   </p>
+                </div>
 
-                  {/* Attribute-based variants */}
-                  {hasAttributes &&
-                    attrKeys.map((key) => (
-                      <div key={key}>
-                        <div className="mb-2.5 flex items-center justify-between">
-                          <p className="text-[10px] uppercase tracking-[0.22em] text-stone-500 capitalize">
-                            {key}
-                          </p>
-                          {selectedAttributes[key] && (
-                            <p className="text-[10px] uppercase tracking-[0.18em] text-stone-700">
-                              {selectedAttributes[key]}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {attributeGroups[key].map((value) => {
-                            const isSelected = selectedAttributes[key] === value;
-                            const available = isValueAvailable(
-                              variants,
-                              key,
-                              value,
-                              selectedAttributes
-                            );
-                            return (
-                              <button
-                                key={value}
-                                type="button"
-                                onClick={() => handleAttributeSelect(key, value)}
-                                disabled={!available}
-                                className={`px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-all duration-200 ${
-                                  isSelected
-                                    ? 'border border-stone-800 bg-stone-800 text-white'
-                                    : available
-                                    ? 'border border-stone-300 bg-white text-stone-700 hover:border-stone-500'
-                                    : 'cursor-not-allowed border border-stone-200 bg-stone-50 text-stone-300 line-through'
-                                }`}
-                              >
-                                {value}
-                              </button>
-                            );
-                          })}
-                        </div>
+                {hasAttributes &&
+                  attrKeys.map((key) => (
+                    <div key={key}>
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="text-sm font-medium capitalize text-text-primary">{key}</p>
+                        {selectedAttributes[key] && (
+                          <p className="text-sm text-text-muted">{selectedAttributes[key]}</p>
+                        )}
                       </div>
-                    ))}
-
-                  {/* No-attribute variants (simple numbered variants) */}
-                  {noAttrVariants.length > 0 && (
-                    <div>
-                      <p className="mb-2.5 text-[10px] uppercase tracking-[0.22em] text-stone-500">
-                        Variant
-                      </p>
                       <div className="flex flex-wrap gap-2">
-                        {noAttrVariants.map((v, idx) => {
-                          const isSelected = selectedNoAttrIdx === idx;
+                        {attributeGroups[key].map((value) => {
+                          const isSelected = selectedAttributes[key] === value;
+                          const available = isValueAvailable(
+                            variants,
+                            key,
+                            value,
+                            selectedAttributes
+                          );
                           return (
                             <button
-                              key={v._id || idx}
+                              key={value}
                               type="button"
-                              onClick={() =>
-                                setSelectedNoAttrIdx(isSelected ? -1 : idx)
-                              }
-                              className={`px-4 py-2 text-[10px] uppercase tracking-[0.18em] transition-all duration-200 ${
+                              onClick={() => handleAttributeSelect(key, value)}
+                              disabled={!available}
+                              className={`rounded border px-4 py-2 text-sm transition-all duration-300 ${
                                 isSelected
-                                  ? 'border border-stone-800 bg-stone-800 text-white'
-                                  : 'border border-stone-300 bg-white text-stone-700 hover:border-stone-500'
+                                  ? 'border-black bg-black text-white'
+                                  : available
+                                  ? 'border-border-default bg-white text-text-primary hover:border-black'
+                                  : 'cursor-not-allowed border-border-light bg-bg-secondary text-text-muted line-through'
                               }`}
                             >
-                              Option {idx + 1}
+                              {value}
                             </button>
                           );
                         })}
                       </div>
                     </div>
-                  )}
+                  ))}
 
-                  {/* Selection status */}
-                  {variantNotFound && (
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-amber-600">
-                      This combination is not available
-                    </p>
-                  )}
-
-                  {/* Stock indicator */}
-                  {activeVariant && !variantNotFound && (
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          isOutOfStock ? 'bg-rose-400' : 'bg-emerald-400'
-                        }`}
-                      />
-                      <p
-                        className={`text-[10px] uppercase tracking-[0.18em] ${
-                          isOutOfStock ? 'text-rose-500' : 'text-stone-500'
-                        }`}
-                      >
-                        {isOutOfStock
-                          ? 'Out of stock'
-                          : `${activeVariant.stock} in stock`}
-                      </p>
+                {noAttrVariants.length > 0 && (
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-text-primary">Variant</p>
+                    <div className="flex flex-wrap gap-2">
+                      {noAttrVariants.map((v, idx) => {
+                        const isSelected = selectedNoAttrIdx === idx;
+                        return (
+                          <button
+                            key={v._id || idx}
+                            type="button"
+                            onClick={() =>
+                              setSelectedNoAttrIdx(isSelected ? -1 : idx)
+                            }
+                            className={`rounded border px-4 py-2 text-sm transition-all duration-300 ${
+                              isSelected
+                                ? 'border-black bg-black text-white'
+                                : 'border-border-default bg-white text-text-primary hover:border-black'
+                            }`}
+                          >
+                            Option {idx + 1}
+                          </button>
+                        );
+                      })}
                     </div>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
 
-              {/* Description */}
-              <div className="mt-7 border-t border-stone-200/80 pt-6">
-                <p className="text-[10px] uppercase tracking-[0.28em] text-stone-300">The Details</p>
-                <p className="mt-4 max-w-md text-[15px] leading-7 text-stone-600">
+                {variantNotFound && (
+                  <p className="text-sm text-amber-600">This combination is not available.</p>
+                )}
+
+                {activeVariant && !variantNotFound && (
+                  <p className={`text-sm ${isOutOfStock ? 'text-red-600' : 'text-text-secondary'}`}>
+                    {isOutOfStock
+                      ? 'Out of stock'
+                      : `${activeVariant.stock} in stock`}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-6 border-b border-border-light pb-6">
+              <div>
+                <p className="text-sm font-medium text-text-primary">Description</p>
+                <p className="mt-3 max-w-xl text-base leading-7 text-text-secondary">
                   {product?.description || 'No description available for this product.'}
                 </p>
               </div>
 
-              {/* Action Buttons */}
-              <div className="mt-7 space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <button
                   type="button"
-                  disabled={isOutOfStock || (needsSelection)}
-                  className="w-full border border-stone-800 bg-stone-800 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || needsSelection || addingToCart}
+                  className="w-full rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isOutOfStock
+                  {addingToCart
+                    ? 'Adding...'
+                    : isOutOfStock
                     ? 'Out of Stock'
                     : needsSelection
                     ? 'Select an Option'
@@ -394,44 +392,83 @@ const ProductDetail = () => {
                 <button
                   type="button"
                   disabled={isOutOfStock || needsSelection}
-                  className="w-full border border-stone-200 bg-transparent px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-700 transition hover:bg-white/70 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="w-full rounded border border-black px-8 py-3 text-sm font-normal text-black transition-all duration-300 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Buy Now
                 </button>
               </div>
+            </div>
 
-              {/* Meta Info */}
-              <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-stone-200/80 pt-6">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Shipping</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
-                    Complimentary city-side delivery
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Returns</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
-                    Eligible within 4 days of delivery
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Currency</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">{currency}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.22em] text-stone-300">Variants</p>
-                  <p className="mt-1.5 text-[13px] leading-5 text-stone-600">
-                    {variants.length > 0
-                      ? `${variants.length} option${variants.length === 1 ? '' : 's'}`
-                      : 'One size'}
-                  </p>
-                </div>
-              </div>
-            </section>
-          </div>
+            <div className="space-y-4">
+              <details className="border-b border-border-light pb-4" open>
+                <summary className="cursor-pointer list-none text-sm font-medium text-text-primary">
+                  Shipping
+                </summary>
+                <p className="mt-3 text-sm leading-6 text-text-secondary">
+                  Complimentary city-side delivery with shipping rates calculated at checkout.
+                </p>
+              </details>
+              <details className="border-b border-border-light pb-4">
+                <summary className="cursor-pointer list-none text-sm font-medium text-text-primary">
+                  Size Chart
+                </summary>
+                <p className="mt-3 text-sm leading-6 text-text-secondary">
+                  Size details can be tailored once your product data includes fit-specific guidance.
+                </p>
+              </details>
+              <details className="border-b border-border-light pb-4">
+                <summary className="cursor-pointer list-none text-sm font-medium text-text-primary">
+                  Shipping & Returns
+                </summary>
+                <p className="mt-3 text-sm leading-6 text-text-secondary">
+                  Returns are eligible within 4 days of delivery, subject to store policy.
+                </p>
+              </details>
+            </div>
+          </section>
         </div>
+
+        <section className="py-12 md:py-16">
+          <div className="mb-8">
+            <p className="text-sm text-text-muted">Recommended</p>
+            <h2 className="mt-2 text-2xl font-medium text-text-primary md:text-3xl">
+              You May Also Like
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {(product?.images || []).slice(0, 4).map((image, index) => (
+              <article key={image?.url || index} className="group">
+                <div className="overflow-hidden rounded bg-white border border-border-light">
+                  <div className="aspect-[4/5] overflow-hidden bg-white">
+                    {image?.url ? (
+                      <img
+                        src={image.url}
+                        alt={`${product?.title || 'Product'} recommendation ${index + 1}`}
+                        className="h-full w-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-text-muted">
+                        Image
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="pt-3">
+                  <h3 className="text-base font-normal text-text-primary">
+                    {product?.title || 'Product'}
+                  </h3>
+                  <p className="mt-1 text-base font-medium text-text-primary">
+                    {formatCurrency(amount, currency)}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
-    </>
+    </div>
   );
 };
 

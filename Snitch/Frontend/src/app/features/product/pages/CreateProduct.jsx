@@ -30,14 +30,14 @@ function FormField({ label, error, children }) {
   return (
     <div className="flex flex-col gap-1">
       <label
-        className="text-[10px] uppercase tracking-[0.18em] font-medium"
+        className="text-sm font-medium text-text-primary"
         style={{ color: accentColors.muted }}
       >
         {label}
       </label>
       {children}
       {error ? (
-        <p className="text-[11px] leading-5" style={{ color: '#b64848' }}>
+        <p className="text-xs leading-5 text-red-600">
           {error}
         </p>
       ) : null}
@@ -48,10 +48,7 @@ function FormField({ label, error, children }) {
 function PreviewGrid({ previews, onRemove }) {
   if (!previews.length) {
     return (
-      <div
-        className="border border-dashed px-4 py-8 text-center text-[11px] uppercase tracking-[0.16em]"
-        style={{ borderColor: '#d9d0c2', color: accentColors.subtle }}
-      >
+      <div className="rounded border border-dashed border-border-default px-4 py-10 text-center text-sm text-text-muted">
         No images selected yet
       </div>
     );
@@ -62,26 +59,21 @@ function PreviewGrid({ previews, onRemove }) {
       {previews.map((preview, index) => (
         <div
           key={preview.id}
-          className="relative overflow-hidden border"
-          style={{ borderColor: accentColors.line }}
+          className="relative overflow-hidden rounded border border-border-light bg-white"
         >
           <img
             src={preview.url}
             alt={preview.file.name}
-            className="h-28 w-full object-cover"
+            className="h-32 w-full object-cover"
           />
           <button
             type="button"
             onClick={() => onRemove(preview.id)}
-            className="absolute right-2 top-2 h-7 min-w-7 px-2 text-[10px] uppercase tracking-[0.14em] transition-colors"
-            style={{ backgroundColor: 'rgba(27,28,26,0.82)', color: accentColors.background }}
+            className="absolute right-2 top-2 rounded bg-black px-3 py-1 text-xs text-white transition-all duration-300 hover:bg-gray-800"
           >
             Remove
           </button>
-          <div
-            className="flex items-center justify-between gap-2 px-3 py-2 text-[10px] uppercase tracking-[0.12em]"
-            style={{ backgroundColor: '#f7f2ea', color: accentColors.muted }}
-          >
+          <div className="flex items-center justify-between gap-2 px-3 py-2 text-xs text-text-secondary">
             <span className="truncate">{preview.file.name}</span>
             <span>{index + 1}</span>
           </div>
@@ -252,224 +244,163 @@ const CreateProduct = () => {
   const sellerRole = user?.role || 'seller';
 
   return (
-    <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
-        rel="stylesheet"
-      />
+    <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8">
+        <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <p className="text-sm text-text-muted">Seller workspace</p>
+            <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+              Welcome back, {sellerName}
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-text-secondary">
+              Create a clean product listing with strong imagery, clear pricing, and consistent presentation.
+            </p>
+          </div>
 
-      <div
-        className="min-h-screen px-6 py-8 sm:px-10 lg:px-16"
-        style={{ backgroundColor: accentColors.background, fontFamily: "'Inter', sans-serif" }}
-      >
-        <div className="mx-auto flex max-w-7xl flex-col gap-8">
-          <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div
-              className="border bg-white px-6 py-7 sm:px-8"
-              style={{ borderColor: accentColors.line }}
-            >
-              <p
-                className="text-[10px] uppercase tracking-[0.22em] font-medium"
-                style={{ color: accentColors.accent }}
-              >
-                Seller Workspace
-              </p>
-              <h1
-                className="mt-2 text-[2.2rem] leading-[1.05] sm:text-[2.8rem]"
-                style={{ fontFamily: "'Cormorant Garamond', serif", color: accentColors.text }}
-              >
-                Welcome back, {sellerName}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7" style={{ color: accentColors.muted }}>
-                Keep your catalog sharp, upload new arrivals, and manage your store with the same calm flow as the rest of Snitch.
-              </p>
-            </div>
-
-            <div
-              className="border bg-white px-6 py-7 sm:px-8"
-              style={{ borderColor: accentColors.line }}
-            >
-              <p
-                className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                style={{ color: accentColors.subtle }}
-              >
-                Seller Info
-              </p>
-              <div className="mt-5 space-y-4">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-                    Name
-                  </p>
-                  <p className="mt-1 text-sm" style={{ color: accentColors.text }}>{sellerName}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-                    Email
-                  </p>
-                  <p className="mt-1 text-sm" style={{ color: accentColors.text }}>{sellerEmail}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-                    Role
-                  </p>
-                  <p className="mt-1 text-sm uppercase tracking-[0.16em]" style={{ color: accentColors.text }}>
-                    {sellerRole}
-                  </p>
-                </div>
+          <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
+            <p className="text-sm text-text-muted">Seller info</p>
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="text-sm text-text-muted">Name</p>
+                <p className="mt-1 text-base text-text-primary">{sellerName}</p>
               </div>
-            </div>
-          </section>
-
-          <form onSubmit={handleSubmit} className="grid items-start gap-6 lg:grid-cols-2">
-            {/* Left side: Product Details */}
-            <div
-              className="border bg-white px-6 py-7 sm:px-8"
-              style={{ borderColor: accentColors.line }}
-            >
-              <div className="mb-8 border-b pb-5" style={{ borderColor: accentColors.line }}>
-                <p
-                  className="text-[10px] uppercase tracking-[0.22em] font-medium"
-                  style={{ color: accentColors.accent }}
-                >
-                  Add New Product
+              <div>
+                <p className="text-sm text-text-muted">Email</p>
+                <p className="mt-1 text-base text-text-primary">{sellerEmail}</p>
+              </div>
+              <div>
+                <p className="text-sm text-text-muted">Role</p>
+                <p className="mt-1 text-base uppercase tracking-[0.08em] text-text-primary">
+                  {sellerRole}
                 </p>
-                <h2
-                  className="mt-2 text-[2rem] leading-[1.08]"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", color: accentColors.text }}
-                >
-                  Create a polished new listing
-                </h2>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <div className="space-y-6">
-                <FormField label="Title" error={errors.title}>
+        <form onSubmit={handleSubmit} className="grid items-start gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <div className="mb-8 border-b border-border-light pb-5">
+              <p className="text-sm text-text-muted">Add new product</p>
+              <h2 className="mt-2 text-3xl font-medium leading-tight text-text-primary">
+                Create a polished new listing
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              <FormField label="Title" error={errors.title}>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="Classic linen shirt"
+                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
+                  style={inputStyle}
+                  disabled={isSubmitting}
+                />
+              </FormField>
+
+              <FormField label="Description" error={errors.description}>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  rows={6}
+                  placeholder="Write a clear, concise product description."
+                  className="w-full rounded border border-border-default bg-white px-4 py-3 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
+                  style={inputStyle}
+                  disabled={isSubmitting}
+                />
+              </FormField>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <FormField label="Price Amount" error={errors.amount}>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    placeholder="4990"
+                    min="0"
+                    className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
+                    style={inputStyle}
+                    disabled={isSubmitting}
+                  />
+                </FormField>
+
+                <FormField label="Currency" error={errors.currency}>
                   <input
                     type="text"
-                    name="title"
-                    value={formData.title}
+                    name="currency"
+                    value={formData.currency}
                     onChange={handleChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
-                    placeholder="Classic linen shirt"
-                    className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
+                    className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm uppercase text-text-primary outline-none transition-all duration-300 focus:border-black"
                     style={inputStyle}
                     disabled={isSubmitting}
                   />
                 </FormField>
-
-                <FormField label="Description" error={errors.description}>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    rows={5}
-                    placeholder="Write a clear, concise product description."
-                    className="w-full resize-none bg-transparent py-2 text-sm outline-none transition-colors duration-300"
-                    style={inputStyle}
-                    disabled={isSubmitting}
-                  />
-                </FormField>
-
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <FormField label="Price Amount" error={errors.amount}>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleChange}
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      placeholder="4990"
-                      min="0"
-                      className="w-full bg-transparent py-2 text-sm outline-none transition-colors duration-300"
-                      style={inputStyle}
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-
-                  <FormField label="Currency" error={errors.currency}>
-                    <input
-                      type="text"
-                      name="currency"
-                      value={formData.currency}
-                      onChange={handleChange}
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      className="w-full bg-transparent py-2 text-sm uppercase outline-none transition-colors duration-300"
-                      style={inputStyle}
-                      disabled={isSubmitting}
-                    />
-                  </FormField>
-                </div>
               </div>
             </div>
+          </div>
 
-            {/* Right side: Images and Publish */}
-            <div className="flex flex-col gap-6">
-              <div
-                className="border bg-white px-6 py-7 sm:px-8"
-                style={{ borderColor: accentColors.line }}
-              >
-                <FormField label={`Images (${previews.length}/${MAX_IMAGES})`} error={errors.images}>
-                  <div className="space-y-4">
-                    <label
-                      className="flex cursor-pointer items-center justify-between border px-4 py-4 transition-colors"
-                      style={{ borderColor: '#d9d0c2', backgroundColor: '#fcfaf7' }}
-                    >
-                      <div>
-                        <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: accentColors.text }}>
-                          Upload product images
-                        </p>
-                        <p className="mt-1 text-sm" style={{ color: accentColors.muted }}>
-                          JPG, PNG or WEBP. Maximum {MAX_IMAGES} images.
-                        </p>
-                      </div>
-                      <span
-                        className="px-4 py-2 text-[10px] uppercase tracking-[0.2em]"
-                        style={{ backgroundColor: accentColors.text, color: accentColors.background }}
-                      >
-                        Browse
-                      </span>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                        className="hidden"
-                        disabled={isSubmitting}
-                      />
-                    </label>
+          <div className="flex flex-col gap-6">
+            <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
+              <FormField label={`Images (${previews.length}/${MAX_IMAGES})`} error={errors.images}>
+                <div className="space-y-4">
+                  <label className="flex cursor-pointer items-center justify-between rounded border border-border-default bg-bg-secondary px-4 py-4">
+                    <div>
+                      <p className="text-sm font-medium text-text-primary">
+                        Upload product images
+                      </p>
+                      <p className="mt-1 text-sm text-text-secondary">
+                        JPG, PNG or WEBP. Maximum {MAX_IMAGES} images.
+                      </p>
+                    </div>
+                    <span className="rounded bg-black px-4 py-2 text-sm text-white">
+                      Browse
+                    </span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      className="hidden"
+                      disabled={isSubmitting}
+                    />
+                  </label>
 
-                    <PreviewGrid previews={previews} onRemove={handleRemoveImage} />
-                  </div>
-                </FormField>
-              </div>
-
-              <div
-                className="border bg-white px-6 py-7 sm:px-8"
-                style={{ borderColor: accentColors.line }}
-              >
-                <div className="mb-6 space-y-2 text-[11px] uppercase tracking-[0.18em]" style={{ color: accentColors.muted }}>
-                  <p>Ready to publish your item?</p>
-                  <p>Ensure all product details are correctly entered and images are uploaded clearly.</p>
+                  <PreviewGrid previews={previews} onRemove={handleRemoveImage} />
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70 shadow-sm hover:shadow-md"
-                  style={{ backgroundColor: accentColors.text, color: accentColors.background }}
-                >
-                  {isSubmitting ? 'Uploading Product...' : 'Publish Product'}
-                </button>
-              </div>
+              </FormField>
             </div>
-          </form>
-        </div>
+
+            <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
+              <div className="mb-6 space-y-2 text-sm text-text-secondary">
+                <p>Ready to publish your item?</p>
+                <p>Make sure all key product details are complete and your imagery is clear.</p>
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? 'Uploading Product...' : 'Publish Product'}
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 

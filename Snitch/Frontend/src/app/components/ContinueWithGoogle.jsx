@@ -1,12 +1,19 @@
 import React from 'react';
 
+const GOOGLE_AUTH_URL = 'http://localhost:3000/api/auth/google';
+
 const ContinueWithGoogle = () => {
+    const handleGoogleAuth = () => {
+        window.location.href = GOOGLE_AUTH_URL;
+    };
+
     return (
         <button
             type="button"
+            onClick={handleGoogleAuth}
             className="w-full flex items-center justify-center gap-3 py-3.5 border transition-colors duration-200"
-            style={{ 
-                borderColor: '#e4e2df', 
+            style={{
+                borderColor: '#e4e2df',
                 backgroundColor: 'transparent',
                 color: '#1b1c1a'
             }}

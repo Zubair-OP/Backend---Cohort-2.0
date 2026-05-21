@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const priceSchema = new mongoose.Schema({
+export const priceSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true,

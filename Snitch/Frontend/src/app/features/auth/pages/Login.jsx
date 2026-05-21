@@ -36,7 +36,6 @@ const Login = () => {
 
             toast.success('Signed in successfully.');
             
-            // Check the user object returned from handleLogin for their role
             if (user.role === 'seller') {
                 navigate("/Dashboard");
             } else {
@@ -62,94 +61,54 @@ const Login = () => {
     const handleBlur = (e) => { e.target.style.borderBottomColor = '#d0c5b5'; };
 
     return (
-        <>
-            {/* Google Fonts */}
-            <link
-                href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap"
-                rel="stylesheet"
-            />
-
-            <div
-                className="min-h-screen flex flex-col lg:flex-row selection:bg-[#C9A96E]/30"
-                style={{ backgroundColor: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
-            >
-                {/* ── LEFT: Editorial Image Panel ── */}
-                <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: '#f5f3f0' }}>
+        <div className="h-screen overflow-hidden bg-bg-primary text-text-primary">
+            <div className="grid h-full lg:grid-cols-2">
+                <div className="relative hidden overflow-hidden border-r border-border-light bg-bg-secondary lg:flex">
                     <img
                         src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2670&auto=format&fit=crop"
-                        alt="Stitch Fashion Editorial"
-                        className="absolute inset-0 w-full h-full object-cover object-center"
-                        style={{ filter: 'brightness(0.95)' }}
+                        alt="Snitch sign in"
+                        className="absolute inset-0 h-full w-full object-cover"
                     />
-                    <div
-                        className="absolute inset-0"
-                        style={{ background: 'linear-gradient(to top, rgba(27,24,20,0.65) 0%, rgba(27,24,20,0.05) 45%, transparent 100%)' }}
-                    />
-                    <div className="absolute inset-0 p-14 flex flex-col justify-between z-10">
-                        <span
-                            className="text-sm font-medium tracking-[0.35em] uppercase"
-                            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
-                        >
-                            Stitch.
-                        </span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+                    <div className="relative z-10 flex h-full flex-col justify-between p-7 xl:p-8">
+                        <div className="flex items-center gap-1 text-sm font-semibold tracking-[0.16em] text-white">
+                            <span className="border border-white px-2 py-1">SN</span>
+                            <span className="border border-white px-2 py-1">ITCH</span>
+                        </div>
                         <div>
-                            <p
-                                className="text-5xl xl:text-6xl font-light leading-[1.08] text-white mb-5"
-                                style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                            >
-                                Reclaim your<br />
-                                <em>wardrobe.</em>
-                            </p>
-                            <p className="text-sm font-light leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Welcome back to the premier movement connecting you to the modern fashion landscape.
+                            <p className="text-xs font-medium text-white/80">Welcome back</p>
+                            <h2 className="mt-2 max-w-sm text-[28px] font-medium leading-[1.15] text-white xl:text-[32px]">
+                                A cleaner way to shop, manage, and return to your essentials.
+                            </h2>
+                            <p className="mt-3 max-w-xs text-[13px] leading-5 text-white/75">
+                                Sign in to continue browsing new arrivals, saved products, and your shopping bag.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* ── RIGHT: Form Panel ── */}
-                <div
-                    className="w-full lg:w-1/2 flex items-center justify-center min-h-screen px-8 sm:px-14 lg:px-20 py-6 overflow-y-auto"
-                    style={{ backgroundColor: '#fbf9f6' }}
-                >
-                    <div className="w-full max-w-sm">
-
-                        {/* Mobile brand mark */}
-                        <div className="lg:hidden mb-6">
-                            <span
-                                className="text-sm tracking-[0.35em] uppercase"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#C9A96E' }}
-                            >
-                                Stitch.
-                            </span>
+                <div className="flex h-full items-center justify-center px-4 py-4 sm:px-6 md:px-8">
+                    <div className="w-full max-w-[430px] rounded border border-border-light bg-white p-5">
+                        <div className="mb-5 flex items-center justify-between">
+                            <div className="flex items-center gap-1 text-xs font-semibold tracking-[0.16em] text-black">
+                                <span className="border border-black px-2 py-1">SN</span>
+                                <span className="border border-black px-2 py-1">ITCH</span>
+                            </div>
                         </div>
 
-                        {/* Header */}
-                        <div className="mb-8">
-                            <p
-                                className="text-[10px] uppercase tracking-[0.22em] mb-2 font-medium"
-                                style={{ color: '#C9A96E' }}
-                            >
-                                Welcome Back
-                            </p>
-                            <h1
-                                className="text-[2.2rem] xl:text-[2.8rem] font-light leading-[1.1]"
-                                style={{ fontFamily: "'Cormorant Garamond', serif", color: '#1b1c1a' }}
-                            >
-                                Sign in to Stitch
+                        <div className="mb-5">
+                            <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Sign in</p>
+                            <h1 className="mt-2 text-[24px] font-medium leading-[1.15] text-text-primary">
+                                Welcome back to Snitch
                             </h1>
+                            <p className="mt-2 text-[13px] leading-5 text-text-secondary">
+                                Enter your details to continue shopping or manage your seller account.
+                            </p>
                         </div>
 
-                        {/* Form */}
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
-                            {/* Email */}
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                             <div className="flex flex-col gap-1">
-                                <label
-                                    htmlFor="login-email"
-                                    className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                    style={{ color: '#7A6E63' }}
-                                >
+                                <label htmlFor="login-email" className="text-[13px] font-medium text-text-primary">
                                     Email Address
                                 </label>
                                 <input
@@ -160,30 +119,25 @@ const Login = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="hello@example.com"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-9 w-full rounded border border-border-default bg-white px-4 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.email ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.email}
                                     </p>
                                 ) : null}
                             </div>
 
-                            {/* Password */}
                             <div className="flex flex-col gap-1">
-                                <div className="flex justify-between items-center">
-                                    <label
-                                        htmlFor="login-password"
-                                        className="text-[10px] uppercase tracking-[0.18em] font-medium"
-                                        style={{ color: '#7A6E63' }}
-                                    >
+                                <div className="flex items-center justify-between">
+                                    <label htmlFor="login-password" className="text-[13px] font-medium text-text-primary">
                                         Password
                                     </label>
-                                    <a href="#" className="text-[10px] tracking-[0.1em] transition-colors" style={{ color: '#B5ADA3' }} onMouseEnter={e => e.target.style.color = '#C9A96E'} onMouseLeave={e => e.target.style.color = '#B5ADA3'}>
+                                    <a href="#" className="text-xs text-text-muted transition-all duration-300 hover:text-black">
                                         Forgot?
                                     </a>
                                 </div>
@@ -195,63 +149,47 @@ const Login = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    className="w-full bg-transparent outline-none py-2 text-sm transition-colors duration-300"
+                                    className="h-9 w-full rounded border border-border-default bg-white px-4 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
                                     onBlur={handleBlur}
                                     disabled={isSubmitting}
                                 />
                                 {errors.password ? (
-                                    <p className="text-[11px] leading-5 mt-1" style={{ color: '#b64848' }}>
+                                    <p className="mt-1 text-xs leading-5 text-red-600">
                                         {errors.password}
                                     </p>
                                 ) : null}
                             </div>
 
                             {formError ? (
-                                <p className="text-[11px] leading-5" style={{ color: '#b64848' }}>
+                                <p className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-600">
                                     {formError}
                                 </p>
                             ) : null}
 
-                            {/* Sign In Button */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full py-4 text-[11px] uppercase tracking-[0.25em] font-medium transition-all duration-300 mt-3"
-                                style={{ backgroundColor: '#1b1c1a', color: '#fbf9f6', fontFamily: "'Inter', sans-serif" }}
-                                onMouseEnter={e => {
-                                    e.currentTarget.style.backgroundColor = '#C9A96E';
-                                    e.currentTarget.style.color = '#1b1c1a';
-                                }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.backgroundColor = '#1b1c1a';
-                                    e.currentTarget.style.color = '#fbf9f6';
-                                }}
+                                className="mt-1 w-full rounded bg-black px-8 py-2.5 text-[13px] font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {isSubmitting ? 'Signing In...' : 'Sign In'}
                             </button>
 
-                            {/* Divider */}
-                            <div className="flex items-center gap-4 my-2">
-                                <div className="flex-1 h-px" style={{ backgroundColor: '#e4e2df' }} />
-                                <span className="text-[10px] uppercase tracking-[0.15em]" style={{ color: '#B5ADA3' }}>or</span>
-                                <div className="flex-1 h-px" style={{ backgroundColor: '#e4e2df' }} />
+                            <div className="flex items-center gap-4">
+                                <div className="h-px flex-1 bg-border-light" />
+                                <span className="text-xs text-text-muted">or</span>
+                                <div className="h-px flex-1 bg-border-light" />
                             </div>
 
-                            {/* Google SSO */}
                             <ContinueWithGoogle />
 
-                            {/* Footer Link */}
-                            <p className="text-center text-[11px] mt-2" style={{ color: '#B5ADA3' }}>
-                                Don't have an account yet?{' '}
+                            <p className="text-center text-[13px] text-text-secondary">
+                                Don&apos;t have an account yet?{' '}
                                 <a
                                     href="/register"
                                     onClick={(e) => { e.preventDefault(); navigate('/register'); }}
-                                    className="transition-colors duration-200 cursor-pointer"
-                                    style={{ color: '#7A6E63', textDecoration: 'underline', textUnderlineOffset: '3px' }}
-                                    onMouseEnter={e => e.target.style.color = '#C9A96E'}
-                                    onMouseLeave={e => e.target.style.color = '#7A6E63'}
+                                    className="cursor-pointer text-text-primary underline underline-offset-4 transition-all duration-300 hover:text-black"
                                 >
                                     Register
                                 </a>
@@ -260,7 +198,7 @@ const Login = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

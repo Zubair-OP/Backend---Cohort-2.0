@@ -93,13 +93,19 @@ export function useAuth() {
     }
 
     async function handleGetme() {
-        try {             
+        try {
              dispatch(setLoading(true))
              dispatch(setError(null))
              const response = await Getme()
              dispatch(setUser(response.user))
         } catch (error) {
-            dispatch(setError(getErrorMessage(error, 'Unable to fetch user session.')))
+            dispatch(setUser(null))
+            dispatch(setError(null))
+            // Cookie missing or expired — redirect away from protected pages
+            const publicPaths = ['/login', '/register'];
+            if (!publicPaths.includes(window.location.pathname)) {
+                window.location.replace('/login');
+            }
         } finally {
             dispatch(setLoading(false))
         }

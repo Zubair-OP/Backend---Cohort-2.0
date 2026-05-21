@@ -37,72 +37,49 @@ function ProductCard({ product }) {
   const currency = product?.price?.currency || 'PKR';
 
   return (
-    <Link to={`/seller-product/${product._id}`} style={{ textDecoration: 'none' }}>
-    <article
-      className="overflow-hidden border bg-white cursor-pointer transition-shadow hover:shadow-md"
-      style={{ borderColor: accentColors.line }}
-    >
-      <div
-        className="aspect-[4/3.6] w-full"
-        style={{ backgroundColor: '#f3efe9' }}
-      >
-        {coverImage ? (
-          <img
-            src={coverImage}
-            alt={product.title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div
-            className="flex h-full items-center justify-center text-[11px] uppercase tracking-[0.18em]"
-            style={{ color: accentColors.subtle }}
-          >
-            No image
+    <Link to={`/seller-product/${product._id}`} className="block">
+      <article className="group overflow-hidden rounded border border-border-light bg-white transition-all duration-300 hover:border-black">
+        <div className="overflow-hidden bg-white">
+          <div className="aspect-[4/5] overflow-hidden bg-white">
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt={product.title}
+                className="h-full w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-text-muted">
+                No image
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <div className="space-y-3 px-4 py-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-3">
-            <p
-              className="text-[10px] uppercase tracking-[0.18em]"
-              style={{ color: accentColors.subtle }}
-            >
-              Listed {formatDate(product.createdAt)}
+        <div className="space-y-3 px-4 py-4">
+          <div className="flex items-center justify-between gap-3 text-sm text-text-muted">
+            <p>Listed {formatDate(product.createdAt)}</p>
+            <span>{product?.images?.length || 0} image{product?.images?.length === 1 ? '' : 's'}</span>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium leading-7 text-text-primary">
+              {product.title}
+            </h3>
+            <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
+              {product.description}
             </p>
-            <span
-              className="text-[10px] uppercase tracking-[0.18em]"
-              style={{ color: accentColors.accent }}
-            >
-              {product?.images?.length || 0} image{product?.images?.length === 1 ? '' : 's'}
-            </span>
           </div>
 
-          <h3
-            className="text-[1.35rem] leading-[1.08]"
-            style={{ fontFamily: "'Fraunces', serif", color: accentColors.text }}
-          >
-            {product.title}
-          </h3>
-          <p className="line-clamp-3 text-[13px] leading-6" style={{ color: accentColors.muted }}>
-            {product.description}
-          </p>
+          <div className="flex items-center justify-between border-t border-border-light pt-3">
+            <p className="text-base font-medium text-text-primary">
+              {formatCurrency(amount, currency)}
+            </p>
+            <p className="text-sm text-text-secondary">Manage</p>
+          </div>
         </div>
-
-        <div
-          className="flex items-center justify-between border-t pt-3"
-          style={{ borderColor: accentColors.line }}
-        >
-          <p className="text-[13px] font-semibold" style={{ color: accentColors.text }}>
-            {formatCurrency(amount, currency)}
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-            Product
-          </p>
-        </div>
-      </div>
-    </article>
+      </article>
     </Link>
   );
 }
@@ -143,129 +120,82 @@ const Dashboard = () => {
   const primaryCurrency = products?.[0]?.price?.currency || 'PKR';
 
   return (
-    <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Manrope:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
+    <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8">
+        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <p className="text-sm text-text-muted">Seller dashboard</p>
+            <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+              {sellerName}&apos;s product catalog
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-text-secondary">
+              Review your listed products, monitor catalog value, and keep the storefront aligned with the same clean Snitch presentation.
+            </p>
+          </div>
 
-      <div
-        className="min-h-screen px-6 py-8 sm:px-10 lg:px-16"
-        style={{ backgroundColor: accentColors.background, fontFamily: "'Manrope', sans-serif" }}
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-6">
-          <section className="grid gap-5 lg:grid-cols-[1.35fr_0.65fr]">
-            <div
-              className="border px-5 py-6 sm:px-7"
-              style={{ borderColor: accentColors.line, backgroundColor: accentColors.surface }}
-            >
-              <p
-                className="text-[10px] uppercase tracking-[0.22em] font-medium"
-                style={{ color: accentColors.accent }}
-              >
-                Seller Dashboard
-              </p>
-              <h1
-                className="mt-2 text-[2rem] leading-[1.02] sm:text-[2.45rem]"
-                style={{ fontFamily: "'Fraunces', serif", color: accentColors.text }}
-              >
-                {sellerName}&apos;s listed products
-              </h1>
-              <p className="mt-3 max-w-xl text-[13px] leading-6" style={{ color: accentColors.muted }}>
-                A quiet view of everything you have published so far, with enough breathing room to scan the catalog quickly.
-              </p>
+          <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
+            <div className="grid grid-cols-2 gap-5">
+              <div>
+                <p className="text-sm text-text-muted">Total Products</p>
+                <p className="mt-2 text-3xl font-medium text-text-primary">{totalProducts}</p>
+              </div>
+              <div>
+                <p className="text-sm text-text-muted">Catalog Value</p>
+                <p className="mt-2 text-2xl font-medium text-text-primary">
+                  {formatCurrency(totalValue, primaryCurrency)}
+                </p>
+              </div>
             </div>
 
-            <div
-              className="flex flex-col justify-between gap-5 border px-5 py-6 sm:px-7"
-              style={{ borderColor: accentColors.line, backgroundColor: accentColors.surface }}
+            <button
+              type="button"
+              onClick={() => navigate('/create-product')}
+              className="mt-6 w-full rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-                    Total Products
-                  </p>
-                  <p className="mt-2 text-[1.7rem]" style={{ color: accentColors.text }}>
-                    {totalProducts}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em]" style={{ color: accentColors.subtle }}>
-                    Catalog Value
-                  </p>
-                  <p className="mt-2 text-[1.7rem]" style={{ color: accentColors.text }}>
-                    {formatCurrency(totalValue, primaryCurrency)}
-                  </p>
+              Add New Product
+            </button>
+          </div>
+        </section>
+
+        {loading ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded border border-border-light bg-white">
+                <div className="aspect-[4/5] animate-pulse bg-bg-secondary" />
+                <div className="space-y-3 px-4 py-4">
+                  <div className="h-4 w-24 animate-pulse rounded bg-neutral-200" />
+                  <div className="h-6 w-3/4 animate-pulse rounded bg-neutral-200" />
+                  <div className="h-12 animate-pulse rounded bg-neutral-100" />
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={() => navigate('/create-product')}
-                className="w-full py-3 text-[11px] uppercase tracking-[0.24em] font-semibold transition-all duration-300"
-                style={{ backgroundColor: accentColors.text, color: accentColors.background }}
-              >
-                Add New Product
-              </button>
-            </div>
-          </section>
-
-          {loading ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="overflow-hidden border bg-white"
-                  style={{ borderColor: accentColors.line }}
-                >
-                  <div className="aspect-[4/3.6] animate-pulse" style={{ backgroundColor: '#efe9df' }} />
-                  <div className="space-y-3 px-4 py-4">
-                    <div className="h-3 w-24 animate-pulse" style={{ backgroundColor: '#efe9df' }} />
-                    <div className="h-6 w-3/4 animate-pulse" style={{ backgroundColor: '#efe9df' }} />
-                    <div className="h-16 animate-pulse" style={{ backgroundColor: '#f5f1ea' }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : totalProducts === 0 ? (
-            <section
-              className="border px-6 py-12 text-center sm:px-8"
-              style={{ borderColor: accentColors.line, backgroundColor: accentColors.surface }}
+            ))}
+          </div>
+        ) : totalProducts === 0 ? (
+          <section className="rounded border border-border-light bg-bg-secondary px-6 py-16 text-center">
+            <p className="text-sm text-text-muted">Nothing listed yet</p>
+            <h2 className="mt-3 text-3xl font-medium text-text-primary">
+              Your storefront is ready for its first product
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-text-secondary">
+              Create one polished listing and it will appear here automatically once published.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/create-product')}
+              className="mt-8 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
             >
-              <p
-                className="text-[10px] uppercase tracking-[0.22em] font-medium"
-                style={{ color: accentColors.accent }}
-              >
-                Nothing Listed Yet
-              </p>
-              <h2
-                className="mt-3 text-[2rem]"
-                style={{ fontFamily: "'Fraunces', serif", color: accentColors.text }}
-              >
-                Your storefront is ready for its first product
-              </h2>
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-7" style={{ color: accentColors.muted }}>
-                Start with one polished listing and it will appear here automatically once published.
-              </p>
-              <button
-                type="button"
-                onClick={() => navigate('/create-product')}
-                className="mt-8 px-8 py-3 text-[11px] uppercase tracking-[0.24em] font-semibold transition-all duration-300"
-                style={{ backgroundColor: accentColors.text, color: accentColors.background }}
-              >
-                Create First Product
-              </button>
-            </section>
-          ) : (
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </section>
-          )}
-        </div>
+              Create First Product
+            </button>
+          </section>
+        ) : (
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </section>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

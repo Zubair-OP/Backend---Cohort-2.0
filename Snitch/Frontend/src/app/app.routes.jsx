@@ -8,6 +8,7 @@ import CreateProduct from './features/product/pages/CreateProduct';
 import ProductDetail from './features/product/pages/ProductDetail';
 import ProductDetails from './features/product/pages/ProductDetails';
 import SellerproductDetails from './features/product/pages/SellerproductDetails';
+import Cart from './features/cart/pages/Cart';
 
 const AppRoutes = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const AppRoutes = createBrowserRouter([
   {
     path: '/seller-product/:Productid',
     element: <Protected role="seller"><SellerproductDetails /></Protected>
+  },
+  {
+    path: '/cart',
+    element: <Cart />
   }
 ])
 

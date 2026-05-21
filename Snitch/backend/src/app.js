@@ -8,12 +8,13 @@ import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
 import { config } from './config/config.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import cartRoutes from './routes/cart.routes.js';
 
 const app = express();
 
 app.use(cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true
 }));
 
@@ -35,6 +36,7 @@ passport.use(new GoogleStrategy({
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
 
 
 export default app;
