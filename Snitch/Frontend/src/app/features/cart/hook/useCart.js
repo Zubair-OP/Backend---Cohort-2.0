@@ -10,12 +10,12 @@ import {
 export const useCart = () => {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.cart.items);
-    const currency = useSelector((state) => state.cart.currency);
+    const totalPrice = useSelector((state) => state.cart.totalPrice);
 
     async function handleGetCart() {
         const response = await apiGetCart();
         if (response.success) {
-            dispatch(setCart(response.cart));
+            dispatch(setCart(response));
         }
         return response;
     }
@@ -41,5 +41,5 @@ export const useCart = () => {
         return response;
     }
 
-    return { items, currency, handleAddItem, handleIncrementItem, handleDecrementItem, handleGetCart };
+    return { items, totalPrice, handleAddItem, handleIncrementItem, handleDecrementItem, handleGetCart };
 };

@@ -28,7 +28,7 @@ const ChevronLeft = () => (
 const Cart = () => {
     const navigate = useNavigate();
     const user = useSelector((state) => state.auth.user);
-    const { items, handleGetCart, handleIncrementItem, handleDecrementItem } = useCart();
+    const { items, totalPrice, handleGetCart, handleIncrementItem, handleDecrementItem } = useCart();
     const [loading, setLoading] = useState(true);
     const [updatingItem, setUpdatingItem] = useState(null);
 
@@ -48,12 +48,6 @@ const Cart = () => {
         };
         loadCart();
     }, []);
-
-    const totalAmount = items.reduce(
-        (sum, item) => sum + (item.price?.amount || 0) * item.quantity,
-        0
-    );
-    const currency = items[0]?.price?.currency || 'PKR';
 
     const handleIncrement = async (productId, variantId) => {
         const key = `${productId}-${variantId}`;
@@ -260,7 +254,7 @@ const Cart = () => {
                                     <div className="flex items-center justify-between text-xs text-text-secondary">
                                         <span>Subtotal</span>
                                         <span className="font-medium text-text-primary">
-                                            {formatCurrency(totalAmount, currency)}
+                                            {formatCurrency(totalPrice)}
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between text-xs text-text-secondary">
@@ -276,7 +270,7 @@ const Cart = () => {
                                 <div className="mt-3 flex items-center justify-between border-t border-border-light pt-3">
                                     <p className="text-sm font-medium text-text-primary">Total</p>
                                     <p className="text-base font-semibold text-text-primary">
-                                        {formatCurrency(totalAmount, currency)}
+                                        {formatCurrency(totalPrice)}
                                     </p>
                                 </div>
 

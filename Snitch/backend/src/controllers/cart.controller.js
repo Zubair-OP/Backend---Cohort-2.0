@@ -76,7 +76,12 @@ export const addToCart = async(req,res) => {
 export const getCart = async (req, res) => {
     try {
         const cart = await cartModel.findOne({ user: req.user._id }).populate('items.product', 'title images price');
-        return res.status(200).json({ message: "Cart fetched successfully", success: true, cart });
+
+        const totalPrice = cart
+            ? cart.items.reduce((sum, item) => sum + (item.price?.amount || 0) * item.quantity, 0)
+            : 0;
+
+        return res.status(200).json({ message: "Cart fetched successfully", success: true, cart, totalPrice });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });

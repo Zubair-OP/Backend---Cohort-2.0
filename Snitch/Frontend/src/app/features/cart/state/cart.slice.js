@@ -4,16 +4,16 @@ export const cartSlice = createSlice({
     name: "cart",
     initialState: {
         items: [],
-        currency: 'PKR',
+        totalPrice: 0,
     },
     reducers: {
         setCart: (state, action) => {
-            state.items = action.payload?.items || [];
-            state.currency = action.payload?.items?.[0]?.price?.currency || 'PKR';
+            state.items = action.payload?.cart?.items || [];
+            state.totalPrice = action.payload?.totalPrice || 0;
         },
         clearCart: (state) => {
             state.items = [];
-            state.currency = 'PKR';
+            state.totalPrice = 0;
         },
     },
 });
