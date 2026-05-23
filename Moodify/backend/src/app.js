@@ -5,8 +5,8 @@ const path = require('path');
 const helmet = require('helmet');
 
 const app = express();
-app.use(express.json());
 app.use(helmet());
+app.use(express.json());
 app.use(CookieParser());
 app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',

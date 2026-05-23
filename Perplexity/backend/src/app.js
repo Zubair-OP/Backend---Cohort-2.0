@@ -6,9 +6,9 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 
 
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(helmet());
 app.use(cookieParser());
 app.use(express.static('public'));
 app.use(cors({
