@@ -2,9 +2,11 @@ const express = require('express');
 const CookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
 
 const app = express();
 app.use(express.json());
+app.use(helmet());
 app.use(CookieParser());
 app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
