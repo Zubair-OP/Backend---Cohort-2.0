@@ -9,6 +9,7 @@ import { config } from './config/config.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cartRoutes from './routes/cart.routes.js';
+import helmet from 'helmet';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cors({
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
