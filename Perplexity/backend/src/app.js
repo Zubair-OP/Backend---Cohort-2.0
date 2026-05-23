@@ -3,12 +3,14 @@ const app = expess();
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import morgan from 'morgan';
+import helmet from 'helmet';
 
 
-app.use(expess.json());
-app.use(expess.urlencoded({extended: true}));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(helmet());
 app.use(cookieParser());
-app.use(expess.static('public'));
+app.use(express.static('public'));
 app.use(cors({
     origin: ['http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
