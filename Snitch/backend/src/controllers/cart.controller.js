@@ -233,6 +233,19 @@ export const decrementCartItemNoVariant = async (req, res) => {
     }
 };
 
+export const clearCart = async (req, res) => {
+    try {
+        await cartModel.findOneAndUpdate(
+            { user: req.user._id },
+            { $set: { items: [] } }
+        );
+        return res.status(200).json({ message: "Cart cleared successfully", success: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+};
+
 export const decrementCartItem = async (req, res) => {
     try {
         const { productId, variantId } = req.params;

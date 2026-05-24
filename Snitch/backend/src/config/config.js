@@ -42,15 +42,25 @@ if (!process.env.REDIS_PASSWORD) {
   throw new Error("REDIS_PASSWORD is not defined in environment variables");
 }
 
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error("STRIPE_SECRET_KEY is not defined in environment variables");
+}
+
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  throw new Error("STRIPE_WEBHOOK_SECRET is not defined in environment variables");
+}
+
 export const config = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
-  GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET:process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   IMG_KIT_PRIVATE_KEY: process.env.IMG_KIT_PRIVATE_KEY,
   IMG_KIT_PUBLIC_KEY: process.env.IMG_KIT_PUBLIC_KEY,
   IMG_KIT_URL_ENDPOINT: process.env.IMG_KIT_URL_ENDPOINT,
   REDIS_HOST: process.env.REDIS_HOST,
   REDIS_PORT: process.env.REDIS_PORT,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
 };

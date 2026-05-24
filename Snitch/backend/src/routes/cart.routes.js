@@ -4,6 +4,7 @@ import {
     addToCart,
     addToCartNoVariant,
     getCart,
+    clearCart,
     incrementCartItem,
     incrementCartItemNoVariant,
     decrementCartItem,
@@ -24,5 +25,6 @@ router.patch('/increment/:productId', authenticateUser, incrementCartItemNoVaria
 router.patch('/decrement/:productId', authenticateUser, decrementCartItemNoVariant);
 
 router.get('/get', authenticateUser, getCart);
+router.delete('/clear', authenticateUser, clearCart);
 
 export default router;

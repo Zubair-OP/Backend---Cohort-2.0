@@ -9,6 +9,8 @@ import { config } from './config/config.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cartRoutes from './routes/cart.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
+import { handleWebhook } from './controllers/payment.controller.js';
 import helmet from 'helmet';
 
 const app = express();
@@ -19,10 +21,14 @@ app.use(cors({
     credentials: true
 }));
 
-
 app.use(morgan('dev'));
-app.use(express.json());
 app.use(helmet());
+
+// Stripe webhook needs the raw request body to verify the signature.
+// This route MUST be registered before express.json() parses the body.
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
@@ -39,6 +45,7 @@ passport.use(new GoogleStrategy({
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/payments', paymentRoutes);
 
 
 export default app;

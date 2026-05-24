@@ -27,3 +27,4 @@ export const decrementCartItem = async (productId, variantId) => {
     const response = await Api.patch(url);
     return response.data;
 };
+

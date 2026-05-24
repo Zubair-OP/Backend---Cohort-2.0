@@ -9,6 +9,8 @@ import ProductDetail from './features/product/pages/ProductDetail';
 import ProductDetails from './features/product/pages/ProductDetails';
 import SellerproductDetails from './features/product/pages/SellerproductDetails';
 import Cart from './features/cart/pages/Cart';
+import Checkout from './features/payment/pages/Checkout';
+import PaymentSuccess from './features/payment/pages/PaymentSuccess';
 
 const AppRoutes = createBrowserRouter([
   {
@@ -42,6 +44,14 @@ const AppRoutes = createBrowserRouter([
   {
     path: '/cart',
     element: <Cart />
+  },
+  {
+    path: '/checkout',
+    element: <Checkout />
+  },
+  {
+    path: '/payment-success',
+    element: <PaymentSuccess />
   }
 ])
 
