@@ -1,5 +1,7 @@
 import { body, validationResult } from "express-validator";
 
+const CONTROL_CHARS = new RegExp("[\\u0000-\\u001F\\u007F]", "g");
+
 function validateRequest(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -14,9 +16,9 @@ export const chatValidator = [
     .notEmpty()
     .withMessage("Message is required")
     .isLength({ max: 500 })
-    .withMessage("Message must be 500 characters or fewer"),
+    .withMessage("Message must be 500 characters or fewer")
+    .customSanitizer((value) => String(value).replace(CONTROL_CHARS, "").trim()),
 
-  // Optional client-provided identifiers — keep them short and safe.
   body("sessionId").optional().trim().isLength({ max: 100 }).escape(),
   body("visitorId").optional().trim().isLength({ max: 100 }).escape(),
 

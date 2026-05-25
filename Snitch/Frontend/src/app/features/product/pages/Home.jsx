@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../cart/hook/useCart';
+import { useAuth } from '../../auth/hook/useAuth';
 
 const formatCurrency = (amount, currency = 'PKR') =>
   new Intl.NumberFormat('en-PK', {
@@ -25,7 +26,7 @@ function ProductCard({ product, onClick }) {
             <img
               src={coverImage}
               alt={product?.title || 'Product'}
-              className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               loading="lazy"
               decoding="async"
             />
@@ -48,18 +49,7 @@ function ProductCard({ product, onClick }) {
   );
 }
 
-function FooterList({ title, items }) {
-  return (
-    <div className="space-y-3">
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-900">{title}</h3>
-      <div className="space-y-2">
-        {items.map((item) => (
-          <p key={item} className="text-xs text-neutral-500">{item}</p>
-        ))}
-      </div>
-    </div>
-  );
-}
+
 
 function CartIcon({ className = 'h-5 w-5' }) {
   return (
@@ -74,6 +64,8 @@ function CartIcon({ className = 'h-5 w-5' }) {
 
 const Home = () => {
   const { handleGetallProductslistUser } = useProduct();
+  const { handleLogout } = useAuth();
+  const user = useSelector((state) => state.auth.user);
   const products = useSelector((state) => state.product.products);
   const loading = useSelector((state) => state.product.loading);
   const navigate = useNavigate();
@@ -112,37 +104,81 @@ const Home = () => {
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-neutral-100 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 md:px-6">
-          <div className="flex items-center gap-1 text-sm font-bold tracking-[0.25em] text-black">
+          <div className="flex cursor-pointer items-center gap-1 text-sm font-bold tracking-[0.25em] text-black" onClick={() => navigate('/')}>
             <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
             <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
           </div>
-          <button
-            onClick={() => navigate('/cart')}
-            className="relative text-neutral-700 transition-colors hover:text-black"
-          >
-            <CartIcon className="h-[18px] w-[18px]" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-0.5 text-[10px] font-semibold text-white">
-                {cartCount}
-              </span>
+
+          <div className="flex items-center gap-6">
+            {user ? (
+              <div className="flex items-center gap-4 text-xs">
+                <span className="hidden font-medium text-neutral-600 sm:inline">
+                  Hi, {user.fullname || user.fullName || user.name || 'User'}
+                </span>
+                {user.role === 'seller' && (
+                  <button
+                    onClick={() => navigate('/Dashboard')}
+                    className="rounded bg-neutral-100 px-3 py-1.5 font-medium text-neutral-800 transition-colors hover:bg-neutral-200"
+                  >
+                    Seller Panel
+                  </button>
+                )}
+                <button
+                  onClick={async () => {
+                    try {
+                      await handleLogout();
+                      toast.success('Logged out successfully.');
+                      navigate('/login');
+                    } catch (err) {
+                      toast.error('Logout failed.');
+                    }
+                  }}
+                  className="font-medium text-red-600 transition-colors hover:text-red-700"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 text-xs font-medium">
+                <button
+                  onClick={() => navigate('/login')}
+                  className="text-neutral-600 transition-colors hover:text-black"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="rounded border border-black px-3 py-1.5 text-black transition-all hover:bg-black hover:text-white"
+                >
+                  Register
+                </button>
+              </div>
             )}
-          </button>
+
+            <button
+              onClick={() => navigate('/cart')}
+              className="relative text-neutral-700 transition-colors hover:text-black"
+            >
+              <CartIcon className="h-[18px] w-[18px]" />
+              {cartCount > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-0.5 text-[10px] font-semibold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
       <section className="relative h-[60vh] overflow-hidden sm:h-[70vh] md:h-[80vh]">
-        {featuredProduct?.images?.[0]?.url ? (
-          <img
-            src={featuredProduct.images[0].url}
-            alt={featuredProduct?.title || 'Featured collection'}
-            className="h-full w-full object-cover"
-            fetchpriority="high"
-            decoding="async"
-          />
-        ) : (
-          <div className="h-full w-full bg-neutral-100" />
-        )}
+        <img
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop"
+          alt="Featured collection"
+          className="h-full w-full object-cover object-top"
+          fetchpriority="high"
+          decoding="async"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 px-4 pb-8 md:px-6 md:pb-10">
           <div className="mx-auto max-w-6xl">
@@ -193,7 +229,7 @@ const Home = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {products.slice(0, 8).map((product) => (
                 <ProductCard
                   key={product._id}
@@ -283,42 +319,11 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-100 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
-            <div className="sm:col-span-2 md:col-span-1">
-              <div className="flex items-center gap-1 text-sm font-bold tracking-[0.25em] text-black">
-                <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
-                <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
-              </div>
-              <p className="mt-3 text-xs leading-5 text-neutral-500">
-                A clean, product-first store for modern everyday menswear.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {['Visa', 'Mastercard', 'COD'].map((method) => (
-                  <span key={method} className="rounded border border-neutral-200 px-2 py-1 text-[10px] text-neutral-500">
-                    {method}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <FooterList title="Shop" items={['Shirts', 'Tees', 'Pants', 'Polos']} />
-            <FooterList
-              title="Support"
-              items={['Contact Us', 'Returns', 'Shipping Info', 'Size Guide']}
-            />
-            <FooterList
-              title="Company"
-              items={['About Us', 'Privacy Policy', 'Terms & Conditions']}
-            />
-          </div>
-
-          <div className="mt-8 border-t border-neutral-100 pt-6">
-            <p className="text-[11px] text-neutral-400">
-              &copy; 2026 Snitch. All rights reserved.
-            </p>
-          </div>
+      <footer className="border-t border-neutral-100 bg-white py-6">
+        <div className="mx-auto max-w-6xl px-4 text-center md:px-6">
+          <p className="text-[11px] tracking-wider text-neutral-400">
+            &copy; 2026 Snitch. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>

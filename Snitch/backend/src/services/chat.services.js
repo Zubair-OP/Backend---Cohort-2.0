@@ -1,26 +1,26 @@
-import Groq from 'groq-sdk';
+import { ChatGroq } from '@langchain/groq';
+import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
+import { HumanMessage, AIMessage } from '@langchain/core/messages';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 import { config } from '../config/config.js';
 import ProductModel from '../models/product.model.js';
 import ConversationModel from '../models/conversation.model.js';
 
-const groq = new Groq({ apiKey: config.GROQ_API_KEY.trim() });
+const model = new ChatGroq({
+  apiKey: config.GROQ_API_KEY.trim(),
+  model: 'llama-3.3-70b-versatile',
+  temperature: 0.6,
+  maxTokens: 1024,
+});
 
-const MODEL = 'llama-3.3-70b-versatile';
-
-// Keep only the most recent turns per session so we stay within token limits.
 const MAX_HISTORY = 15;
-
-// Drop in-memory sessions that have been idle for this long.
-const SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
-
-// Maximum products injected as grounding context for a single reply.
+const SESSION_TTL_MS = 30 * 60 * 1000;
 const MAX_CONTEXT_PRODUCTS = 5;
 
 /* ------------------------------------------------------------------ */
-/*  In-memory conversation memory (per session)                       */
+/*  In-memory session memory                                           */
 /* ------------------------------------------------------------------ */
 
-// sessionId -> { messages: [{ role, content, timestamp }], lastActive }
 const sessions = new Map();
 
 export function getSessionHistory(sessionId) {
@@ -28,7 +28,6 @@ export function getSessionHistory(sessionId) {
   return session ? session.messages : [];
 }
 
-// Append a turn and keep the rolling window trimmed to MAX_HISTORY.
 export function appendMessage(sessionId, role, content) {
   let session = sessions.get(sessionId);
   if (!session) {
@@ -46,7 +45,6 @@ export function appendMessage(sessionId, role, content) {
   return session.messages;
 }
 
-// Periodically evict idle sessions so the Map does not grow unbounded.
 const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [sessionId, session] of sessions.entries()) {
@@ -54,13 +52,12 @@ const cleanupTimer = setInterval(() => {
       sessions.delete(sessionId);
     }
   }
-}, 5 * 60 * 1000); // sweep every 5 minutes
+}, 5 * 60 * 1000);
 
-// Don't let this timer keep the process alive on its own.
 cleanupTimer.unref?.();
 
 /* ------------------------------------------------------------------ */
-/*  Product context injection                                         */
+/*  Product context                                                    */
 /* ------------------------------------------------------------------ */
 
 const STOP_WORDS = new Set([
@@ -69,7 +66,6 @@ const STOP_WORDS = new Set([
   'any', 'some', 'looking', 'want', 'need', 'please', 'tell', 'from',
 ]);
 
-// Pull meaningful keywords out of a free-text query.
 function extractKeywords(query) {
   return (query || '')
     .toLowerCase()
@@ -79,24 +75,20 @@ function extractKeywords(query) {
     .slice(0, 8);
 }
 
-// Compute a human-readable stock status from a product's variants.
 function describeStock(product) {
   const variants = product.variants || [];
   if (variants.length === 0) return 'Available';
-
   const total = variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
   return total > 0 ? `In stock (${total} available)` : 'Out of stock';
 }
 
-// Keyword-based search across product title and description (regex based,
-// so it needs no special text index on the collection).
 export async function findRelevantProducts(query) {
   const keywords = extractKeywords(query);
   if (keywords.length === 0) return [];
 
   const regexes = keywords.map((word) => new RegExp(word, 'i'));
 
-  const products = await ProductModel.find({
+  return ProductModel.find({
     $or: [
       { title: { $in: regexes } },
       { description: { $in: regexes } },
@@ -104,11 +96,8 @@ export async function findRelevantProducts(query) {
   })
     .limit(MAX_CONTEXT_PRODUCTS)
     .lean();
-
-  return products;
 }
 
-// Format matched products into a compact block the model can ground on.
 function formatProductContext(products) {
   if (!products.length) {
     return 'No matching products were found in the catalog for this query.';
@@ -127,7 +116,7 @@ function formatProductContext(products) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  System prompt                                                     */
+/*  System prompt                                                      */
 /* ------------------------------------------------------------------ */
 
 export function buildSystemPrompt(products) {
@@ -158,40 +147,38 @@ ${formatProductContext(products)}`;
 }
 
 /* ------------------------------------------------------------------ */
-/*  Groq streaming                                                    */
+/*  LangChain chain                                                    */
 /* ------------------------------------------------------------------ */
 
-// Returns an async-iterable stream of completion chunks from Groq.
-// The caller is responsible for catching errors (e.g. 429 rate limits).
-export async function streamChatCompletion(systemPrompt, history) {
-  const messages = [
-    { role: 'system', content: systemPrompt },
-    ...history.map(({ role, content }) => ({ role, content })),
-  ];
+const promptTemplate = ChatPromptTemplate.fromMessages([
+  ['system', '{systemPrompt}'],
+  new MessagesPlaceholder('history'),
+]);
 
-  return groq.chat.completions.create({
-    model: MODEL,
-    messages,
-    stream: true,
-    temperature: 0.6,
-    max_tokens: 1024,
+const chain = promptTemplate.pipe(model).pipe(new StringOutputParser());
+
+function toLangChainMessages(messages) {
+  return messages.map(({ role, content }) =>
+    role === 'user' ? new HumanMessage(content) : new AIMessage(content),
+  );
+}
+
+// Returns an async iterable where each chunk is a plain string token.
+export async function streamChatCompletion(systemPrompt, history) {
+  return chain.stream({
+    systemPrompt,
+    history: toLangChainMessages(history),
   });
 }
 
 /* ------------------------------------------------------------------ */
-/*  Persistence                                                       */
+/*  Persistence                                                        */
 /* ------------------------------------------------------------------ */
 
-// Upsert the full conversation for a session. Called after each bot reply
-// (not after every user message) to reduce DB writes.
 export async function persistConversation(sessionId, visitorId, messages) {
   await ConversationModel.findOneAndUpdate(
     { sessionId },
-    {
-      sessionId,
-      visitorId: visitorId || 'anonymous',
-      messages,
-    },
+    { sessionId, visitorId: visitorId || 'anonymous', messages },
     { upsert: true, new: true, setDefaultsOnInsert: true },
   );
 }

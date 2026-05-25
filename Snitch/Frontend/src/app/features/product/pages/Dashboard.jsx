@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../auth/hook/useAuth';
 
 const CATEGORIES = ['shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
 
@@ -47,7 +48,7 @@ function ProductCard({ product }) {
               <img
                 src={coverImage}
                 alt={product.title}
-                className="h-full w-full object-contain"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
                 decoding="async"
               />
@@ -89,6 +90,7 @@ function ProductCard({ product }) {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { handleGetAllProducts } = useProduct();
+  const { handleLogout } = useAuth();
   const user = useSelector((state) => state.auth.user);
   const products = useSelector((state) => state.product.products);
   const loading = useSelector((state) => state.product.loading);
@@ -128,40 +130,97 @@ const Dashboard = () => {
       : (products || []).filter((p) => p.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
-            <p className="text-sm text-text-muted">Seller dashboard</p>
-            <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
-              {sellerName}&apos;s product catalog
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-text-secondary">
-              Review your listed products, monitor catalog value, and keep the storefront aligned with the same clean Snitch presentation.
-            </p>
+    <div className="min-h-screen bg-bg-primary text-text-primary">
+      {/* Seller Console Navigation Header */}
+      <header className="sticky top-0 z-30 border-b border-border-light bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 md:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex cursor-pointer items-center gap-1 text-sm font-bold tracking-[0.25em] text-black" onClick={() => navigate('/')}>
+              <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
+              <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
+            </div>
+            <span className="rounded bg-black px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-white uppercase">
+              Seller Console
+            </span>
           </div>
 
-          <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
-            <div className="grid grid-cols-2 gap-5">
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => navigate('/')}
+              className="text-xs font-medium text-neutral-600 transition-colors hover:text-black"
+            >
+              View Storefront
+            </button>
+            <div className="h-4 w-px bg-neutral-200" />
+            <div className="flex items-center gap-3 text-xs">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 font-semibold text-neutral-800">
+                {sellerName.charAt(0).toUpperCase()}
+              </div>
+              <span className="hidden font-medium text-neutral-700 md:inline">
+                Hi, {sellerName}
+              </span>
+              <button
+                onClick={async () => {
+                  try {
+                    await handleLogout();
+                    toast.success('Logged out successfully.');
+                    navigate('/login');
+                  } catch (err) {
+                    toast.error('Logout failed.');
+                  }
+                }}
+                className="font-medium text-red-600 transition-colors hover:text-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8 flex flex-col gap-8">
+        <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+          <div className="flex flex-col justify-between rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Merchant Portal</p>
+              <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+                {sellerName}&apos;s product catalog
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-text-secondary">
+                Review your listed products, monitor catalog value, and keep the storefront aligned with the same clean Snitch presentation.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/create-product')}
+                className="rounded bg-black px-6 py-2.5 text-xs font-normal text-white transition-all duration-300 hover:bg-gray-800"
+              >
+                Add New Product
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="rounded border border-black px-6 py-2.5 text-xs font-normal text-black transition-all duration-300 hover:bg-black hover:text-white"
+              >
+                Browse Storefront
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center rounded border border-border-light bg-neutral-50 px-6 py-7 md:px-8">
+            <div className="space-y-6">
               <div>
-                <p className="text-sm text-text-muted">Total Products</p>
-                <p className="mt-2 text-3xl font-medium text-text-primary">{totalProducts}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Total Products</p>
+                <p className="mt-1 text-4xl font-semibold text-text-primary">{totalProducts}</p>
               </div>
               <div>
-                <p className="text-sm text-text-muted">Catalog Value</p>
-                <p className="mt-2 text-2xl font-medium text-text-primary">
+                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Catalog Value</p>
+                <p className="mt-1 text-3xl font-semibold text-text-primary">
                   {formatCurrency(totalValue, primaryCurrency)}
                 </p>
               </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => navigate('/create-product')}
-              className="mt-6 w-full rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
-            >
-              Add New Product
-            </button>
           </div>
         </section>
 

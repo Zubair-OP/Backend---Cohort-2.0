@@ -16,7 +16,11 @@ function ChatIcon({ className = "h-5 w-5" }) {
       className={className}
       aria-hidden="true"
     >
-      <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.7-.8L3 21l1.8-5.3A8.5 8.5 0 1 1 21 11.5z" />
+      <path d="M12 8V4m0 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM5 8h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z" />
+      <circle cx="8.5" cy="14" r="1.2" fill="currentColor" />
+      <circle cx="15.5" cy="14" r="1.2" fill="currentColor" />
+      <path d="M9 17h6" />
+      <path d="M2 13v3M22 13v3" />
     </svg>
   );
 }

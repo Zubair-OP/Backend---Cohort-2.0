@@ -13,6 +13,8 @@
   "type": "module",
   "dependencies": {
     "@imagekit/nodejs": "^7.5.0",
+    "@langchain/core": "^1.1.48",
+    "@langchain/groq": "^1.2.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
