@@ -109,7 +109,7 @@ export const googleCallBack = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect("http://localhost:5173/");
+    res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

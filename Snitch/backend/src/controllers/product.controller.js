@@ -96,6 +96,54 @@ export const getAllProductslist = async (req, res) => {
   }
 };
 
+export const filterProducts = async (req, res) => {
+  try {
+    const { category = "all", search = "", sortBy = "latest" } = req.query;
+    const normalizedSearch = search.trim();
+    const query = {};
+
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    if (normalizedSearch) {
+      query.$or = [
+        { title: { $regex: normalizedSearch, $options: "i" } },
+        { description: { $regex: normalizedSearch, $options: "i" } },
+      ];
+    }
+
+    const sortOptions = {
+      latest: { createdAt: -1 },
+      "price-low": { "price.amount": 1, createdAt: -1 },
+      "price-high": { "price.amount": -1, createdAt: -1 },
+    };
+
+    const products = await ProductModel.find(query)
+      .sort(sortOptions[sortBy] || sortOptions.latest)
+      .lean();
+
+    res.status(200).json({
+      message: "Filtered products fetched successfully",
+      success: true,
+      count: products.length,
+      appliedFilters: {
+        category,
+        search: normalizedSearch,
+        sortBy,
+      },
+      products,
+    });
+  } catch (error) {
+    console.error("filterProducts failed:", error);
+
+    res.status(500).json({
+      message: "Failed to filter products",
+      error: error.message || "Unknown error",
+    });
+  }
+};
+
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;

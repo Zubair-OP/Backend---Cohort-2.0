@@ -136,7 +136,18 @@ const ProductDetail = () => {
   const allAttrsSelected = hasAttributes && attrKeys.every((k) => selectedAttributes[k]);
   const variantNotFound = hasAttributes && allAttrsSelected && !selectedVariant;
   const isOutOfStock = activeVariant != null && activeVariant.stock === 0;
-  const needsSelection = false;
+  const needsSelection =
+    (hasAttributes && !allAttrsSelected) ||
+    (noAttrVariants.length > 0 && activeNoAttrVariant == null) ||
+    variantNotFound;
+  const selectedSummary = hasAttributes
+    ? attrKeys
+        .map((key) => selectedAttributes[key])
+        .filter(Boolean)
+        .join(' / ')
+    : activeNoAttrVariant
+    ? `Option ${selectedNoAttrIdx + 1}`
+    : '';
 
   useEffect(() => {
     if (displayImages.length) {
@@ -154,9 +165,9 @@ const ProductDetail = () => {
   async function handleAddToCart() {
     if (!user) {
       navigate('/login');
-      return;
+      return false;
     }
-    if (hasVariants && !activeVariant) return;
+    if (hasVariants && (!activeVariant || needsSelection)) return false;
     try {
       setAddingToCart(true);
       await handleAddItem(product._id, activeVariant?._id);
@@ -164,10 +175,19 @@ const ProductDetail = () => {
         onClick: () => navigate('/cart'),
         autoClose: 3000,
       });
+      return true;
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to add to cart.');
+      return false;
     } finally {
       setAddingToCart(false);
+    }
+  }
+
+  async function handleBuyNow() {
+    const added = await handleAddToCart();
+    if (added) {
+      navigate('/checkout');
     }
   }
 
@@ -468,6 +488,12 @@ const ProductDetail = () => {
                   <p className="text-xs text-amber-600">This combination is not available.</p>
                 )}
 
+                {needsSelection && !variantNotFound && (
+                  <p className="text-xs text-text-muted">
+                    Select your preferred option to continue.
+                  </p>
+                )}
+
                 {activeVariant && !variantNotFound && (
                   <p className={`text-xs ${isOutOfStock ? 'text-red-600' : 'text-text-secondary'}`}>
                     {isOutOfStock
@@ -486,6 +512,15 @@ const ProductDetail = () => {
                 </p>
               </div>
 
+              {selectedSummary && !variantNotFound ? (
+                <div className="rounded border border-border-light bg-neutral-50 px-3 py-2.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-text-secondary">
+                    Selected
+                  </p>
+                  <p className="mt-1 text-sm text-text-primary">{selectedSummary}</p>
+                </div>
+              ) : null}
+
               <div className="grid gap-2 sm:grid-cols-2">
                 <button
                   type="button"
@@ -503,6 +538,7 @@ const ProductDetail = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={handleBuyNow}
                   disabled={isOutOfStock || needsSelection}
                   className="w-full rounded border border-black px-6 py-2.5 text-xs font-medium text-black transition-all duration-300 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                 >

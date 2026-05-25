@@ -3,6 +3,7 @@ import {
   createProduct,
   getProductById,
   getallProductslistUser,
+  getFilteredProducts,
   addProductVariant,
   updateProductVariant,
   deleteProductVariant,
@@ -69,6 +70,20 @@ export function useProduct() {
     }
   }
 
+  async function handleGetFilteredProducts(filters) {
+    try {
+      dispatch(setLoading(true));
+      const response = await getFilteredProducts(filters);
+      dispatch(setProducts(response.products));
+      return response.products;
+    } catch (error) {
+      console.error("Error filtering products:", error);
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+
   async function handleAddVariant(productId, variantData) {
     try {
       dispatch(setLoading(true));
@@ -113,6 +128,7 @@ export function useProduct() {
     handleCreateProduct,
     handleGetProductById,
     handleGetallProductslistUser,
+    handleGetFilteredProducts,
     handleAddVariant,
     handleUpdateVariant,
     handleDeleteVariant,

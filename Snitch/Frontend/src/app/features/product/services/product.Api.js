@@ -47,6 +47,16 @@ export async function getallProductslistUser() {
   }
 }
 
+export async function getFilteredProducts(params = {}) {
+  try {
+    const response = await Api.get('/filter', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error filtering products:', error);
+    throw error;
+  }
+}
+
 export async function addProductVariant(productId, newProductVariant) {
   const formData = new FormData();
 

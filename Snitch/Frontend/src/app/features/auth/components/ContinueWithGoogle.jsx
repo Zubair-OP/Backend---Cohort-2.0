@@ -2,7 +2,7 @@ import React from 'react';
 
 const GOOGLE_AUTH_URL = 'http://localhost:3000/api/auth/google';
 
-const ContinueWithGoogle = () => {
+const ContinueWithGoogle = ({ compact = false }) => {
     const handleGoogleAuth = () => {
         window.location.href = GOOGLE_AUTH_URL;
     };
@@ -11,7 +11,9 @@ const ContinueWithGoogle = () => {
         <button
             type="button"
             onClick={handleGoogleAuth}
-            className="flex w-full items-center justify-center gap-3 rounded border border-border-default bg-white px-4 py-3 text-sm font-normal text-text-primary transition-all duration-300 hover:border-black hover:bg-black hover:text-white"
+            className={`flex w-full items-center justify-center gap-3 rounded border border-border-default bg-white px-4 text-sm font-normal text-text-primary transition-all duration-300 hover:border-black hover:bg-black hover:text-white ${
+                compact ? 'py-2.5' : 'py-3'
+            }`}
         >
             <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

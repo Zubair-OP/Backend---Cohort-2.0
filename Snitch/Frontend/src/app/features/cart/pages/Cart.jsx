@@ -11,6 +11,8 @@ const formatCurrency = (amount, currency = 'PKR') =>
         maximumFractionDigits: 0,
     }).format(Number(amount) || 0);
 
+const buildCartKey = (productId, variantId) => `${productId}-${variantId ?? 'no-variant'}`;
+
 const CartIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto h-12 w-12 text-neutral-300">
         <circle cx="9" cy="20" r="1.25" />
@@ -37,6 +39,7 @@ const Cart = () => {
             navigate('/login');
             return;
         }
+
         const loadCart = async () => {
             try {
                 await handleGetCart();
@@ -46,11 +49,12 @@ const Cart = () => {
                 setLoading(false);
             }
         };
+
         loadCart();
     }, []);
 
     const handleIncrement = async (productId, variantId) => {
-        const key = `${productId}-${variantId}`;
+        const key = buildCartKey(productId, variantId);
         try {
             setUpdatingItem(key);
             await handleIncrementItem(productId, variantId);
@@ -61,11 +65,12 @@ const Cart = () => {
         }
     };
 
-    const handleDecrement = async (productId, variantId) => {
-        const key = `${productId}-${variantId}`;
+    const handleDecrement = async (productId, variantId, quantity) => {
+        const key = buildCartKey(productId, variantId);
         try {
             setUpdatingItem(key);
             await handleDecrementItem(productId, variantId);
+            toast.success(quantity === 1 ? 'Item removed from bag.' : 'Bag updated.');
         } catch (error) {
             toast.error(error?.response?.data?.message || 'Failed to update quantity.');
         } finally {
@@ -75,7 +80,6 @@ const Cart = () => {
 
     return (
         <div className="min-h-screen bg-neutral-50 text-text-primary">
-            {/* Header */}
             <header className="border-b border-border-light bg-white">
                 <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3.5 md:px-6">
                     <button
@@ -98,11 +102,11 @@ const Cart = () => {
             <main className="mx-auto max-w-5xl px-4 py-6 md:px-6 md:py-8">
                 <div className="mb-6 flex items-baseline gap-2">
                     <h1 className="text-lg font-medium text-text-primary">Shopping Bag</h1>
-                    {!loading && items.length > 0 && (
+                    {!loading && items.length > 0 ? (
                         <span className="text-xs text-text-muted">
                             {items.length} {items.length === 1 ? 'item' : 'items'}
                         </span>
-                    )}
+                    ) : null}
                 </div>
 
                 {loading ? (
@@ -137,24 +141,24 @@ const Cart = () => {
                     </div>
                 ) : (
                     <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-
-                        {/* Cart Items */}
                         <div className="space-y-2.5">
                             {items.map((item) => {
                                 const productId = item.product?._id || item.product;
                                 const variantId = item.variant?._id || item.variant || null;
-                                const key = `${productId}-${variantId ?? 'no-variant'}`;
+                                const key = buildCartKey(productId, variantId);
                                 const isUpdating = updatingItem === key;
                                 const image = item.product?.images?.[0]?.url;
                                 const title = item.product?.title;
                                 const subtotal = (item.price?.amount || 0) * item.quantity;
+                                const variantAttributes = item.variant?.attributes
+                                    ? Object.entries(item.variant.attributes)
+                                    : [];
 
                                 return (
                                     <div
                                         key={key}
                                         className="flex gap-3 rounded-lg border border-border-light bg-white p-3 sm:p-4"
                                     >
-                                        {/* Image */}
                                         <div className="h-24 w-20 shrink-0 overflow-hidden rounded border border-neutral-100 bg-white sm:h-28 sm:w-24">
                                             {image ? (
                                                 <img
@@ -171,12 +175,18 @@ const Cart = () => {
                                             )}
                                         </div>
 
-                                        {/* Details */}
                                         <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
                                             <div className="flex items-start justify-between gap-2">
-                                                <h3 className="line-clamp-2 text-sm font-medium leading-5 text-text-primary">
-                                                    {title || 'Product'}
-                                                </h3>
+                                                <div className="min-w-0">
+                                                    <h3 className="line-clamp-2 text-sm font-medium leading-5 text-text-primary">
+                                                        {title || 'Product'}
+                                                    </h3>
+                                                    {variantAttributes.length > 0 ? (
+                                                        <p className="mt-1 text-xs text-text-secondary">
+                                                            {variantAttributes.map(([name, value]) => `${name}: ${value}`).join(' | ')}
+                                                        </p>
+                                                    ) : null}
+                                                </div>
                                                 <p className="shrink-0 text-sm font-semibold text-text-primary">
                                                     {formatCurrency(subtotal, item.price?.currency)}
                                                 </p>
@@ -186,22 +196,24 @@ const Cart = () => {
                                                 {formatCurrency(item.price?.amount, item.price?.currency)} / piece
                                             </p>
 
-                                            <div className="mt-3 flex items-center justify-between">
+                                            <div className="mt-3 flex items-center justify-between gap-3">
                                                 <div className="flex items-center rounded border border-neutral-200">
                                                     <button
-                                                        onClick={() => handleDecrement(productId, variantId)}
+                                                        onClick={() => handleDecrement(productId, variantId, item.quantity)}
                                                         disabled={isUpdating}
                                                         className="flex h-7 w-7 items-center justify-center text-sm text-text-primary transition-colors hover:bg-neutral-50 disabled:opacity-40"
+                                                        aria-label={item.quantity === 1 ? 'Remove item' : 'Decrease quantity'}
                                                     >
-                                                        −
+                                                        -
                                                     </button>
                                                     <span className="w-7 text-center text-xs font-medium text-text-primary">
-                                                        {isUpdating ? '·' : item.quantity}
+                                                        {isUpdating ? '...' : item.quantity}
                                                     </span>
                                                     <button
                                                         onClick={() => handleIncrement(productId, variantId)}
                                                         disabled={isUpdating}
                                                         className="flex h-7 w-7 items-center justify-center text-sm text-text-primary transition-colors hover:bg-neutral-50 disabled:opacity-40"
+                                                        aria-label="Increase quantity"
                                                     >
                                                         +
                                                     </button>
@@ -209,10 +221,10 @@ const Cart = () => {
 
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleDecrement(productId, variantId)}
+                                                    onClick={() => handleDecrement(productId, variantId, item.quantity)}
                                                     className="text-xs text-text-muted transition-colors hover:text-red-500"
                                                 >
-                                                    Remove
+                                                    {item.quantity === 1 ? 'Remove item' : 'Remove one'}
                                                 </button>
                                             </div>
                                         </div>
@@ -221,7 +233,6 @@ const Cart = () => {
                             })}
                         </div>
 
-                        {/* Order Summary */}
                         <div className="h-fit lg:sticky lg:top-6">
                             <div className="rounded-lg border border-border-light bg-white p-4">
                                 <h2 className="text-sm font-medium text-text-primary">Order Summary</h2>
@@ -232,17 +243,17 @@ const Cart = () => {
                                         const variantId = item.variant?._id || item.variant;
                                         return (
                                             <div
-                                                key={`sum-${productId}-${variantId ?? 'nv'}`}
+                                                key={`sum-${buildCartKey(productId, variantId)}`}
                                                 className="flex items-start justify-between gap-2"
                                             >
                                                 <span className="line-clamp-1 max-w-[65%] text-xs text-text-secondary">
                                                     {item.product?.title || 'Product'}
-                                                    <span className="ml-1 text-text-muted">×{item.quantity}</span>
+                                                    <span className="ml-1 text-text-muted">x{item.quantity}</span>
                                                 </span>
                                                 <span className="shrink-0 text-xs font-medium text-text-primary">
                                                     {formatCurrency(
                                                         (item.price?.amount || 0) * item.quantity,
-                                                        item.price?.currency
+                                                        item.price?.currency,
                                                     )}
                                                 </span>
                                             </div>

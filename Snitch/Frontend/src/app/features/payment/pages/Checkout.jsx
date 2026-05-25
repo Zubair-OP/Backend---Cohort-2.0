@@ -61,7 +61,6 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
             setErrorMessage(error.message);
             setPaying(false);
         } else if (paymentIntent?.status === 'succeeded') {
-            // Sirf Redux state clear karo — DB cart webhook handle karega
             dispatch(clearCart());
             navigate('/payment-success', { state: { paymentId, amount: cartTotal } });
         } else {
@@ -74,11 +73,11 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
         <form onSubmit={handleSubmit} className="space-y-5">
             <PaymentElement options={{ layout: 'tabs' }} />
 
-            {errorMessage && (
+            {errorMessage ? (
                 <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">
                     {errorMessage}
                 </div>
-            )}
+            ) : null}
 
             <button
                 type="submit"
@@ -88,7 +87,7 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
                 {paying ? (
                     <>
                         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Processing…
+                        Processing...
                     </>
                 ) : (
                     <>
@@ -144,17 +143,20 @@ const Checkout = () => {
             </header>
 
             <main className="mx-auto max-w-md px-4 py-10 md:px-6">
-                <h1 className="mb-6 text-lg font-medium text-text-primary">Checkout</h1>
+                <h1 className="mb-2 text-lg font-medium text-text-primary">Checkout</h1>
+                <p className="mb-6 text-sm text-text-secondary">
+                    Review your payment details and complete your order securely.
+                </p>
 
-                {loading && (
+                {loading ? (
                     <div className="space-y-3">
                         <div className="h-10 animate-pulse rounded bg-neutral-200" />
                         <div className="h-10 animate-pulse rounded bg-neutral-200" />
                         <div className="h-10 animate-pulse rounded bg-neutral-100" />
                     </div>
-                )}
+                ) : null}
 
-                {error && !loading && (
+                {error && !loading ? (
                     <div className="rounded-lg border border-border-light bg-white p-6 text-center">
                         <p className="text-sm text-red-500">{error}</p>
                         <button
@@ -164,9 +166,9 @@ const Checkout = () => {
                             Return to cart
                         </button>
                     </div>
-                )}
+                ) : null}
 
-                {clientSecret && !loading && (
+                {clientSecret && !loading ? (
                     <div className="rounded-lg border border-border-light bg-white p-5 shadow-sm">
                         <Elements
                             stripe={stripePromise}
@@ -185,7 +187,7 @@ const Checkout = () => {
                             <CheckoutForm paymentId={paymentId} cartTotal={cartTotal} />
                         </Elements>
                     </div>
-                )}
+                ) : null}
             </main>
         </div>
     );

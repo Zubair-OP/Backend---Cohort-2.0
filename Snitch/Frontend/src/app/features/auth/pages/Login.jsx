@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from "../hook/useAuth";
+import { useAuth } from '../hook/useAuth';
 import { useNavigate } from 'react-router';
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
 import { toast } from 'react-toastify';
@@ -13,13 +13,13 @@ const Login = () => {
 
     const [formData, setFormData] = useState({
         email: '',
-        password: ''
+        password: '',
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setErrors(prev => ({ ...prev, [name]: '' }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        setErrors((prev) => ({ ...prev, [name]: '' }));
         setFormError('');
     };
 
@@ -31,18 +31,18 @@ const Login = () => {
             setFormError('');
             const user = await handleLogin({
                 email: formData.email,
-                password: formData.password
+                password: formData.password,
             });
 
             toast.success('Signed in successfully.');
-            
+
             if (user.role === 'seller') {
-                navigate("/Dashboard");
+                navigate('/Dashboard');
             } else {
-                navigate("/");
+                navigate('/');
             }
         } catch (error) {
-            console.error("Login failed:", error);
+            console.error('Login failed:', error);
             setErrors(error.fieldErrors || {});
             setFormError(error.message || 'Unable to sign in.');
             toast.error(error.message || 'Unable to sign in.');
@@ -54,7 +54,7 @@ const Login = () => {
     const inputStyle = {
         color: '#1b1c1a',
         borderBottom: '1px solid #d0c5b5',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Inter', sans-serif",
     };
 
     const handleFocus = (e) => { e.target.style.borderBottomColor = '#C9A96E'; };
@@ -87,7 +87,7 @@ const Login = () => {
                     </div>
                 </div>
 
-                <div className="flex h-full items-center justify-center px-4 py-4 sm:px-6 md:px-8">
+                <div className="flex h-full items-center justify-center overflow-y-auto px-4 py-4 sm:px-6 md:px-8">
                     <div className="w-full max-w-[430px] rounded border border-border-light bg-white p-5">
                         <div className="mb-5 flex items-center justify-between">
                             <div className="flex items-center gap-1 text-xs font-semibold tracking-[0.16em] text-black">
@@ -137,9 +137,9 @@ const Login = () => {
                                     <label htmlFor="login-password" className="text-[13px] font-medium text-text-primary">
                                         Password
                                     </label>
-                                    <a href="#" className="text-xs text-text-muted transition-all duration-300 hover:text-black">
-                                        Forgot?
-                                    </a>
+                                    <span className="text-xs text-text-muted">
+                                        Password reset coming soon
+                                    </span>
                                 </div>
                                 <input
                                     id="login-password"
@@ -148,7 +148,7 @@ const Login = () => {
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
-                                    placeholder="••••••••"
+                                    placeholder="........"
                                     className="h-9 w-full rounded border border-border-default bg-white px-4 text-[13px] text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
                                     style={inputStyle}
                                     onFocus={handleFocus}
