@@ -3,7 +3,7 @@ import {uploadImage} from "../services/storage.services.js";
 
 export const addProduct = async (req, res) => {
   try {
-    const { title, description, priceAmount, priceCurrency } = req.body;
+    const { title, description, priceAmount, priceCurrency, category } = req.body;
     const sellerId = req.user._id;
     const files = req.files || [];
 
@@ -29,6 +29,7 @@ export const addProduct = async (req, res) => {
         amount: Number(priceAmount),
         currency: priceCurrency || "PKR",
       },
+      category,
       sellerId,
       images,
     });

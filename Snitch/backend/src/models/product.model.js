@@ -1,70 +1,80 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-export const priceSchema = new mongoose.Schema({
+export const priceSchema = new mongoose.Schema(
+  {
     amount: {
-        type: Number,
-        required: true,
+      type: Number,
+      required: true,
     },
     currency: {
-        type: String,
-        default: 'PKR',
+      type: String,
+      default: "PKR",
     },
-}, { _id: false });
+  },
+  { _id: false },
+);
 
-const productSchema = new mongoose.Schema({
+const productSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     description: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     price: {
-        type: priceSchema,
-        required: true,
+      type: priceSchema,
+      required: true,
     },
     images: [
-        {
-            url: {
-                type: String,
-                required: true
-            },
-            fileId: {
-                type: String,
-            }
-        }
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        fileId: {
+          type: String,
+        },
+      },
     ],
+    category: {
+      type: String,
+      enum: ["shirts", "pants", "caps", "hoodies", "shoes",'Kameez Shalwar'],
+    },
     sellerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     variants: [
-        {
-            images: [
-                {
-                    url: {
-                        type: String,
-                        required: true
-                    }
-                }
-            ],
-            stock: {
-                type: Number,
-                default: 0
+      {
+        images: [
+          {
+            url: {
+              type: String,
+              required: true,
             },
-            attributes: {
-                type: Map,
-                of: String
-            },
-            price: {
-                type: priceSchema,
-            }
+          },
+        ],
+        stock: {
+          type: Number,
+          default: 0,
         },
-    ]
-}, { timestamps: true });
+        attributes: {
+          type: Map,
+          of: String,
+        },
+        price: {
+          type: priceSchema,
+        },
+      },
+    ],
+  },
+  { timestamps: true },
+);
 
-const ProductModel = mongoose.model('Product', productSchema);
+const ProductModel = mongoose.model("Product", productSchema);
 
 export default ProductModel;

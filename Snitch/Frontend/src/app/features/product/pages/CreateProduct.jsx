@@ -4,11 +4,14 @@ import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 
 const MAX_IMAGES = 7;
+const CATEGORIES = ['shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
+
 const defaultForm = {
   title: '',
   description: '',
   amount: '',
   currency: 'PKR',
+  category: '',
 };
 
 const inputStyle = {
@@ -130,6 +133,10 @@ const CreateProduct = () => {
       nextErrors.currency = 'Currency is required.';
     }
 
+    if (!formData.category) {
+      nextErrors.category = 'Please select a category.';
+    }
+
     if (!previews.length) {
       nextErrors.images = 'Add at least one image.';
     }
@@ -221,6 +228,7 @@ const CreateProduct = () => {
     payload.append('description', formData.description.trim());
     payload.append('priceAmount', formData.amount);
     payload.append('priceCurrency', formData.currency.trim() || 'PKR');
+    payload.append('category', formData.category);
 
     previews.forEach((preview) => {
       payload.append('images', preview.file);
@@ -349,6 +357,23 @@ const CreateProduct = () => {
                   />
                 </FormField>
               </div>
+
+              <FormField label="Category" error={errors.category}>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black disabled:opacity-60"
+                  disabled={isSubmitting}
+                >
+                  <option value="">Select a category</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
             </div>
           </div>
 

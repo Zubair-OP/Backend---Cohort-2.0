@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 import { Link } from 'react-router-dom';
+
+const CATEGORIES = ['shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
 
 const accentColors = {
   background: '#fbf9f6',
@@ -90,6 +92,7 @@ const Dashboard = () => {
   const user = useSelector((state) => state.auth.user);
   const products = useSelector((state) => state.product.products);
   const loading = useSelector((state) => state.product.loading);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     let isMounted = true;
@@ -118,6 +121,11 @@ const Dashboard = () => {
     0,
   );
   const primaryCurrency = products?.[0]?.price?.currency || 'PKR';
+
+  const filteredProducts =
+    selectedCategory === 'all'
+      ? (products || [])
+      : (products || []).filter((p) => p.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
@@ -157,6 +165,30 @@ const Dashboard = () => {
           </div>
         </section>
 
+        <div className="flex items-center gap-3">
+          <label htmlFor="category-filter" className="text-sm text-text-muted whitespace-nowrap">
+            Filter by category
+          </label>
+          <select
+            id="category-filter"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="rounded border border-border-light bg-white px-3 py-2 text-sm text-text-primary focus:border-black focus:outline-none"
+          >
+            <option value="all">All Categories</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </option>
+            ))}
+          </select>
+          {selectedCategory !== 'all' && (
+            <span className="text-sm text-text-muted">
+              {filteredProducts.length} product{filteredProducts.length === 1 ? '' : 's'}
+            </span>
+          )}
+        </div>
+
         {loading ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
@@ -187,9 +219,26 @@ const Dashboard = () => {
               Create First Product
             </button>
           </section>
+        ) : filteredProducts.length === 0 ? (
+          <section className="rounded border border-border-light bg-bg-secondary px-6 py-16 text-center">
+            <p className="text-sm text-text-muted">No products found</p>
+            <h2 className="mt-3 text-2xl font-medium text-text-primary">
+              No products in &ldquo;{selectedCategory}&rdquo; category
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-text-secondary">
+              You have no products listed under this category yet.
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('all')}
+              className="mt-6 rounded border border-black px-6 py-2.5 text-sm text-text-primary transition-all duration-300 hover:bg-black hover:text-white"
+            >
+              Show all products
+            </button>
+          </section>
         ) : (
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </section>
