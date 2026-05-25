@@ -7,6 +7,6 @@ services:
         - ./backend:/app
         - backend_node_modules:/app/node_modules
     command: npx nodemon -L /app/server.js 
-
+    
 volumes:
   backend_node_modules:
