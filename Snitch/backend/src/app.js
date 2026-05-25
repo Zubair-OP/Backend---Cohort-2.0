@@ -11,6 +11,7 @@ import path from 'path';
 import cartRoutes from './routes/cart.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import { handleWebhook } from './controllers/payment.controller.js';
+import chatRoutes from './routes/chat.routes.js';
 import helmet from 'helmet';
 
 const app = express();
@@ -46,6 +47,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/chat', chatRoutes);
 
 
 export default app;

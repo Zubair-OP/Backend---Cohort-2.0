@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir frontend\\\\src\\\\app /s /b)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\DELL\\\\Desktop\\\\Backend - Cohort 2.0\\\\Snitch\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(npm install *)"
     ]
   }
 }

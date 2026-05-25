@@ -50,6 +50,10 @@ if (!process.env.STRIPE_WEBHOOK_SECRET) {
   throw new Error("STRIPE_WEBHOOK_SECRET is not defined in environment variables");
 }
 
+if (!process.env.GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY is not defined in environment variables");
+}
+
 export const config = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
@@ -63,4 +67,5 @@ export const config = {
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+  GROQ_API_KEY: process.env.GROQ_API_KEY,
 };

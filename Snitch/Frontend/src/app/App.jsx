@@ -7,6 +7,7 @@ import { useAuth } from './features/auth/hook/useAuth'
 import { useEffect } from 'react'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import ChatWidget from './features/chat/components/ChatWidget'
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
     <>
         <RouterProvider router={AppRoutes} />
         <ToastContainer position="top-right" autoClose={3000} />
+        <ChatWidget />
     </>
   )
 }
