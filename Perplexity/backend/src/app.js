@@ -1,5 +1,5 @@
 import express from 'express';
-const app = expess();
+const app = express();
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import morgan from 'morgan';
