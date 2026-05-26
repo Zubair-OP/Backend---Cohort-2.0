@@ -19,7 +19,6 @@ app.use(cors({
 
 app.use(morgan('dev'))
 
-// Routes
 import authRoutes from './routes/auth.routes.js';
 import chatRoutes from './routes/chat.routes.js';
 import transcribeRoutes from './routes/transcribe.routes.js';
