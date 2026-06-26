@@ -124,7 +124,7 @@ Each project folder is usually self-contained and may include:
 
 ## Current Direction
 
-I am now moving toward a more production-level architecture approach and trying to understand how real applications are structured, deployed, and maintained.
+I am now moving toward a more production-level architecture approach like microservices and Agentic Ai Systems and trying to understand how real applications are structured, deployed, and maintained.
 
 ## Contact / Notes
 
