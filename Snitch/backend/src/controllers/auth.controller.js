@@ -2,6 +2,15 @@ import usermodel from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import redis from "../config/cache.js";
+import { config } from "../config/config.js";
+
+const isProduction = process.env.NODE_ENV === "production";
+const authCookieOptions = {
+  httpOnly: true,
+  sameSite: isProduction ? "none" : "lax",
+  secure: isProduction,
+  path: "/",
+};
 
 async function tokenResponse(user, res, message) {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -9,8 +18,7 @@ async function tokenResponse(user, res, message) {
   });
 
   res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
+    ...authCookieOptions,
     maxAge: 3 * 24 * 60 * 60 * 1000,
   });
 
@@ -97,19 +105,18 @@ export const googleCallBack = async (req, res) => {
       {
         id: user._id,
       },
-      process.env.JWT_SECRET || config.JWT_SECRET,
+      config.JWT_SECRET,
       {
         expiresIn: "7d",
       },
     );
 
     res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
+      ...authCookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect(process.env.FRONTEND_URL || "http://localhost:5173/");
+    res.redirect(config.FRONTEND_URL);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -125,7 +132,7 @@ export const logout = async (req, res) => {
 
   await redis.set(token, Date.now().toString(), "EX", 60 * 60);
 
-  res.clearCookie("token");
+  res.clearCookie("token", authCookieOptions);
 
   return res.status(200).json({ message: "User logged out successfully" });
 };
