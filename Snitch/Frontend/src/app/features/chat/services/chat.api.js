@@ -1,6 +1,6 @@
-// Base URL comes from an env var so nothing is hardcoded; falls back to the
-// local backend during development.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { API_BASE_URL } from '../../../config/apiBaseUrl.js';
+
+// Base URL comes from an env var in production and localhost in development.
 const STREAM_URL = `${API_BASE_URL}/api/chat/stream`;
 
 /**

@@ -1,6 +1,6 @@
 import React from 'react';
+import { API_BASE_URL } from '../config/apiBaseUrl.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 const GOOGLE_AUTH_URL = `${API_BASE_URL}/api/auth/google`;
 
 const ContinueWithGoogle = () => {
