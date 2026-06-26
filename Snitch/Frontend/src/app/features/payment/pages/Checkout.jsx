@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadStripe } from '@stripe/stripe-js';
 import { clearCart } from '../../cart/state/cart.slice';
+import { clearCart as clearCartApi } from '../../cart/service/cart.api';
 import {
     Elements,
     PaymentElement,
@@ -35,19 +36,33 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
     const elements = useElements();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const userEmail = useSelector((state) => state.auth.user?.email);
     const [paying, setPaying] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState(null);
+    const submittingRef = React.useRef(false);
+    const paymentElementOptions = {
+        layout: 'tabs',
+        defaultValues: userEmail
+            ? {
+                  billingDetails: {
+                      email: userEmail,
+                  },
+              }
+            : undefined,
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!stripe || !elements) return;
+        if (!stripe || !elements || submittingRef.current) return;
 
+        submittingRef.current = true;
         setPaying(true);
         setErrorMessage(null);
 
         const { error: submitError } = await elements.submit();
         if (submitError) {
             setErrorMessage(submitError.message);
+            submittingRef.current = false;
             setPaying(false);
             return;
         }
@@ -59,19 +74,27 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
 
         if (error) {
             setErrorMessage(error.message);
+            submittingRef.current = false;
             setPaying(false);
         } else if (paymentIntent?.status === 'succeeded') {
-            dispatch(clearCart());
-            navigate('/payment-success', { state: { paymentId, amount: cartTotal } });
+            try {
+                await clearCartApi();
+            } catch (clearError) {
+                console.warn('[checkout] Failed to clear cart after payment:', clearError);
+            } finally {
+                dispatch(clearCart());
+                navigate('/payment-success', { state: { paymentId, amount: cartTotal } });
+            }
         } else {
             setErrorMessage('Payment could not be completed. Please try again.');
+            submittingRef.current = false;
             setPaying(false);
         }
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-5">
-            <PaymentElement options={{ layout: 'tabs' }} />
+            <PaymentElement options={paymentElementOptions} />
 
             {errorMessage ? (
                 <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">
@@ -108,6 +131,7 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
 const Checkout = () => {
     const navigate = useNavigate();
     const { handleCreatePaymentIntent } = usePayment();
+    const hasCreatedIntent = useRef(false);
 
     const clientSecret = useSelector((state) => state.payment.clientSecret);
     const paymentId = useSelector((state) => state.payment.paymentId);
@@ -116,7 +140,11 @@ const Checkout = () => {
     const cartTotal = useSelector((state) => state.cart.totalPrice);
 
     useEffect(() => {
+        if (hasCreatedIntent.current) return;
+        hasCreatedIntent.current = true;
+
         handleCreatePaymentIntent().catch((err) => {
+            hasCreatedIntent.current = false;
             toast.error(err?.message || 'Failed to initiate payment.');
         });
     }, []);

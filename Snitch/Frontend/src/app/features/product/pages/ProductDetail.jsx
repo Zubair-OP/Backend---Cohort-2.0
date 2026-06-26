@@ -163,6 +163,7 @@ const ProductDetail = () => {
   }
 
   async function handleAddToCart() {
+    if (addingToCart) return false;
     if (!user) {
       navigate('/login');
       return false;
@@ -275,7 +276,7 @@ const ProductDetail = () => {
                       await handleLogout();
                       toast.success('Logged out successfully.');
                       navigate('/login');
-                    } catch (err) {
+                    } catch {
                       toast.error('Logout failed.');
                     }
                   }}
@@ -539,10 +540,10 @@ const ProductDetail = () => {
                 <button
                   type="button"
                   onClick={handleBuyNow}
-                  disabled={isOutOfStock || needsSelection}
-                  className="w-full rounded border border-black px-6 py-2.5 text-xs font-medium text-black transition-all duration-300 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={isOutOfStock || needsSelection || addingToCart}
+                  className="w-full rounded border border-black px-6 py-2.5 text-xs font-medium text-black transition-all duration-300 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:border-neutral-400 disabled:bg-neutral-100 disabled:text-neutral-500 disabled:opacity-70"
                 >
-                  Buy Now
+                  {addingToCart ? 'Adding...' : 'Buy Now'}
                 </button>
               </div>
             </div>

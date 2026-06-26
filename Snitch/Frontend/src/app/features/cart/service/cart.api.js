@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
 const Api = axios.create({
-    baseURL: "http://localhost:3000/api/cart",
+    baseURL: `${API_BASE_URL}/api/cart`,
     withCredentials: true,
 });
 
@@ -25,6 +27,11 @@ export const incrementCartItem = async (productId, variantId) => {
 export const decrementCartItem = async (productId, variantId) => {
     const url = variantId ? `/decrement/${productId}/${variantId}` : `/decrement/${productId}`;
     const response = await Api.patch(url);
+    return response.data;
+};
+
+export const clearCart = async () => {
+    const response = await Api.delete('/clear');
     return response.data;
 };
 

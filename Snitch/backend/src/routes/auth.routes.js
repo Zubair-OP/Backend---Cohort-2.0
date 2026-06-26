@@ -6,7 +6,15 @@ import passport from "passport";
 import {authenticateUser} from  "../middleware/auth.middlleware.js"
 
 router.post("/register", registerValidator, register);
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get(
+	"/google",
+	passport.authenticate("google", {
+		scope: ["profile", "email"],
+		prompt: "consent",
+		accessType: "offline",
+		includeGrantedScopes: true,
+	})
+);
 router.get("/google/callback", passport.authenticate("google", {session :false}),
 googleCallBack
 );

@@ -28,6 +28,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
         try {
             setIsSubmitting(true);
             setErrors({});

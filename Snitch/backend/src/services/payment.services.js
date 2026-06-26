@@ -7,9 +7,13 @@ export const createPaymentIntent = async ({ amount, currency = 'usd', metadata =
   return stripe.paymentIntents.create({
     amount,
     currency,
-    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    payment_method_types: ['card'],
     metadata,
   });
+};
+
+export const cancelPaymentIntent = async (paymentIntentId) => {
+  return stripe.paymentIntents.cancel(paymentIntentId);
 };
 
 // Used in webhook handler to verify the event came from Stripe

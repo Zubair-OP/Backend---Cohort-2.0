@@ -8,16 +8,6 @@ import { useAuth } from '../../auth/hook/useAuth';
 
 const CATEGORIES = ['shirts', 'pants', 'caps', 'hoodies', 'shoes', 'Kameez Shalwar'];
 
-const accentColors = {
-  background: '#fbf9f6',
-  surface: '#ffffff',
-  line: '#e4e2df',
-  muted: '#7A6E63',
-  text: '#1b1c1a',
-  accent: '#C9A96E',
-  subtle: '#B5ADA3',
-};
-
 const formatCurrency = (amount, currency = 'PKR') =>
   new Intl.NumberFormat('en-PK', {
     style: 'currency',
@@ -165,7 +155,7 @@ const Dashboard = () => {
                     await handleLogout();
                     toast.success('Logged out successfully.');
                     navigate('/login');
-                  } catch (err) {
+                  } catch {
                     toast.error('Logout failed.');
                   }
                 }}

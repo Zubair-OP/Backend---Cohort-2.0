@@ -158,7 +158,7 @@ const Home = () => {
                       await handleLogout();
                       toast.success('Logged out successfully.');
                       navigate('/login');
-                    } catch (err) {
+                    } catch {
                       toast.error('Logout failed.');
                     }
                   }}

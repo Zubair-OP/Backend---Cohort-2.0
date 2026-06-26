@@ -1,6 +1,7 @@
 import Cart from '../models/cart.model.js';
 import PaymentModel from '../models/payment.model.js';
 import {
+  cancelPaymentIntent,
   createPaymentIntent,
   constructWebhookEvent,
 } from '../services/payment.services.js';
@@ -24,13 +25,18 @@ export const createPayment = async (req, res) => {
       return res.status(400).json({ message: 'Invalid cart total' });
     }
 
-    // Block duplicate pending payments for the same user
     const existingPending = await PaymentModel.findOne({ userId, status: 'pending' });
     if (existingPending) {
-      return res.status(409).json({
-        message: 'You already have a pending payment. Complete or cancel it first.',
-        paymentId: existingPending._id,
-      });
+      try {
+        if (existingPending.stripePaymentIntentId) {
+          await cancelPaymentIntent(existingPending.stripePaymentIntentId);
+        }
+      } catch (cancelError) {
+        console.warn('[createPayment] Could not cancel old payment intent:', cancelError.message);
+      }
+
+      existingPending.status = 'cancelled';
+      await existingPending.save();
     }
 
     const paymentIntent = await createPaymentIntent({
@@ -108,6 +114,11 @@ export const handleWebhook = async (req, res) => {
         { status: 'failed' }
       );
       // Cart intact rehti hai — user dobara try kar sake
+    } else if (event.type === 'payment_intent.canceled') {
+      await PaymentModel.findOneAndUpdate(
+        { stripePaymentIntentId: paymentIntent.id },
+        { status: 'cancelled' }
+      );
     }
 
     return res.status(200).json({ received: true });

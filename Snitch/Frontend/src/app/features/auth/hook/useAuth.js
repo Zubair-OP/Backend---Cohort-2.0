@@ -98,14 +98,9 @@ export function useAuth() {
              dispatch(setError(null))
              const response = await Getme()
              dispatch(setUser(response.user))
-        } catch (error) {
+        } catch {
             dispatch(setUser(null))
             dispatch(setError(null))
-            // Cookie missing or expired — redirect away from protected pages
-            const publicPaths = ['/login', '/register'];
-            if (!publicPaths.includes(window.location.pathname)) {
-                window.location.replace('/login');
-            }
         } finally {
             dispatch(setLoading(false))
         }

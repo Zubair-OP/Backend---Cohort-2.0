@@ -33,6 +33,7 @@ const Cart = () => {
     const { items, totalPrice, handleGetCart, handleIncrementItem, handleDecrementItem } = useCart();
     const [loading, setLoading] = useState(true);
     const [updatingItem, setUpdatingItem] = useState(null);
+    const [checkingOut, setCheckingOut] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -287,10 +288,22 @@ const Cart = () => {
 
                                 <div className="mt-4 space-y-2">
                                     <button
-                                        onClick={() => navigate('/checkout')}
-                                        className="w-full rounded bg-black py-2.5 text-xs font-medium text-white transition-colors hover:bg-neutral-800"
+                                        onClick={() => {
+                                            if (checkingOut) return;
+                                            setCheckingOut(true);
+                                            navigate('/checkout');
+                                        }}
+                                        disabled={checkingOut}
+                                        className="flex w-full items-center justify-center gap-2 rounded bg-black py-2.5 text-xs font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-500 disabled:opacity-70"
                                     >
-                                        Proceed to Checkout
+                                        {checkingOut ? (
+                                            <>
+                                                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                Proceeding...
+                                            </>
+                                        ) : (
+                                            'Proceed to Checkout'
+                                        )}
                                     </button>
                                     <button
                                         onClick={() => navigate('/')}
