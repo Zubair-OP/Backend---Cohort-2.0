@@ -33,7 +33,7 @@ app.use(helmet({
             scriptSrc: ["'self'", 'https://js.stripe.com'],
             scriptSrcElem: ["'self'", 'https://js.stripe.com'],
             styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-            imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
+            imgSrc: ["'self'", 'data:', 'https://images.unsplash.com', 'https://ik.imagekit.io'],
             connectSrc: ["'self'", 'https://api.stripe.com', 'https://js.stripe.com'],
             frameSrc: ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com'],
             fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
