@@ -61,7 +61,8 @@ export async function POST(req: NextRequest) {
         }
     )
 
-    response.cookies.set("Token",token,{httpOnly:true,sameSite:"lax",maxAge:60 * 60 * 1000})
+    response.cookies.set("token", token, { httpOnly: true, sameSite: "lax", maxAge: 60 * 60 });
+    response.cookies.set("Token", token, { httpOnly: true, sameSite: "lax", maxAge: 60 * 60 });
 
     return response;
     } catch (error) 

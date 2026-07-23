@@ -39,5 +39,5 @@ userSchema.pre('save', function (): void{
 userSchema.methods.ComparePassword = function (password : string): boolean {
     return bcrypt.compareSync(password, this.password)
 }
-const UserModel = mongoose.model<NewDocument>('User',userSchema)
-export default UserModel
+const UserModel = (mongoose.models.User as mongoose.Model<NewDocument>) || mongoose.model<NewDocument>('User', userSchema);
+export default UserModel;
