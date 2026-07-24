@@ -1,10 +1,13 @@
 import { generateAiContent } from "@/lib/gemini";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import { GenerateProjectDescriptionBody } from "@/types/ai.types";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
+        await getCurrentUser();
+
         const body: GenerateProjectDescriptionBody = await req.json();
 
         const { experienceLevel, jobTitle, techStack } = body;
@@ -13,6 +16,16 @@ export async function POST(req: NextRequest) {
             return NextResponse.json<ApiResponse>({
                 success: false, message: "Missing fields"
             }, { status: 400 });
+
+        if (jobTitle.length > 120 || experienceLevel.length > 40 || techStack.length > 20) {
+            return NextResponse.json<ApiResponse>(
+                {
+                    success: false,
+                    message: "Input is too large to process",
+                },
+                { status: 413 }
+            );
+        }
 
         const prompt = `
             You are an expert resume writer, ATS optimization specialist, and senior software engineer.
@@ -53,7 +66,7 @@ export async function POST(req: NextRequest) {
 
         const result = await generateAiContent(prompt);
 
-        let projectDescription = result;
+        const projectDescription = result;
 
 
         return NextResponse.json<ApiResponse>({

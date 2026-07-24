@@ -1,10 +1,13 @@
 import { generateAiContent } from "@/lib/gemini";
-import { GenerateSkillsBody, GenerateSummaryBody } from "@/types/ai.types";
+import { getCurrentUser } from "@/lib/getCurrentUser";
+import { GenerateSkillsBody } from "@/types/ai.types";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
+        await getCurrentUser();
+
         const body: GenerateSkillsBody = await req.json();
 
         const { experienceLevel, jobTitle } = body;
@@ -13,6 +16,16 @@ export async function POST(req: NextRequest) {
             return NextResponse.json<ApiResponse>({
                 success: false, message: "Missing fields"
             }, { status: 400 });
+
+        if (jobTitle.length > 120 || experienceLevel.length > 40) {
+            return NextResponse.json<ApiResponse>(
+                {
+                    success: false,
+                    message: "Input is too large to process",
+                },
+                { status: 413 }
+            );
+        }
 
         const prompt = `
             You are an ATS optimization specialist.

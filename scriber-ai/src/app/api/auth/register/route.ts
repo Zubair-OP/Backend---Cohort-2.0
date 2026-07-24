@@ -2,7 +2,7 @@ import connectToDB from "@/lib/mongodb";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 import UserModel from "@/models/user.model";
-import { generateToken } from "@/lib/jwt";
+import { authCookieOptions, generateToken } from "@/lib/jwt";
 import { RegisterBody } from "@/types/user.types";
 
 export async function POST(req: NextRequest) {
@@ -15,19 +15,19 @@ export async function POST(req: NextRequest) {
 
     if(!email || !password || !name) return NextResponse.json<ApiResponse>({
         success:false,
-        message:"All fields are required",
+        message:"Email, name, and password are required",
     }, 
     {
         status: 400
     })
 
-    const user = await UserModel.findOne({email})
+    const normalizedEmail = email.toLowerCase().trim()
+    const user = await UserModel.findOne({email: normalizedEmail})
 
     if(user) return NextResponse.json<ApiResponse>(
         {
             success: false,
-            message: "User already exists",
-            error: "User already exists"
+            message: "User already exists"
         },
         {
             status: 409
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     const createdUser = await UserModel.create({
         name,
-        email,
+        email: normalizedEmail,
         password,
         Mobile
     })
@@ -61,8 +61,8 @@ export async function POST(req: NextRequest) {
         }
     )
 
-    response.cookies.set("token", token, { httpOnly: true, sameSite: "lax", maxAge: 60 * 60 });
-    response.cookies.set("Token", token, { httpOnly: true, sameSite: "lax", maxAge: 60 * 60 });
+    response.cookies.set("token", token, authCookieOptions);
+    response.cookies.set("Token", token, authCookieOptions);
 
     return response;
     } catch (error) 
@@ -71,8 +71,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json<ApiResponse>(
             {
                 success : false,
-                message: "Something Went Wrong",
-                error : String(error)
+                message: "Something went wrong"
             },
             {status:500}
         )    

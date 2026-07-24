@@ -1,5 +1,5 @@
 import { IResume } from "@/types/resume.types";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const resumeSchema = new mongoose.Schema<IResume>(
   {

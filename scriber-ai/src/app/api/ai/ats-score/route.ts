@@ -1,10 +1,12 @@
 import { generateAiContent } from "@/lib/gemini";
-import { GenerateSummaryBody, ImproveContentBody } from "@/types/ai.types";
+import { getCurrentUser } from "@/lib/getCurrentUser";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
+    await getCurrentUser();
+
     const body = await req.json();
 
     const { resumeText } = body;
@@ -18,6 +20,16 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
+
+    if (typeof resumeText !== "string" || resumeText.length > 15000) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          message: "Input is too large to process",
+        },
+        { status: 413 }
+      );
+    }
     const prompt = `
       You are an expert ATS (Applicant Tracking System) evaluator, technical recruiter, and resume reviewer.
       

@@ -9,7 +9,6 @@ export async function getCurrentUser(): Promise<string> {
     if (!token) throw new Error("Token not found");
 
     const decode = verifyToken(token);
-    console.log("decode value", decode);
 
     if (!decode || !decode.userId) throw new Error("unauthorized");
 

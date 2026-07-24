@@ -4,6 +4,41 @@ import ResumeModel from "@/models/Resume.model";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
+const allowedPersonalInfoKeys = [
+  "fullname",
+  "email",
+  "mobile",
+  "location",
+  "github",
+  "portfolio",
+];
+
+const sanitizeResumeUpdate = (body: Record<string, unknown>) => {
+  const update: Record<string, unknown> = {};
+
+  if (typeof body.title === "string") update.title = body.title;
+  if (typeof body.summary === "string") update.summary = body.summary;
+
+  if (body.personalInfo && typeof body.personalInfo === "object" && !Array.isArray(body.personalInfo)) {
+    const personalInfo = body.personalInfo as Record<string, unknown>;
+    update.personalInfo = allowedPersonalInfoKeys.reduce<Record<string, string>>((acc, key) => {
+      const value = personalInfo[key];
+      if (typeof value === "string") {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
+  }
+
+  if (Array.isArray(body.education)) update.education = body.education;
+  if (Array.isArray(body.workExperience)) update.workExperience = body.workExperience;
+  if (Array.isArray(body.projects)) update.projects = body.projects;
+  if (Array.isArray(body.skills)) update.skills = body.skills;
+  if (Array.isArray(body.certifications)) update.certifications = body.certifications;
+
+  return update;
+};
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ resumeId: string }> }
@@ -69,13 +104,25 @@ export async function PATCH(
     const { resumeId } = await params;
     console.log("resume id", resumeId);
 
+    const update = sanitizeResumeUpdate(body);
+
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          message: "No valid resume fields provided",
+        },
+        { status: 400 }
+      );
+    }
+
     const updatedResume = await ResumeModel.findOneAndUpdate(
       {
         _id: resumeId,
         user_id: userId,
       },
       {
-        $set: body,
+        $set: update,
       },
       {
         new: true,
@@ -154,4 +201,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+}

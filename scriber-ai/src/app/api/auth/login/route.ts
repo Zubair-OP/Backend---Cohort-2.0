@@ -3,7 +3,7 @@ import { ApiResponse } from "@/types/api.types";
 import { LoginBody } from "@/types/user.types";
 import connectToDB from "@/lib/mongodb";
 import UserModel from "@/models/user.model";
-import { generateToken } from "@/lib/jwt";
+import { authCookieOptions, generateToken } from "@/lib/jwt";
 
 
 export async function POST(req: NextRequest) {
@@ -15,30 +15,29 @@ export async function POST(req: NextRequest) {
         if (!email || !password) return NextResponse.json<ApiResponse>(
             {
                 success: false,
-                message: "All fields are required",
+                message: "Email and password are required",
             },
             {
                 status: 400
             }
         )
 
-        const user = await UserModel.findOne({ email })
+        const normalizedEmail = email.toLowerCase().trim()
+        const user = await UserModel.findOne({ email: normalizedEmail }).select("+password")
         if (!user) return NextResponse.json<ApiResponse>(
             {
                 success: false,
-                message: "User not found",
+                message: "Invalid credentials",
             },
-            {
-                status: 404
-            }
+            { status: 401 }
         )
 
-        const isPasswordValid = user.ComparePassword(password)
+        const isPasswordValid = await user.ComparePassword(password)
         if (!isPasswordValid) {
             return NextResponse.json<ApiResponse>(
                 {
                     success: false,
-                    message: "Incorrect password",
+                    message: "Invalid credentials",
                 },
                 {
                     status: 401
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
 
         const token = generateToken({ userId: user._id.toString() })
 
-        let response = NextResponse.json<ApiResponse>(
+        const response = NextResponse.json<ApiResponse>(
             {
                 success: true,
                 message: "User logged in successfully",
@@ -67,14 +66,10 @@ export async function POST(req: NextRequest) {
         )
 
         response.cookies.set("token", token, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 60 * 60
+            ...authCookieOptions,
         })
         response.cookies.set("Token", token, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 60 * 60
+            ...authCookieOptions,
         })
 
         return response
@@ -86,8 +81,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json<ApiResponse>(
             {
                 success: false,
-                message: "Something went wrong",
-                error: String(error)
+                message: "Something went wrong"
             },
             {
                 status: 500

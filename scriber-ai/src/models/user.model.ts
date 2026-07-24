@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 
 interface NewDocument extends Omit<Iuser, '_id'>,Document{
-    ComparePassword(password: string) :boolean
+    ComparePassword(password: string) : Promise<boolean>
 }
 
 const userSchema = new mongoose.Schema<NewDocument>({
@@ -16,11 +16,14 @@ const userSchema = new mongoose.Schema<NewDocument>({
         type: String,
         required: true,
         unique: true,
+        lowercase: true,
+        trim: true,
     },
     password: {
         type: String,
         required: true,
         minlength: 6,
+        select: false,
     },
     Mobile: {
         type: String,
@@ -36,8 +39,8 @@ userSchema.pre('save', function (): void{
     this.password = bcrypt.hashSync(this.password, 10)
 })
 
-userSchema.methods.ComparePassword = function (password : string): boolean {
-    return bcrypt.compareSync(password, this.password)
+userSchema.methods.ComparePassword = function (password : string): Promise<boolean> {
+    return bcrypt.compare(password, this.password)
 }
 const UserModel = (mongoose.models.User as mongoose.Model<NewDocument>) || mongoose.model<NewDocument>('User', userSchema);
 export default UserModel;

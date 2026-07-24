@@ -26,6 +26,18 @@ export async function POST(
         { status: 404 }
       );
 
+    const promptPayload = JSON.stringify(resume);
+
+    if (promptPayload.length > 20000) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          message: "Resume is too large to process",
+        },
+        { status: 413 }
+      );
+    }
+
     const {
       personalInfo,
       summary,

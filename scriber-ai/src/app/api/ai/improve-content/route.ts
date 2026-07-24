@@ -1,15 +1,17 @@
 import { generateAiContent } from "@/lib/gemini";
-import { GenerateSummaryBody, ImproveContentBody } from "@/types/ai.types";
+import { getCurrentUser } from "@/lib/getCurrentUser";
+import type { ImproveContentBody } from "@/types/ai.types";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const body: ImproveContentBody = await req.json();
+    await getCurrentUser();
 
+    const body: ImproveContentBody = await req.json();
     const { content } = body;
 
-    if (!content)
+    if (!content) {
       return NextResponse.json<ApiResponse>(
         {
           success: false,
@@ -17,6 +19,17 @@ export async function POST(req: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    if (content.length > 12000) {
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          message: "Content is too large to process",
+        },
+        { status: 413 }
+      );
+    }
 
     const prompt = `
       You are an expert resume writer, ATS optimization specialist, and technical recruiter.
@@ -54,9 +67,7 @@ export async function POST(req: NextRequest) {
       Return ONLY the improved ATS-friendly resume content.
       `;
 
-    const result = await generateAiContent(prompt);
-
-    const improvedContent = result;
+    const improvedContent = await generateAiContent(prompt);
 
     return NextResponse.json<ApiResponse>(
       {
@@ -66,9 +77,7 @@ export async function POST(req: NextRequest) {
           improvedContent,
         },
       },
-      {
-        status: 201,
-      }
+      { status: 201 }
     );
   } catch (error) {
     console.log("error in improvedContent api", error);
