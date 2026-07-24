@@ -7,14 +7,14 @@ export function ComparisonSection() {
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           eyebrow="Comparison"
-          title="Cake vs Other Resume Builders"
+          title="Scriber Builder vs Other Resume Builders"
           description="A clear side-by-side view of the features most job seekers care about when they want something beyond a basic document editor."
         />
         <RevealSection className="mt-12">
           <div className="overflow-hidden rounded-4xl border border-slate-900/8 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.05)]">
             <div className="grid grid-cols-[2fr_1fr_1fr] bg-slate-950 px-5 py-4 text-sm font-semibold text-white">
               <div>Feature</div>
-              <div>Cake</div>
+              <div>Scriber Builder</div>
               <div>Other Resume Builders</div>
             </div>
             <div className="divide-y divide-slate-900/8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/home/sections/site-header";
 import { SiteFooter } from "@/components/home/sections/site-footer";
@@ -71,14 +71,16 @@ export default function TemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Templates");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredTemplates = TEMPLATES.filter((template) => {
-    const matchesCategory =
-      selectedCategory === "All Templates" || template.category === selectedCategory;
-    const matchesSearch =
-      template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.style.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredTemplates = useMemo(() => {
+    return TEMPLATES.filter((template) => {
+      const matchesCategory =
+        selectedCategory === "All Templates" || template.category === selectedCategory;
+      const matchesSearch =
+        template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.style.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-on-surface">

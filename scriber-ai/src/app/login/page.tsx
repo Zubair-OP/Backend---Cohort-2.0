@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginApi } from "@/apis/auth.api";
+import { LogoIcon } from "@/components/home/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,14 +42,9 @@ export default function LoginPage() {
         <div className="w-full max-w-sm mx-auto my-auto py-6">
           {/* Brand Logo */}
           <Link href="/" className="mb-6 inline-flex items-center gap-2">
-            <span
-              className="material-symbols-outlined text-primary-container text-3xl fill"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              description
-            </span>
+            <LogoIcon className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold text-primary tracking-tight">
-              CakeBuilder
+              Scriber Builder
             </h1>
           </Link>
 

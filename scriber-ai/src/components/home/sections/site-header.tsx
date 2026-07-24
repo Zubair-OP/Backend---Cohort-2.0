@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { LogoIcon } from "@/components/home/ui";
+
 export function SiteHeader() {
   const pathname = usePathname();
 
@@ -13,55 +15,55 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="bg-surface sticky top-0 border-b border-surface-variant h-20 flex items-center z-50 transition-all duration-200">
+    <header className="bg-surface sticky top-0 border-b border-surface-variant h-16 flex items-center z-50 transition-all duration-200">
       <div className="flex justify-between items-center w-full px-4 md:px-10 max-w-[1200px] mx-auto">
         {/* Brand */}
         <Link
           href="/"
-          className="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2"
+          className="text-base font-semibold text-primary flex items-center gap-2 tracking-tight"
         >
-          <span className="material-symbols-outlined fill text-primary">cake</span>
-          <span>CakeBuilder</span>
+          <LogoIcon className="h-5 w-5" />
+          <span>Scriber Builder</span>
         </Link>
 
         {/* Navigation (Desktop) */}
-        <nav className="hidden md:flex gap-6 items-center">
+        <nav className="hidden md:flex gap-4 items-center">
           <Link
             href="/"
-            className={`font-body-lg text-body-lg px-3 py-2 rounded-lg transition-colors ${
+            className={`text-sm font-medium px-1 py-1.5 transition-colors ${
               isActive("/")
-                ? "text-primary font-bold border-b-2 border-primary pb-1"
-                : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low"
+                ? "text-primary border-b-2 border-primary pb-0.5"
+                : "text-on-surface-variant hover:text-primary"
             }`}
           >
             Features
           </Link>
           <Link
             href="/templates"
-            className={`font-body-lg text-body-lg px-3 py-2 rounded-lg transition-colors ${
+            className={`text-sm font-medium px-1 py-1.5 transition-colors ${
               isActive("/templates")
-                ? "text-primary font-bold border-b-2 border-primary pb-1"
-                : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low"
+                ? "text-primary border-b-2 border-primary pb-0.5"
+                : "text-on-surface-variant hover:text-primary"
             }`}
           >
             Templates
           </Link>
           <Link
             href="/pricing"
-            className={`font-body-lg text-body-lg px-3 py-2 rounded-lg transition-colors ${
+            className={`text-sm font-medium px-1 py-1.5 transition-colors ${
               isActive("/pricing")
-                ? "text-primary font-bold border-b-2 border-primary pb-1"
-                : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low"
+                ? "text-primary border-b-2 border-primary pb-0.5"
+                : "text-on-surface-variant hover:text-primary"
             }`}
           >
             Pricing
           </Link>
           <Link
             href="/testimonials"
-            className={`font-body-lg text-body-lg px-3 py-2 rounded-lg transition-colors ${
+            className={`text-sm font-medium px-1 py-1.5 transition-colors ${
               isActive("/testimonials")
-                ? "text-primary font-bold border-b-2 border-primary pb-1"
-                : "text-on-surface-variant hover:text-primary hover:bg-surface-container-low"
+                ? "text-primary border-b-2 border-primary pb-0.5"
+                : "text-on-surface-variant hover:text-primary"
             }`}
           >
             Testimonials
@@ -72,13 +74,13 @@ export function SiteHeader() {
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="hidden sm:inline-block font-label-lg text-label-lg text-primary hover:bg-surface-container-low px-4 py-2 rounded-lg transition-all"
+            className="hidden sm:inline-block text-sm font-medium text-primary hover:opacity-85 px-3 py-1.5 transition-all"
           >
             Log In
           </Link>
           <Link
             href="/signup"
-            className="bg-primary-container text-white px-6 py-2.5 rounded-xl font-title-md text-title-md hover:bg-primary hover:brightness-95 transition-all shadow-sm flex items-center gap-1"
+            className="bg-primary-container text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary active:scale-[0.98] transition-all shadow-xs flex items-center gap-1"
           >
             Build My Resume
           </Link>

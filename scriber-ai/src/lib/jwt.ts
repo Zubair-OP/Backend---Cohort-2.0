@@ -11,9 +11,9 @@ const getJwtSecret = () => {
     return secret
 }
 
-export const generateToken = (payload: JWTPayload): string =>{
+export const generateToken = (payload: JWTPayload, rememberMe = false): string =>{
     return jwt.sign(payload, getJwtSecret(), {
-        expiresIn: '1h',
+        expiresIn: rememberMe ? '30d' : '1h',
         algorithm: 'HS256'
     })
 }
@@ -32,3 +32,8 @@ export const authCookieOptions = {
     path: '/',
     maxAge: 60 * 60,
 }
+
+export const getAuthCookieOptions = (rememberMe = false) => ({
+    ...authCookieOptions,
+    maxAge: rememberMe ? 60 * 60 * 24 * 30 : authCookieOptions.maxAge,
+})

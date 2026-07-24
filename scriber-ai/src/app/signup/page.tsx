@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerApi } from "@/apis/auth.api";
+import { LogoIcon } from "@/components/home/ui";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -46,13 +47,8 @@ export default function SignupPage() {
         <div className="w-full max-w-sm mx-auto my-auto py-6">
           {/* Brand Header */}
           <Link href="/" className="mb-6 inline-flex items-center gap-2">
-            <span
-              className="material-symbols-outlined text-primary-container text-2xl fill"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              cake
-            </span>
-            <h1 className="text-xl font-bold text-on-surface">CakeBuilder</h1>
+            <LogoIcon className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold text-on-surface">Scriber Builder</h1>
           </Link>
 
           <h2 className="text-2xl font-bold text-on-surface mb-1">Create an account</h2>
@@ -191,7 +187,7 @@ export default function SignupPage() {
               format_quote
             </span>
             <h3 className="text-lg font-semibold text-on-surface mb-6 leading-snug italic">
-              &quot;CakeBuilder transformed how I present my experience. The templates are spotless.&quot;
+              &quot;Scriber Builder transformed how I present my experience. The templates are spotless.&quot;
             </h3>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">

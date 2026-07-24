@@ -2,7 +2,7 @@ import connectToDB from "@/lib/mongodb";
 import { ApiResponse } from "@/types/api.types";
 import { NextRequest, NextResponse } from "next/server";
 import UserModel from "@/models/user.model";
-import { authCookieOptions, generateToken } from "@/lib/jwt";
+import { generateToken, getAuthCookieOptions } from "@/lib/jwt";
 import { RegisterBody } from "@/types/user.types";
 
 export async function POST(req: NextRequest) {
@@ -53,6 +53,8 @@ export async function POST(req: NextRequest) {
                     name : createdUser.name,
                     email : createdUser.email,
                     mobile : createdUser.Mobile,
+                    plan: createdUser.plan,
+                    subscriptionStatus: createdUser.subscriptionStatus,
                 }
             }
         },
@@ -61,8 +63,10 @@ export async function POST(req: NextRequest) {
         }
     )
 
-    response.cookies.set("token", token, authCookieOptions);
-    response.cookies.set("Token", token, authCookieOptions);
+    const cookieOptions = getAuthCookieOptions();
+
+    response.cookies.set("token", token, cookieOptions);
+    response.cookies.set("Token", token, cookieOptions);
 
     return response;
     } catch (error) 

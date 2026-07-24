@@ -47,15 +47,9 @@ export function useReveal() {
   return { ref, visible };
 }
 
-export function RevealSection({ children, className = "", delay = 0 }: RevealProps) {
-  const { ref, visible } = useReveal();
-
+export function RevealSection({ children, className = "" }: RevealProps) {
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${visible ? "translate-y-0 opacity-100 blur-0" : "translate-y-10 opacity-0 blur-md"} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div className={className}>
       {children}
     </div>
   );
@@ -169,14 +163,45 @@ export function DeviceIcon() {
   );
 }
 
+export function LogoIcon({ className = "h-6 w-6" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <defs>
+        <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#10b981" />
+          <stop offset="100%" stopColor="#0d9488" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M19 3H9c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+        fill="url(#logo-grad)"
+      />
+      <path
+        d="M5 7H3v14c0 1.1.9 2 2 2h14v-2H5V7z"
+        fill="url(#logo-grad)"
+        opacity="0.4"
+      />
+      <path
+        d="M10 7h8v2h-8V7zm0 4h8v2h-8v-2zm0 4h5v2h-5v-2z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
 export function LogoMark() {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-slate-950 shadow-[0_12px_32px_rgba(72,227,106,0.3)]">
-        <span className="text-sm font-black tracking-tight">C</span>
+      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 border border-white/10 shadow-[0_12px_32px_rgba(16,185,129,0.15)]">
+        <LogoIcon className="h-5 w-5" />
       </div>
       <div>
-        <div className="text-sm font-semibold uppercase tracking-[0.28em] text-white/70">Cake</div>
+        <div className="text-sm font-semibold uppercase tracking-[0.28em] text-white/70">Scriber</div>
         <div className="text-sm text-white/60">AI Resume Builder</div>
       </div>
     </div>
@@ -219,7 +244,7 @@ export function MockResumeScreen() {
       <div className="rounded-[34px] bg-slate-950 p-4 text-white">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.24em] text-white/40">Cake AI Editor</div>
+            <div className="text-[10px] uppercase tracking-[0.24em] text-white/40">Scriber AI Editor</div>
             <div className="mt-1 text-lg font-semibold">Senior Product Designer Resume</div>
           </div>
           <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-300">

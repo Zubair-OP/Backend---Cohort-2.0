@@ -29,7 +29,36 @@ const userSchema = new mongoose.Schema<NewDocument>({
         type: String,
         minlength:10,
         maxlength:10
-    }
+    },
+    passwordResetTokenHash: {
+        type: String,
+        select: false,
+    },
+    passwordResetExpiresAt: {
+        type: Date,
+        select: false,
+    },
+    stripeCustomerId: {
+        type: String,
+        index: true,
+    },
+    stripeSubscriptionId: {
+        type: String,
+        index: true,
+    },
+    subscriptionStatus: {
+        type: String,
+        enum: ["free", "active", "past_due", "canceled"],
+        default: "free",
+    },
+    plan: {
+        type: String,
+        enum: ["free", "pro"],
+        default: "free",
+    },
+    currentPeriodEnd: {
+        type: Date,
+    },
 },{
     timestamps: true
 })

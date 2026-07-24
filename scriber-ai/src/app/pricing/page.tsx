@@ -109,7 +109,7 @@ export default function PricingPage() {
                 <span className="font-body-md text-body-md text-on-surface-variant">/month</span>
               </div>
               <a
-                href="mailto:sales@cakebuilder.com"
+                href="mailto:sales@scriberbuilder.com"
                 className="w-full text-center bg-surface-variant text-on-surface font-title-md text-title-md py-3 rounded-lg hover:bg-surface-dim transition-colors mb-8"
               >
                 Contact Sales

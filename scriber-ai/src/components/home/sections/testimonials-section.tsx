@@ -16,7 +16,7 @@ export function TestimonialsSection() {
             format_quote
           </span>
           <blockquote className="font-headline-lg text-headline-lg md:text-[40px] md:leading-[48px] text-on-surface italic mb-8">
-            &quot;I spent months applying with my old resume with no luck. After using CakeBuilder, I landed three interviews in the first week. The AI suggestions were a total game-changer for my bullet points.&quot;
+            &quot;I spent months applying with my old resume with no luck. After using Scriber Builder, I landed three interviews in the first week. The AI suggestions were a total game-changer for my bullet points.&quot;
           </blockquote>
           <div className="flex items-center justify-center gap-4">
             <div className="w-16 h-16 rounded-full bg-surface-dim overflow-hidden border-2 border-white shadow-md flex items-center justify-center font-bold text-primary text-xl bg-secondary-container">

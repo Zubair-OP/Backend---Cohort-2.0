@@ -209,11 +209,11 @@ export const faqItems: FaqItem[] = [
     ),
   },
   {
-    question: "What makes Cake different from other resume builders?",
+    question: "What makes Scriber Builder different from other resume builders?",
     answer: (
       <div className="space-y-3 text-sm leading-7 text-slate-600">
         <p>
-          Cake combines editing, scoring, template selection, and sharing into one workflow instead of making you jump across separate tools.
+          Scriber Builder combines editing, scoring, template selection, and sharing into one workflow instead of making you jump across separate tools.
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li><strong>Single workflow:</strong> edit, check, and export from the same place.</li>

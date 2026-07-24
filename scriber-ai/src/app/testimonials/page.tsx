@@ -12,7 +12,7 @@ interface TestimonialCard {
 
 const TESTIMONIALS: TestimonialCard[] = [
   {
-    quote: "I spent months applying with my old resume with no luck. After using CakeBuilder, I landed three interviews in the first week. The AI suggestions were a total game-changer.",
+    quote: "I spent months applying with my old resume with no luck. After using Scriber Builder, I landed three interviews in the first week. The AI suggestions were a total game-changer.",
     name: "Sarah Jenkins",
     role: "Senior Product Designer at Apex",
     initials: "SJ",
@@ -36,7 +36,7 @@ const TESTIMONIALS: TestimonialCard[] = [
     rating: 5
   },
   {
-    quote: "CakeBuilder helped me highlight my achievements with quantified bullet points. I went from zero responses to 5 callbacks in two weeks.",
+    quote: "Scriber Builder helped me highlight my achievements with quantified bullet points. I went from zero responses to 5 callbacks in two weeks.",
     name: "David Kim",
     role: "Data Analyst at Zeno",
     initials: "DK",
@@ -75,7 +75,7 @@ export default function TestimonialsPage() {
             Loved by job seekers worldwide
           </h1>
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-            Discover how millions of professionals unlocked new career opportunities using CakeBuilder.
+            Discover how millions of professionals unlocked new career opportunities using Scriber Builder.
           </p>
         </div>
 

@@ -3,7 +3,7 @@ import { ApiResponse } from "@/types/api.types";
 import { LoginBody } from "@/types/user.types";
 import connectToDB from "@/lib/mongodb";
 import UserModel from "@/models/user.model";
-import { authCookieOptions, generateToken } from "@/lib/jwt";
+import { generateToken, getAuthCookieOptions } from "@/lib/jwt";
 
 
 export async function POST(req: NextRequest) {
@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
         await connectToDB()
         const data: LoginBody = await req.json()
         const { email, password } = data
+        const rememberMe = Boolean((data as LoginBody & { rememberMe?: boolean }).rememberMe)
 
         if (!email || !password) return NextResponse.json<ApiResponse>(
             {
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        const token = generateToken({ userId: user._id.toString() })
+        const token = generateToken({ userId: user._id.toString() }, rememberMe)
 
         const response = NextResponse.json<ApiResponse>(
             {
@@ -57,6 +58,8 @@ export async function POST(req: NextRequest) {
                         name: user.name,
                         email: user.email,
                         mobile: user.Mobile,
+                        plan: user.plan,
+                        subscriptionStatus: user.subscriptionStatus,
                     }
                 }
             },
@@ -65,12 +68,10 @@ export async function POST(req: NextRequest) {
             }
         )
 
-        response.cookies.set("token", token, {
-            ...authCookieOptions,
-        })
-        response.cookies.set("Token", token, {
-            ...authCookieOptions,
-        })
+        const cookieOptions = getAuthCookieOptions(rememberMe)
+
+        response.cookies.set("token", token, cookieOptions)
+        response.cookies.set("Token", token, cookieOptions)
 
         return response
 
