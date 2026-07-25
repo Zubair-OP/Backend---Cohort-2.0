@@ -36,25 +36,25 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-surface-subtle text-on-surface font-sans flex">
-      {/* Left Side: Compact Centered Form Container (Fits 100vh) */}
-      <div className="w-full lg:w-[460px] xl:w-[500px] flex-shrink-0 h-full flex flex-col justify-center px-6 sm:px-10 lg:px-12 bg-white border-r border-surface-variant relative z-10 shadow-xl overflow-y-auto lg:overflow-hidden">
+    <div className="min-h-[100dvh] w-screen overflow-hidden bg-surface-subtle text-on-surface font-sans flex">
+      {/* Left Side: Compact Centered Form Container */}
+      <div className="w-full lg:w-[460px] xl:w-[500px] flex-shrink-0 min-h-[100dvh] flex flex-col justify-center px-6 sm:px-10 lg:px-12 bg-white border-r border-surface-variant relative z-10 overflow-y-auto lg:overflow-hidden">
         <div className="w-full max-w-sm mx-auto my-auto py-6">
           {/* Brand Logo */}
-          <Link href="/" className="mb-6 inline-flex items-center gap-2">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2">
             <LogoIcon className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold text-primary tracking-tight">
+            <h1 className="text-lg font-bold text-primary tracking-tight">
               Scriber Builder
             </h1>
           </Link>
 
           <h2 className="text-2xl font-bold mb-1 text-on-surface">Welcome back</h2>
-          <p className="text-xs text-on-surface-variant mb-6">
+          <p className="text-sm text-on-surface-variant mb-8">
             Please enter your details to sign in.
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg flex items-center gap-2">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">error</span>
               <span>{error}</span>
             </div>
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-on-surface-variant mb-1" htmlFor="email">
+              <label className="block text-sm font-medium text-on-surface mb-1.5" htmlFor="email">
                 Email address
               </label>
               <input
@@ -72,12 +72,12 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-3.5 py-2.5 border border-surface-variant rounded-lg bg-surface-subtle placeholder-outline-variant focus:outline-none focus:ring-1 focus:ring-primary-container focus:border-primary-container focus:bg-white transition-colors text-xs"
+                className="w-full px-4 py-3 border border-surface-variant rounded-xl bg-surface-subtle placeholder-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container focus:bg-white transition-all text-sm"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-on-surface-variant mb-1" htmlFor="password">
+              <label className="block text-sm font-medium text-on-surface mb-1.5" htmlFor="password">
                 Password
               </label>
               <div className="relative">
@@ -88,14 +88,14 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 border border-surface-variant rounded-lg bg-surface-subtle placeholder-outline-variant focus:outline-none focus:ring-1 focus:ring-primary-container focus:border-primary-container focus:bg-white transition-colors text-xs pr-9"
+                  className="w-full px-4 py-3 border border-surface-variant rounded-xl bg-surface-subtle placeholder-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-container/30 focus:border-primary-container focus:bg-white transition-all text-sm pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-primary transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-on-surface-variant hover:text-primary transition-colors"
                 >
-                  <span className="material-symbols-outlined text-lg">
+                  <span className="material-symbols-outlined text-xl">
                     {showPassword ? "visibility_off" : "visibility"}
                   </span>
                 </button>
@@ -109,14 +109,14 @@ export default function LoginPage() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-3.5 w-3.5 text-primary-container focus:ring-primary-container border-outline-variant rounded bg-surface-subtle cursor-pointer"
+                  className="h-4 w-4 text-primary-container focus:ring-primary-container border-outline-variant rounded bg-surface-subtle cursor-pointer"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-xs text-on-surface-variant cursor-pointer">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-on-surface-variant cursor-pointer">
                   Remember me
                 </label>
               </div>
 
-              <a href="#" className="text-xs font-medium text-primary-container hover:text-primary transition-colors">
+              <a href="#" className="text-sm font-medium text-primary-container hover:text-primary transition-colors">
                 Forgot password?
               </a>
             </div>
@@ -124,13 +124,13 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 border border-transparent rounded-lg shadow-xs text-xs font-semibold text-white bg-primary-container hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-container transition-colors disabled:opacity-50 mt-2"
+              className="w-full py-3 px-4 bg-primary-container text-white text-sm font-semibold rounded-xl hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-all disabled:opacity-50 mt-4"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-on-surface-variant">
+          <p className="mt-8 text-center text-sm text-on-surface-variant">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="font-semibold text-primary-container hover:text-primary transition-colors">
               Sign up for free
@@ -139,8 +139,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side: Hero Visual Panel (Fits 100vh) */}
-      <div className="hidden lg:block relative flex-1 h-full bg-surface-container overflow-hidden">
+      {/* Right Side: Hero Visual Panel */}
+      <div className="hidden lg:block relative flex-1 min-h-[100dvh] bg-surface-container overflow-hidden">
         <div
           className="absolute inset-0 h-full w-full object-cover bg-cover bg-center"
           style={{
@@ -149,11 +149,11 @@ export default function LoginPage() {
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent mix-blend-multiply opacity-75"></div>
-          <div className="absolute bottom-10 left-10 right-10 text-white bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 shadow-xl max-w-lg">
-            <h2 className="text-2xl font-bold mb-2 leading-tight text-white">
+          <div className="absolute bottom-10 left-10 right-10 text-white bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-xl max-w-lg">
+            <h2 className="text-xl font-bold mb-2 leading-tight text-white">
               Build a resume that stands out.
             </h2>
-            <p className="text-xs opacity-90 leading-relaxed text-white/90">
+            <p className="text-sm opacity-90 leading-relaxed text-white/90">
               Join thousands of professionals who have advanced their careers with our modern, structured resume builder.
             </p>
           </div>
