@@ -190,9 +190,11 @@ export default function SignupPage() {
               &quot;Scriber Builder transformed how I present my experience. The templates are spotless.&quot;
             </h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white text-sm font-bold">
-                MR
-              </div>
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="Michael R."
+                className="w-10 h-10 rounded-full object-cover"
+              />
               <div>
                 <p className="text-sm font-semibold text-on-surface">Michael R.</p>
                 <p className="text-xs text-on-surface-variant">Senior Designer</p>

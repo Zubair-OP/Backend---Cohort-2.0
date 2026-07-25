@@ -1,5 +1,28 @@
 import { RevealSection } from "../ui";
 
+const PORTFOLIO_ITEMS = [
+  {
+    title: "Case study framing",
+    description: "Designed to help employers understand the outcome behind the work.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop"
+  },
+  {
+    title: "Project proof blocks",
+    description: "Designed to help employers understand the outcome behind the work.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=200&fit=crop"
+  },
+  {
+    title: "Visual hierarchy",
+    description: "Designed to help employers understand the outcome behind the work.",
+    image: "https://images.unsplash.com/photo-1545235617-9465d2a55698?w=400&h=200&fit=crop"
+  },
+  {
+    title: "Shareable presentation",
+    description: "Designed to help employers understand the outcome behind the work.",
+    image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400&h=200&fit=crop"
+  },
+];
+
 export function PortfolioSection() {
   return (
     <section className="bg-white px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
@@ -26,17 +49,16 @@ export function PortfolioSection() {
           </RevealSection>
           <RevealSection delay={120}>
             <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                "Case study framing",
-                "Project proof blocks",
-                "Visual hierarchy",
-                "Shareable presentation",
-              ].map((item) => (
-                <div key={item} className="rounded-4xl border border-slate-900/8 bg-slate-50 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)]">
+              {PORTFOLIO_ITEMS.map((item) => (
+                <div key={item.title} className="rounded-4xl border border-slate-900/8 bg-slate-50 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.04)]">
                   <div className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Portfolio ready</div>
-                  <div className="mt-6 h-24 rounded-3xl bg-linear-to-br from-slate-950 to-slate-800" />
-                  <div className="mt-5 text-lg font-semibold text-slate-950">{item}</div>
-                  <div className="mt-2 text-sm leading-6 text-slate-600">Designed to help employers understand the outcome behind the work.</div>
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="mt-6 h-24 w-full rounded-3xl object-cover"
+                  />
+                  <div className="mt-5 text-lg font-semibold text-slate-950">{item.title}</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-600">{item.description}</div>
                 </div>
               ))}
             </div>

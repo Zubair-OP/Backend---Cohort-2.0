@@ -2,8 +2,36 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Scriber Ai | Build a Resume That Lands Your Dream Job",
-  description: "Stand out with professional, recruiter-approved templates. Our easy-to-use editor and AI suggestions help you create a job-winning resume in minutes.",
+  title: "Scriber AI | Build a Resume That Lands Your Dream Job in 15 Minutes",
+  description: "Build a professional, ATS-optimized resume in minutes with AI-powered suggestions. Recruiter-approved templates that help you land 3x more interviews. Free to start.",
+  keywords: ["resume builder", "AI resume", "ATS resume", "resume templates", "job application", "career", "professional resume", "resume maker", "CV builder"],
+  openGraph: {
+    title: "Scriber AI | Build a Resume That Lands Your Dream Job",
+    description: "Build a professional, ATS-optimized resume in minutes with AI-powered suggestions. Recruiter-approved templates that help you land 3x more interviews.",
+    url: "https://scriber.ai",
+    siteName: "Scriber AI",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Scriber AI | Build a Resume That Lands Your Dream Job",
+    description: "Build a professional, ATS-optimized resume in minutes with AI-powered suggestions.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://scriber.ai",
+  },
 };
 
 export default function RootLayout({

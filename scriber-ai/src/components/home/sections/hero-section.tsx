@@ -35,9 +35,26 @@ export function HeroSection() {
           </div>
           <div className="mt-5 md:mt-6 flex items-center gap-3 text-on-surface-variant">
             <div className="flex -space-x-2">
-              <div className="w-7 h-7 rounded-full border-2 border-white bg-primary-container/20 flex items-center justify-center text-[10px] font-bold text-primary">SJ</div>
-              <div className="w-7 h-7 rounded-full border-2 border-white bg-secondary-container flex items-center justify-center text-[10px] font-bold text-secondary">MR</div>
-              <div className="w-7 h-7 rounded-full border-2 border-white bg-tertiary-container flex items-center justify-center text-[10px] font-bold text-tertiary">AK</div>
+              <img
+                src="https://randomuser.me/api/portraits/women/44.jpg"
+                alt="User avatar"
+                className="w-8 h-8 rounded-full border-2 border-white object-cover"
+              />
+              <img
+                src="https://randomuser.me/api/portraits/men/32.jpg"
+                alt="User avatar"
+                className="w-8 h-8 rounded-full border-2 border-white object-cover"
+              />
+              <img
+                src="https://randomuser.me/api/portraits/women/68.jpg"
+                alt="User avatar"
+                className="w-8 h-8 rounded-full border-2 border-white object-cover"
+              />
+              <img
+                src="https://randomuser.me/api/portraits/men/75.jpg"
+                alt="User avatar"
+                className="w-8 h-8 rounded-full border-2 border-white object-cover"
+              />
             </div>
             <span className="font-label-lg text-on-surface-variant">Joined by 500+ job seekers today</span>
           </div>

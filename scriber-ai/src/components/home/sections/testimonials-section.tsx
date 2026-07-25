@@ -15,16 +15,18 @@ export function TestimonialsSection() {
           <span className="material-symbols-outlined text-primary-container text-6xl mb-8 fill">
             format_quote
           </span>
-          <blockquote className="font-headline-lg text-headline-lg md:text-[40px] md:leading-[48px] text-on-surface italic mb-8">
+          <blockquote className="font-headline-lg md:text-[40px] md:leading-[48px] text-on-surface italic mb-8">
             &quot;I spent months applying with my old resume with no luck. After using Scriber Builder, I landed three interviews in the first week. The AI suggestions were a total game-changer for my bullet points.&quot;
           </blockquote>
           <div className="flex items-center justify-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-surface-dim overflow-hidden border-2 border-white shadow-md flex items-center justify-center font-bold text-primary text-xl bg-secondary-container">
-              SJ
-            </div>
+            <img
+              src="https://randomuser.me/api/portraits/women/44.jpg"
+              alt="Sarah Jenkins"
+              className="w-16 h-16 rounded-full border-2 border-white shadow-md object-cover"
+            />
             <div className="text-left">
-              <p className="font-title-lg text-title-lg text-on-surface">Sarah Jenkins</p>
-              <p className="font-label-lg text-label-lg text-primary">Senior Product Designer at Apex Solutions</p>
+              <p className="font-title-lg text-on-surface">Sarah Jenkins</p>
+              <p className="font-label-lg text-primary">Senior Product Designer at Apex Solutions</p>
             </div>
           </div>
         </div>
