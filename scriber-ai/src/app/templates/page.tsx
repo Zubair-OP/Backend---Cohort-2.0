@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { SiteHeader } from "@/components/home/sections/site-header";
 import { SiteFooter } from "@/components/home/sections/site-footer";
 
@@ -9,355 +10,18 @@ interface Template {
   id: string;
   title: string;
   category: string;
+  image: string;
 }
 
 const TEMPLATES: Template[] = [
-  { id: "classic", title: "Classic", category: "Professional" },
-  { id: "formal", title: "Formal", category: "Professional" },
-  { id: "creative", title: "Creative", category: "Creative" },
-  { id: "precision", title: "Precision", category: "Modern" },
-  { id: "capability", title: "Capability", category: "Modern" },
-  { id: "purity", title: "Purity", category: "Minimalist" },
+  { id: "formal", title: "Formal", category: "Professional", image: "/template-formal.3d5b8a13.avif" },
+  { id: "creative", title: "Creative", category: "Creative", image: "/template-creative.e656d51a.avif" },
+  { id: "precision", title: "Precision", category: "Modern", image: "/template-precision.d846963e.avif" },
+  { id: "capability", title: "Capability", category: "Modern", image: "/template-capability.11d18190.avif" },
+  { id: "purity", title: "Purity", category: "Minimalist", image: "/template-purity.25c7c873.avif" },
 ];
 
 const CATEGORIES = ["All Templates", "Professional", "Creative", "Modern", "Minimalist"];
-
-function ResumePreview({ templateId }: { templateId: string }) {
-  if (templateId === "classic") {
-    return (
-      <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-        <div className="flex items-start justify-between mb-1">
-          <div>
-            <div className="font-bold text-[10px] text-gray-900">Kathryn Murphy</div>
-            <div className="text-[7px] text-gray-500">Software Engineer</div>
-          </div>
-        </div>
-        <div className="text-[5.5px] text-gray-600 leading-relaxed mb-2">
-          24 years of experience in software development as well as in creating innovative solutions to distributed system...
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-          <div className="space-y-1.5">
-            <div>
-              <div className="flex justify-between items-start">
-                <div className="text-[6px] font-semibold text-gray-800">Associate software Engineer <span className="text-gray-400">· Company Name</span></div>
-              </div>
-              <div className="text-[5px] text-gray-400">Oct 2020 - Aug 2020</div>
-              <div className="mt-0.5 space-y-px">
-                <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-              </div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Solutions Engineer <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">May 2018 - Sep 2019</div>
-              <div className="mt-0.5 space-y-px">
-                <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-4/5 bg-gray-100 rounded"></div>
-              </div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Full Stack Developer <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Nov 2017 - May 2018</div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Education</div>
-          <div className="text-[6px] text-gray-700 font-semibold">Princeton University</div>
-          <div className="text-[5px] text-gray-400">Field of study</div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 flex gap-4">
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Skills</div>
-            <div className="text-[5px] text-gray-600">Competitor analysis</div>
-          </div>
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Language</div>
-            <div className="text-[5px] text-gray-600">Chinese · Native</div>
-            <div className="text-[5px] text-gray-600">English · Professional</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (templateId === "formal") {
-    return (
-      <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-        <div className="flex gap-2.5 mb-2">
-          <div className="w-9 h-9 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400"></div>
-          </div>
-          <div className="flex-1">
-            <div className="font-bold text-[10px] text-gray-900">Wade Warren</div>
-            <div className="text-[5.5px] text-gray-600 leading-relaxed">
-              Senior Sales professional with 25 years of experience providing assistance in office environments within (field), looking for new strategies to engage and inspire new team members and customers at (company name).
-            </div>
-            <div className="flex gap-2 mt-1">
-              <span className="text-[5px] text-gray-400">Taipei, Taiwan</span>
-              <span className="text-[5px] text-gray-400">youname.com</span>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-          <div className="space-y-1.5">
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Senior Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-              <div className="mt-0.5 space-y-px">
-                <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-              </div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Senior Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Education</div>
-          <div className="flex gap-4">
-            <div>
-              <div className="text-[5px] text-gray-400">Sep 2018 - Jun 2020</div>
-              <div className="text-[6px] text-gray-700 font-semibold">Princeton University</div>
-              <div className="text-[5px] text-gray-400">Field of study</div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 flex gap-4">
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Skills</div>
-            <div className="text-[5px] text-gray-600">Competitor analysis</div>
-            <div className="text-[5px] text-gray-600">Business research</div>
-          </div>
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Language</div>
-            <div className="text-[5px] text-gray-600">Chinese · Native</div>
-            <div className="text-[5px] text-gray-600">English · Professional</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (templateId === "creative") {
-    return (
-      <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-        <div className="flex gap-2.5 mb-2">
-          <div className="flex-1">
-            <div className="font-bold text-[10px] text-gray-900">Jenny Wilson</div>
-            <div className="text-[6px] text-gray-500 mb-1">Senior Sales professional</div>
-            <div className="text-[5.5px] text-gray-600 leading-relaxed">
-              Senior Sales professional with 25 years of experience providing assistance in office environments within (field), looking for new strategies to engage and inspire new team members and customers at (company name).
-            </div>
-            <div className="flex gap-2 mt-1">
-              <span className="text-[5px] text-gray-400">Taipei, Taiwan</span>
-              <span className="text-[5px] text-gray-400">youname.com</span>
-            </div>
-          </div>
-          <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400"></div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-          <div className="space-y-1.5">
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Senior Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-              <div className="mt-0.5 space-y-px">
-                <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-              </div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Senior Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-            </div>
-            <div>
-              <div className="text-[6px] font-semibold text-gray-800">Sales <span className="text-gray-400">· Company Name</span></div>
-              <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 rounded h-14 mt-2"></div>
-      </div>
-    );
-  }
-
-  if (templateId === "precision") {
-    return (
-      <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-        <div className="text-center mb-2">
-          <div className="font-bold text-[10px] text-gray-900">Your Name</div>
-          <div className="text-[6px] text-gray-500">Job Title</div>
-          <div className="text-[5px] text-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-          <div className="space-y-1.5">
-            <div>
-              <div className="flex justify-between items-start">
-                <div className="text-[6px] font-semibold text-gray-800">Job Title <span className="text-gray-400">· Company Name</span></div>
-                <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-              </div>
-              <div className="text-[5px] text-gray-400">Taipei, Taiwan</div>
-              <div className="mt-0.5 space-y-px">
-                <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-                <div className="h-[1.5px] w-4/5 bg-gray-100 rounded"></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-start">
-                <div className="text-[6px] font-semibold text-gray-800">Job Title <span className="text-gray-400">· Company Name</span></div>
-                <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-              </div>
-              <div className="text-[5px] text-gray-400">Taipei, Taiwan</div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Education</div>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="text-[6px] text-gray-700 font-semibold">University or School</div>
-              <div className="text-[5px] text-gray-400">Field of study</div>
-            </div>
-            <div className="text-[5px] text-gray-400">Apr 2018 - Jan 2020</div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 flex gap-4">
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Skills</div>
-            <div className="text-[5px] text-gray-600">Lorem ipsum dolor</div>
-          </div>
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Languages</div>
-            <div className="text-[5px] text-gray-600">Chinese · English</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (templateId === "capability") {
-    return (
-      <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-        <div className="mb-2">
-          <div className="font-bold text-[10px] text-gray-900">Your Name</div>
-          <div className="text-[6px] text-gray-500">Job Title</div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-          <div className="space-y-1.5">
-            <div className="flex gap-2">
-              <div className="w-14 flex-shrink-0">
-                <div className="text-[5px] text-gray-400">Sep 2018 - Jun 2020</div>
-                <div className="text-[5px] text-gray-400">Taipei, Taiwan</div>
-              </div>
-              <div className="flex-1">
-                <div className="text-[6px] font-semibold text-gray-800">Job Title</div>
-                <div className="text-[5px] text-gray-500">Company Name</div>
-                <div className="mt-0.5 space-y-px">
-                  <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-                  <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <div className="w-14 flex-shrink-0">
-                <div className="text-[5px] text-gray-400">Sep 2018 - Jun 2020</div>
-                <div className="text-[5px] text-gray-400">Taipei, Taiwan</div>
-              </div>
-              <div className="flex-1">
-                <div className="text-[6px] font-semibold text-gray-800">Job Title</div>
-                <div className="text-[5px] text-gray-500">Company Name</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 mb-2">
-          <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Education</div>
-          <div className="flex gap-2">
-            <div className="w-14 flex-shrink-0">
-              <div className="text-[5px] text-gray-400">Sep 2018 - Jun 2020</div>
-            </div>
-            <div className="flex-1">
-              <div className="text-[6px] text-gray-700 font-semibold">University or School</div>
-              <div className="text-[5px] text-gray-400">Field of study</div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 pt-2 flex gap-4">
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Skills</div>
-            <div className="text-[5px] text-gray-600">Lorem ipsum dolor</div>
-          </div>
-          <div>
-            <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Languages</div>
-            <div className="text-[5px] text-gray-600">Chinese · English</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // purity
-  return (
-    <div className="absolute inset-0 bg-white p-4 text-left overflow-hidden">
-      <div className="text-center mb-2">
-        <div className="font-bold text-[10px] text-gray-900">Your Name</div>
-        <div className="text-[5px] text-gray-400">Taipei, Taiwan | +886 910 123456 | yourname@youremail.com</div>
-      </div>
-      <div className="text-[5.5px] text-gray-500 text-center mb-2">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-      </div>
-      <div className="border-t border-gray-200 pt-2 mb-2">
-        <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Work Experience</div>
-        <div className="space-y-1.5">
-          <div>
-            <div className="text-[6px] font-semibold text-gray-800">Job Title <span className="text-gray-400">· Company Name</span></div>
-            <div className="text-[5px] text-gray-400">Apr 2018 · Jan 2020 | Taipei, Taiwan</div>
-            <div className="mt-0.5 space-y-px">
-              <div className="h-[1.5px] w-full bg-gray-100 rounded"></div>
-              <div className="h-[1.5px] w-5/6 bg-gray-100 rounded"></div>
-              <div className="h-[1.5px] w-4/5 bg-gray-100 rounded"></div>
-            </div>
-          </div>
-          <div>
-            <div className="text-[6px] font-semibold text-gray-800">Job Title <span className="text-gray-400">· Company Name</span></div>
-            <div className="text-[5px] text-gray-400">Apr 2018 · Jan 2020 | Taipei, Taiwan</div>
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-gray-200 pt-2 mb-2">
-        <div className="text-[6px] font-bold text-gray-800 mb-1 uppercase tracking-wider">Education</div>
-        <div className="text-[6px] text-gray-700 font-semibold">University or School</div>
-        <div className="text-[5px] text-gray-400">Field of study · Apr 2018 - Jan 2020</div>
-      </div>
-      <div className="border-t border-gray-200 pt-2 flex gap-4">
-        <div>
-          <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Skills</div>
-          <div className="text-[5px] text-gray-600">• Lorem ipsum dolor sit amet</div>
-          <div className="text-[5px] text-gray-600">• Lorem ipsum dolor sit amet</div>
-        </div>
-        <div>
-          <div className="text-[6px] font-bold text-gray-800 uppercase tracking-wider mb-0.5">Languages</div>
-          <div className="text-[5px] text-gray-600">• Chinese</div>
-          <div className="text-[5px] text-gray-600">• English</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function TemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Templates");
@@ -440,32 +104,41 @@ export default function TemplatesPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               {filteredTemplates.map((template) => (
-                <div key={template.id} className="group cursor-pointer">
+                <Link
+                  key={template.id}
+                  href={`/builder?template=${template.id}`}
+                  className="group cursor-pointer block"
+                >
                   {/* Resume Preview Card */}
-                  <div className="relative bg-white rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.06)] overflow-hidden mb-4 transition-shadow group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
-                    <div className="aspect-[1/1.4] relative">
-                      <ResumePreview templateId={template.id} />
+                  <div className="relative bg-white rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.06)] overflow-hidden mb-4 transition-all duration-300 group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] group-hover:scale-[1.02]">
+                    <div className="aspect-[1/1.4] relative overflow-hidden">
+                      <Image
+                        src={template.image}
+                        alt={`${template.title} resume template preview`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        quality={85}
+                      />
 
                       {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Link
-                          href="/signup"
-                          className="bg-primary-container hover:bg-primary text-white font-title-md px-6 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all transform translate-y-4 group-hover:translate-y-0"
-                        >
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-8">
+                        <span className="bg-primary-container hover:bg-primary text-white font-title-md px-6 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all transform translate-y-4 group-hover:translate-y-0">
                           <span>Start with this template</span>
                           <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
                             <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                        </Link>
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Template Label */}
                   <div className="text-center">
-                    <h3 className="font-headline-md text-on-surface">{template.title}</h3>
+                    <h3 className="font-headline-md text-on-surface group-hover:text-primary transition-colors">{template.title}</h3>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

@@ -72,3 +72,15 @@ export const getATSScoreApi = async (payload: { resumeText: string }) => {
 
   return response.data;
 };
+
+/**
+ * Optimize entire resume with AI (stateless, no auth required)
+ */
+export const optimizeResumeApi = async (payload: {
+  userData: Record<string, unknown>;
+  templateId: string;
+}) => {
+  const response = await axios.post("/api/ai/optimize-resume", payload);
+
+  return response.data;
+};
