@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 if (!process.env.MONGO_URI) {
   throw new Error("MONGO_URI is not defined in environment variables");
 }
@@ -63,6 +62,7 @@ if (!process.env.GROQ_API_KEY) {
 }
 
 export const config = {
+  NODE_ENV: process.env.NODE_ENV || 'development',
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

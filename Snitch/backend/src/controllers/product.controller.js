@@ -1,5 +1,9 @@
 import ProductModel from "../models/product.model.js";
-import {uploadImage} from "../services/storage.services.js";
+import { uploadImage } from "../services/storage.services.js";
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export const addProduct = async (req, res) => {
   try {
@@ -14,7 +18,6 @@ export const addProduct = async (req, res) => {
     const images = await Promise.all(
       files.map(async (image) => {
         const uploadedImage = await uploadImage(image);
-
         return {
           url: uploadedImage.url,
           fileId: uploadedImage.fileId,
@@ -40,26 +43,14 @@ export const addProduct = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error("addProduct failed:", {
-      message: error.message,
-      status: error.status,
-      cause: error.cause?.message,
-      stack: error.stack,
-    });
-
-    res
-      .status(500)
-      .json({
-        message: "Failed to add product",
-        error: error.message || "Unknown error",
-      });
+    console.error("addProduct failed:", error.message);
+    res.status(500).json({ message: "Failed to add product" });
   }
 };
 
 export const getAllProducts = async (req, res) => {
   try {
     const seller = req.user;
-
     const products = await ProductModel.find({ sellerId: seller._id }).lean();
 
     res.status(200).json({
@@ -68,12 +59,8 @@ export const getAllProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error("getAllProducts failed:", error);
-
-    res.status(500).json({
-      message: "Failed to fetch products",
-      error: error.message || "Unknown error",
-    });
+    console.error("getAllProducts failed:", error.message);
+    res.status(500).json({ message: "Failed to fetch products" });
   }
 };
 
@@ -87,12 +74,8 @@ export const getAllProductslist = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error("getAllProductsForUser failed:", error);
-
-    res.status(500).json({
-      message: "Failed to fetch products",
-      error: error.message || "Unknown error",
-    });
+    console.error("getAllProductslist failed:", error.message);
+    res.status(500).json({ message: "Failed to fetch products" });
   }
 };
 
@@ -107,9 +90,10 @@ export const filterProducts = async (req, res) => {
     }
 
     if (normalizedSearch) {
+      const safeSearch = escapeRegex(normalizedSearch);
       query.$or = [
-        { title: { $regex: normalizedSearch, $options: "i" } },
-        { description: { $regex: normalizedSearch, $options: "i" } },
+        { title: { $regex: safeSearch, $options: "i" } },
+        { description: { $regex: safeSearch, $options: "i" } },
       ];
     }
 
@@ -121,6 +105,7 @@ export const filterProducts = async (req, res) => {
 
     const products = await ProductModel.find(query)
       .sort(sortOptions[sortBy] || sortOptions.latest)
+      .limit(100)
       .lean();
 
     res.status(200).json({
@@ -135,19 +120,14 @@ export const filterProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error("filterProducts failed:", error);
-
-    res.status(500).json({
-      message: "Failed to filter products",
-      error: error.message || "Unknown error",
-    });
+    console.error("filterProducts failed:", error.message);
+    res.status(500).json({ message: "Failed to filter products" });
   }
 };
 
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const product = await ProductModel.findById(id).lean();
 
     if (!product) {
@@ -160,11 +140,8 @@ export const getProductById = async (req, res) => {
       product,
     });
   } catch (error) {
-    console.error("getProductById failed:", error);
-    res.status(500).json({
-      message: "Failed to fetch product",
-      error: error.message || "Unknown error",
-    });
+    console.error("getProductById failed:", error.message);
+    res.status(500).json({ message: "Failed to fetch product" });
   }
 };
 
@@ -191,7 +168,12 @@ export async function addProductVariant(req, res) {
       uploaded.forEach((img) => images.push({ url: img.url }));
     }
 
-    const attributes = JSON.parse(req.body.attributes || "{}");
+    let attributes = {};
+    try {
+      attributes = JSON.parse(req.body.attributes || "{}");
+    } catch {
+      return res.status(400).json({ message: "Invalid attributes JSON" });
+    }
 
     product.variants.push({
       images,
@@ -211,8 +193,8 @@ export async function addProductVariant(req, res) {
       product,
     });
   } catch (error) {
-    console.error("addProductVariant failed:", error);
-    res.status(500).json({ message: "Failed to add variant", error: error.message });
+    console.error("addProductVariant failed:", error.message);
+    res.status(500).json({ message: "Failed to add variant" });
   }
 }
 
@@ -238,15 +220,19 @@ export async function updateProductVariant(req, res) {
       };
     }
     if (req.body.attributes) {
-      variant.attributes = JSON.parse(req.body.attributes);
+      try {
+        variant.attributes = JSON.parse(req.body.attributes);
+      } catch {
+        return res.status(400).json({ message: "Invalid attributes JSON" });
+      }
     }
 
     await product.save();
 
     return res.status(200).json({ message: "Variant updated successfully", success: true, product });
   } catch (error) {
-    console.error("updateProductVariant failed:", error);
-    res.status(500).json({ message: "Failed to update variant", error: error.message });
+    console.error("updateProductVariant failed:", error.message);
+    res.status(500).json({ message: "Failed to update variant" });
   }
 }
 
@@ -264,7 +250,7 @@ export async function deleteProductVariant(req, res) {
 
     return res.status(200).json({ message: "Variant deleted successfully", success: true, product });
   } catch (error) {
-    console.error("deleteProductVariant failed:", error);
-    res.status(500).json({ message: "Failed to delete variant", error: error.message });
+    console.error("deleteProductVariant failed:", error.message);
+    res.status(500).json({ message: "Failed to delete variant" });
   }
 }

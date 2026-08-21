@@ -1,5 +1,4 @@
 import usermodel from "../models/user.model.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import redis from "../config/cache.js";
 import { config } from "../config/config.js";
@@ -13,7 +12,7 @@ const authCookieOptions = {
 };
 
 async function tokenResponse(user, res, message) {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
     expiresIn: "3d",
   });
 
@@ -23,7 +22,7 @@ async function tokenResponse(user, res, message) {
   });
 
   res.status(201).json({
-    message: message,
+    message,
     success: true,
     user: {
       id: user._id,
@@ -46,18 +45,17 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Create new user
     const newUser = await usermodel.create({
-      fullname: fullname,
-      email: email,
-      password: password,
-      contact: contact,
+      fullname,
+      email,
+      password,
+      contact,
       role: isSeller ? "seller" : "buyer",
     });
 
     await tokenResponse(newUser, res, "User registered successfully");
   } catch (error) {
-    console.error(error);
+    console.error("register failed:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -67,49 +65,40 @@ export const Login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await usermodel.findOne({ email });
-
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     await tokenResponse(user, res, "User login successfully");
   } catch (error) {
-    console.error(error);
+    console.error("Login failed:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const googleCallBack = async (req, res) => {
   try {
-    const { id, displayName, emails, photos } = req.user;
+    const { id, displayName, emails } = req.user;
     const email = emails[0].value;
-    const ProfilePic = photos[0].value;
 
     let user = await usermodel.findOne({ email });
 
     if (!user) {
       user = await usermodel.create({
         fullname: displayName,
-        email: email,
+        email,
         googleId: id,
       });
     }
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-      },
-      config.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
+    const token = jwt.sign({ id: user._id }, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.cookie("token", token, {
       ...authCookieOptions,
@@ -118,7 +107,7 @@ export const googleCallBack = async (req, res) => {
 
     res.redirect(config.FRONTEND_URL);
   } catch (error) {
-    console.error(error);
+    console.error("googleCallBack failed:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -130,7 +119,7 @@ export const logout = async (req, res) => {
     return res.status(400).json({ message: "No token provided" });
   }
 
-  await redis.set(token, Date.now().toString(), "EX", 60 * 60);
+  await redis.set(`bl:${token}`, "1", "EX", 60 * 60 * 24 * 3);
 
   res.clearCookie("token", authCookieOptions);
 
@@ -149,7 +138,7 @@ export const getme = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
         contact: user.contact,
-        role: user.role
+        role: user.role,
       },
     });
   } catch (error) {

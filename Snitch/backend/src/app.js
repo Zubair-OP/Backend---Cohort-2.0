@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import authRoutes from './routes/auth.routes.js';
 import passport from 'passport';
 import productRoutes from './routes/product.routes.js';
-import {Strategy as GoogleStrategy} from 'passport-google-oauth20';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { config } from './config/config.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -14,6 +14,7 @@ import { handleWebhook } from './controllers/payment.controller.js';
 import chatRoutes from './routes/chat.routes.js';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
+import { generalLimiter } from './middleware/rateLimit.js';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -21,12 +22,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin: config.FRONTEND_URL || 'http://localhost:5173',
+    origin: config.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
 }));
 
-app.use(morgan('dev'));
+app.use(morgan('combined'));
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -42,17 +45,21 @@ app.use(helmet({
             baseUri: ["'self'"],
         },
     },
+    crossOriginEmbedderPolicy: false,
 }));
 
 // Stripe webhook needs the raw request body to verify the signature.
 // This route MUST be registered before express.json() parses the body.
-app.use('/api/payments/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+app.use('/api/payments/webhook', express.raw({ type: 'application/json', limit: '1mb' }), handleWebhook);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 app.use(passport.initialize());
-app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads'), {
+    maxAge: '1d',
+    etag: true,
+}));
 passport.use(new GoogleStrategy({
     clientID: config.GOOGLE_CLIENT_ID,
     clientSecret: config.GOOGLE_CLIENT_SECRET,
@@ -60,9 +67,16 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, done) => {
     return done(null, profile);
 }));
-app.use(express.static(path.resolve(__dirname, '../public')));
+app.use(express.static(path.resolve(__dirname, '../public'), {
+    maxAge: '1h',
+    etag: true,
+}));
 
+app.use(generalLimiter);
 
+app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -70,10 +84,13 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/chat', chatRoutes);
 
-
 app.get('{*splat}', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../public/index.html'));
 });
 
+app.use((err, _req, res, _next) => {
+    console.error('Unhandled error:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
+});
 
 export default app;
