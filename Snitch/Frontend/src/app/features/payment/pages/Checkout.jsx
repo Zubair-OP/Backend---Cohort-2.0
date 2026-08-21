@@ -97,7 +97,7 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
             <PaymentElement options={paymentElementOptions} />
 
             {errorMessage ? (
-                <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-600">
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-500">
                     {errorMessage}
                 </div>
             ) : null}
@@ -105,7 +105,7 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
             <button
                 type="submit"
                 disabled={!stripe || paying}
-                className="flex w-full items-center justify-center gap-2 rounded bg-black py-3 text-xs font-medium text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-magnetic flex w-full items-center justify-center gap-2 rounded-full bg-bg-dark py-3.5 text-xs font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
                 {paying ? (
                     <>
@@ -120,7 +120,7 @@ const CheckoutForm = ({ paymentId, cartTotal }) => {
                 )}
             </button>
 
-            <p className="flex items-center justify-center gap-1 text-[11px] text-text-muted">
+            <p className="flex items-center justify-center gap-1.5 text-[11px] text-text-muted">
                 <LockIcon />
                 Secured by Stripe
             </p>
@@ -150,46 +150,50 @@ const Checkout = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-neutral-50 text-text-primary">
-            <header className="border-b border-border-light bg-white">
-                <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3.5 md:px-6">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex items-center gap-1 text-sm font-semibold tracking-[0.2em] text-black"
-                    >
-                        <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
-                        <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
-                    </button>
-                    <button
-                        onClick={() => navigate('/cart')}
-                        className="flex items-center gap-1 text-xs text-text-secondary transition-colors hover:text-black"
-                    >
-                        <ChevronLeft />
-                        Back to cart
-                    </button>
+        <div className="min-h-screen bg-cream text-text-primary">
+            <header className="sticky top-0 z-30 px-4 pt-4 md:px-8">
+                <div className="mx-auto max-w-5xl">
+                    <nav className="glass rounded-full px-5 py-3 md:px-8 md:py-3.5">
+                        <div className="flex items-center justify-between">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="flex items-center gap-1 text-sm font-bold tracking-[0.25em] text-black"
+                            >
+                                <span className="rounded-full border border-black/10 bg-white/50 px-2 py-0.5 text-xs">SN</span>
+                                <span className="text-xs tracking-[0.3em]">ITCH</span>
+                            </button>
+                            <button
+                                onClick={() => navigate('/cart')}
+                                className="flex items-center gap-1 text-xs text-text-secondary transition-colors duration-600 ease-premium hover:text-black"
+                            >
+                                <ChevronLeft />
+                                Back to cart
+                            </button>
+                        </div>
+                    </nav>
                 </div>
             </header>
 
             <main className="mx-auto max-w-md px-4 py-10 md:px-6">
-                <h1 className="mb-2 text-lg font-medium text-text-primary">Checkout</h1>
+                <h1 className="mb-2 font-serif text-lg font-medium text-text-primary">Checkout</h1>
                 <p className="mb-6 text-sm text-text-secondary">
                     Review your payment details and complete your order securely.
                 </p>
 
                 {loading ? (
                     <div className="space-y-3">
-                        <div className="h-10 animate-pulse rounded bg-neutral-200" />
-                        <div className="h-10 animate-pulse rounded bg-neutral-200" />
-                        <div className="h-10 animate-pulse rounded bg-neutral-100" />
+                        <div className="h-10 animate-pulse rounded-full bg-warm-gray" />
+                        <div className="h-10 animate-pulse rounded-full bg-warm-gray" />
+                        <div className="h-10 animate-pulse rounded-full bg-warm-gray/50" />
                     </div>
                 ) : null}
 
                 {error && !loading ? (
-                    <div className="rounded-lg border border-border-light bg-white p-6 text-center">
+                    <div className="rounded-4xl border border-border-light bg-white p-6 text-center">
                         <p className="text-sm text-red-500">{error}</p>
                         <button
                             onClick={() => navigate('/cart')}
-                            className="mt-4 rounded bg-black px-5 py-2 text-xs text-white hover:bg-neutral-800"
+                            className="btn-magnetic mt-4 rounded-full bg-bg-dark px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-white hover:bg-black"
                         >
                             Return to cart
                         </button>
@@ -197,23 +201,25 @@ const Checkout = () => {
                 ) : null}
 
                 {clientSecret && !loading ? (
-                    <div className="rounded-lg border border-border-light bg-white p-5 shadow-sm">
-                        <Elements
-                            stripe={stripePromise}
-                            options={{
-                                clientSecret,
-                                appearance: {
-                                    theme: 'stripe',
-                                    variables: {
-                                        colorPrimary: '#000000',
-                                        borderRadius: '4px',
-                                        fontFamily: 'inherit',
+                    <div className="double-bezel">
+                        <div className="double-bezel-inner p-5">
+                            <Elements
+                                stripe={stripePromise}
+                                options={{
+                                    clientSecret,
+                                    appearance: {
+                                        theme: 'stripe',
+                                        variables: {
+                                            colorPrimary: '#1A1A1A',
+                                            borderRadius: '9999px',
+                                            fontFamily: '"Plus Jakarta Sans", system-ui, sans-serif',
+                                        },
                                     },
-                                },
-                            }}
-                        >
-                            <CheckoutForm paymentId={paymentId} cartTotal={cartTotal} />
-                        </Elements>
+                                }}
+                            >
+                                <CheckoutForm paymentId={paymentId} cartTotal={cartTotal} />
+                            </Elements>
+                        </div>
                     </div>
                 ) : null}
             </main>

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /Dashboard
+Disallow: /create-product
+Disallow: /seller-product/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /payment-success
+
+Sitemap: https://snitch.store/sitemap.xml

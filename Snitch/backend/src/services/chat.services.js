@@ -8,7 +8,7 @@ import ConversationModel from '../models/conversation.model.js';
 
 const model = new ChatGroq({
   apiKey: config.GROQ_API_KEY.trim(),
-  model: 'llama-3.3-70b-versatile',
+  model: 'openai/gpt-oss-120b',
   temperature: 0.6,
   maxTokens: 1024,
 });

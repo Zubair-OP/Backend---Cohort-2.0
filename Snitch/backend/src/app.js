@@ -12,6 +12,7 @@ import cartRoutes from './routes/cart.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import { handleWebhook } from './controllers/payment.controller.js';
 import chatRoutes from './routes/chat.routes.js';
+import sitemapRoutes from './routes/sitemap.routes.js';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { generalLimiter } from './middleware/rateLimit.js';
@@ -83,6 +84,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/chat', chatRoutes);
+app.use(sitemapRoutes);
 
 app.get('{*splat}', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../public/index.html'));

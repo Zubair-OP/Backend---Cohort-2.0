@@ -14,33 +14,15 @@ const defaultForm = {
   category: '',
 };
 
-const inputStyle = {
-  color: '#1b1c1a',
-  borderBottom: '1px solid #d0c5b5',
-  fontFamily: "'Inter', sans-serif",
-};
-
-const accentColors = {
-  background: '#fbf9f6',
-  line: '#e4e2df',
-  muted: '#7A6E63',
-  text: '#1b1c1a',
-  accent: '#C9A96E',
-  subtle: '#B5ADA3',
-};
-
 function FormField({ label, error, children }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label
-        className="text-sm font-medium text-text-primary"
-        style={{ color: accentColors.muted }}
-      >
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[13px] font-medium text-text-secondary">
         {label}
       </label>
       {children}
       {error ? (
-        <p className="text-xs leading-5 text-red-600">
+        <p className="text-xs leading-5 text-red-500">
           {error}
         </p>
       ) : null}
@@ -51,7 +33,7 @@ function FormField({ label, error, children }) {
 function PreviewGrid({ previews, onRemove }) {
   if (!previews.length) {
     return (
-      <div className="rounded border border-dashed border-border-default px-4 py-10 text-center text-sm text-text-muted">
+      <div className="rounded-2xl border border-dashed border-border-light bg-warm-gray/30 px-4 py-10 text-center text-sm text-text-muted">
         No images selected yet
       </div>
     );
@@ -62,7 +44,7 @@ function PreviewGrid({ previews, onRemove }) {
       {previews.map((preview, index) => (
         <div
           key={preview.id}
-          className="relative overflow-hidden rounded border border-border-light bg-white"
+          className="relative overflow-hidden rounded-2xl border border-border-light bg-white"
         >
           <img
             src={preview.url}
@@ -72,7 +54,7 @@ function PreviewGrid({ previews, onRemove }) {
           <button
             type="button"
             onClick={() => onRemove(preview.id)}
-            className="absolute right-2 top-2 rounded bg-black px-3 py-1 text-xs text-white transition-all duration-300 hover:bg-gray-800"
+            className="absolute right-2 top-2 rounded-full bg-bg-dark px-3 py-1 text-xs text-white transition-all duration-600 ease-premium hover:bg-black"
           >
             Remove
           </button>
@@ -105,14 +87,6 @@ const CreateProduct = () => {
       previewsRef.current.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, []);
-
-  const handleFocus = (event) => {
-    event.target.style.borderBottomColor = accentColors.accent;
-  };
-
-  const handleBlur = (event) => {
-    event.target.style.borderBottomColor = '#d0c5b5';
-  };
 
   const validateForm = () => {
     const nextErrors = {};
@@ -252,12 +226,12 @@ const CreateProduct = () => {
   const sellerRole = user?.role || 'seller';
 
   return (
-    <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8">
+    <div className="min-h-screen bg-cream px-4 py-10 md:px-8">
+      <div className="mx-auto flex max-w-7xl flex-col gap-10">
         <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
-            <p className="text-sm text-text-muted">Seller workspace</p>
-            <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+          <div className="rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Seller workspace</p>
+            <h1 className="mt-2 font-serif text-3xl font-medium leading-tight text-text-primary md:text-4xl">
               Welcome back, {sellerName}
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-text-secondary">
@@ -265,20 +239,20 @@ const CreateProduct = () => {
             </p>
           </div>
 
-          <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
-            <p className="text-sm text-text-muted">Seller info</p>
+          <div className="rounded-4xl border border-border-light bg-warm-gray/50 px-7 py-8 md:px-9">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Seller info</p>
             <div className="mt-5 space-y-4">
               <div>
                 <p className="text-sm text-text-muted">Name</p>
-                <p className="mt-1 text-base text-text-primary">{sellerName}</p>
+                <p className="mt-1 text-base font-medium text-text-primary">{sellerName}</p>
               </div>
               <div>
                 <p className="text-sm text-text-muted">Email</p>
-                <p className="mt-1 text-base text-text-primary">{sellerEmail}</p>
+                <p className="mt-1 text-base font-medium text-text-primary">{sellerEmail}</p>
               </div>
               <div>
                 <p className="text-sm text-text-muted">Role</p>
-                <p className="mt-1 text-base uppercase tracking-[0.08em] text-text-primary">
+                <p className="mt-1 text-base font-medium uppercase tracking-[0.08em] text-text-primary">
                   {sellerRole}
                 </p>
               </div>
@@ -287,10 +261,10 @@ const CreateProduct = () => {
         </section>
 
         <form onSubmit={handleSubmit} className="grid items-start gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
-            <div className="mb-8 border-b border-border-light pb-5">
-              <p className="text-sm text-text-muted">Add new product</p>
-              <h2 className="mt-2 text-3xl font-medium leading-tight text-text-primary">
+          <div className="rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
+            <div className="mb-8 border-b border-border-light pb-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Add new product</p>
+              <h2 className="mt-2 font-serif text-3xl font-medium leading-tight text-text-primary">
                 Create a polished new listing
               </h2>
             </div>
@@ -302,11 +276,8 @@ const CreateProduct = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
                   placeholder="Classic linen shirt"
-                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
-                  style={inputStyle}
+                  className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium placeholder:text-text-muted focus:border-accent focus:ring-2 focus:ring-accent/10"
                   disabled={isSubmitting}
                 />
               </FormField>
@@ -316,12 +287,9 @@ const CreateProduct = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
                   rows={6}
                   placeholder="Write a clear, concise product description."
-                  className="w-full rounded border border-border-default bg-white px-4 py-3 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
-                  style={inputStyle}
+                  className="w-full rounded-2xl border border-border-light bg-cream px-5 py-3 text-sm text-text-primary outline-none transition-all duration-600 ease-premium placeholder:text-text-muted focus:border-accent focus:ring-2 focus:ring-accent/10"
                   disabled={isSubmitting}
                 />
               </FormField>
@@ -333,12 +301,9 @@ const CreateProduct = () => {
                     name="amount"
                     value={formData.amount}
                     onChange={handleChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
                     placeholder="4990"
                     min="0"
-                    className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 placeholder:text-text-muted focus:border-black"
-                    style={inputStyle}
+                    className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium placeholder:text-text-muted focus:border-accent focus:ring-2 focus:ring-accent/10"
                     disabled={isSubmitting}
                   />
                 </FormField>
@@ -349,10 +314,7 @@ const CreateProduct = () => {
                     name="currency"
                     value={formData.currency}
                     onChange={handleChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm uppercase text-text-primary outline-none transition-all duration-300 focus:border-black"
-                    style={inputStyle}
+                    className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm uppercase text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
                     disabled={isSubmitting}
                   />
                 </FormField>
@@ -363,7 +325,7 @@ const CreateProduct = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black disabled:opacity-60"
+                  className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent disabled:opacity-60"
                   disabled={isSubmitting}
                 >
                   <option value="">Select a category</option>
@@ -378,10 +340,10 @@ const CreateProduct = () => {
           </div>
 
           <div className="flex flex-col gap-6">
-            <div className="rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <div className="rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
               <FormField label={`Images (${previews.length}/${MAX_IMAGES})`} error={errors.images}>
                 <div className="space-y-4">
-                  <label className="flex cursor-pointer items-center justify-between rounded border border-border-default bg-bg-secondary px-4 py-4">
+                  <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-border-light bg-warm-gray/30 px-5 py-5 transition-all duration-600 ease-premium hover:border-accent">
                     <div>
                       <p className="text-sm font-medium text-text-primary">
                         Upload product images
@@ -390,7 +352,7 @@ const CreateProduct = () => {
                         JPG, PNG or WEBP. Maximum {MAX_IMAGES} images.
                       </p>
                     </div>
-                    <span className="rounded bg-black px-4 py-2 text-sm text-white">
+                    <span className="rounded-full bg-bg-dark px-5 py-2.5 text-sm font-medium text-white">
                       Browse
                     </span>
                     <input
@@ -409,7 +371,7 @@ const CreateProduct = () => {
               </FormField>
             </div>
 
-            <div className="rounded border border-border-light bg-bg-secondary px-6 py-7 md:px-8">
+            <div className="rounded-4xl border border-border-light bg-warm-gray/30 px-7 py-8 md:px-9">
               <div className="mb-6 space-y-2 text-sm text-text-secondary">
                 <p>Ready to publish your item?</p>
                 <p>Make sure all key product details are complete and your imagery is clear.</p>
@@ -417,7 +379,7 @@ const CreateProduct = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                className="btn-magnetic w-full rounded-full bg-bg-dark px-8 py-3.5 text-sm font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSubmitting ? 'Uploading Product...' : 'Publish Product'}
               </button>

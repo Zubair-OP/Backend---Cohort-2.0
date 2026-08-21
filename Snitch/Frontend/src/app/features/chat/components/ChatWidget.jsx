@@ -96,26 +96,26 @@ function ChatWidget() {
       <button
         onClick={toggleOpen}
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-neutral-900 text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-bg-dark text-white shadow-2xl transition-all duration-600 ease-premium hover:scale-105 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] active:scale-95"
       >
         {isOpen ? <CloseIcon /> : <ChatIcon />}
       </button>
 
       {isOpen ? (
-        <div className="fixed bottom-20 left-4 right-4 z-50 flex h-[70vh] max-h-[calc(100vh-7rem)] flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-2xl sm:left-auto sm:h-[600px] sm:w-96">
-          <div className="flex-none bg-neutral-900 px-4 py-3 text-white">
-            <div className="flex items-center gap-2">
+        <div className="fixed bottom-24 left-4 right-4 z-50 flex h-[70vh] max-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-4xl border border-border-light bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.15)] sm:left-auto sm:h-[600px] sm:w-96">
+          <div className="flex-none bg-bg-dark px-5 py-4 text-white">
+            <div className="flex items-center gap-2.5">
               <span className="flex h-2 w-2 items-center justify-center">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
               </span>
               <h2 className="text-sm font-semibold tracking-wide">Snitch Assistant</h2>
             </div>
-            <p className="mt-1 text-[10px] leading-tight text-white/60">
+            <p className="mt-1.5 text-[10px] leading-tight text-white/50">
               Ask about products, orders, shipping, or returns.
             </p>
           </div>
 
-          <div className="flex-none border-b border-neutral-100 bg-neutral-50 px-3.5 py-3">
+          <div className="flex-none border-b border-border-light bg-cream/50 px-4 py-3">
             <div className="flex flex-wrap gap-2">
               {QUICK_PROMPTS.map((prompt) => (
                 <button
@@ -123,7 +123,7 @@ function ChatWidget() {
                   type="button"
                   onClick={() => handleQuickPrompt(prompt)}
                   disabled={isStreaming}
-                  className="rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-[11px] font-medium text-neutral-700 transition-colors hover:border-neutral-900 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full border border-border-light bg-white px-3 py-1.5 text-[11px] font-medium text-text-secondary transition-all duration-600 ease-premium hover:border-bg-dark hover:text-black disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {prompt}
                 </button>
@@ -131,7 +131,7 @@ function ChatWidget() {
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-white px-3.5 py-4">
+          <div className="flex-1 space-y-3 overflow-y-auto bg-white px-4 py-4">
             {messages.map((message) => (
               <ChatMessage
                 key={message.id}
@@ -142,7 +142,7 @@ function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          <div className="flex-none border-t border-neutral-100 bg-white p-3">
+          <div className="flex-none border-t border-border-light bg-cream/30 p-3">
             <div className="flex items-end gap-2">
               <textarea
                 value={input}
@@ -151,18 +151,18 @@ function ChatWidget() {
                 rows={1}
                 maxLength={MAX_CHARS}
                 placeholder="Ask about products, orders, returns..."
-                className="max-h-24 flex-1 resize-none rounded-lg border border-neutral-200 px-3 py-2 text-xs text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900"
+                className="max-h-24 flex-1 resize-none rounded-2xl border border-border-light bg-white px-4 py-2.5 text-xs text-text-primary outline-none placeholder:text-text-muted transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isStreaming}
                 aria-label="Send message"
-                className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-neutral-900 text-white transition-colors hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-bg-dark text-white transition-all duration-600 ease-premium hover:bg-black active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <SendIcon />
               </button>
             </div>
-            <div className="mt-1.5 flex items-center justify-between text-[10px] text-neutral-400">
+            <div className="mt-2 flex items-center justify-between text-[10px] text-text-muted">
               <span>Shift + Enter for a new line</span>
               <span>{input.length}/{MAX_CHARS}</span>
             </div>

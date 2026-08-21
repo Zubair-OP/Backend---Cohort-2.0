@@ -3,23 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useProduct } from '../hook/useProduct';
 
-const ac = {
-  background: '#fbf9f6',
-  surface: '#ffffff',
-  line: '#e4e2df',
-  muted: '#7A6E63',
-  text: '#1b1c1a',
-  accent: '#C9A96E',
-  subtle: '#B5ADA3',
-  danger: '#b64848',
-};
-
-const inputStyle = {
-  color: ac.text,
-  borderBottom: `1px solid #d0c5b5`,
-  fontFamily: "'Inter', sans-serif",
-};
-
 const MAX_VARIANT_IMAGES = 4;
 
 const defaultVariantForm = {
@@ -32,18 +15,15 @@ const defaultVariantForm = {
 
 function FormField({ label, error, children }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-text-primary" style={{ color: ac.muted }}>
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[13px] font-medium text-text-secondary">
         {label}
       </label>
       {children}
-      {error && <p className="text-xs leading-5 text-red-600">{error}</p>}
+      {error && <p className="text-xs leading-5 text-red-500">{error}</p>}
     </div>
   );
 }
-
-function handleFocus(e) { e.target.style.borderBottomColor = ac.accent; }
-function handleBlur(e) { e.target.style.borderBottomColor = '#d0c5b5'; }
 
 function VariantModal({ product, editingVariant, onClose, onSaved }) {
   const { handleAddVariant, handleUpdateVariant } = useProduct();
@@ -181,23 +161,23 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded border border-border-light bg-white px-6 py-7 md:px-8">
+      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 text-sm text-text-secondary transition-all duration-300 hover:text-black"
+          className="absolute right-5 top-5 text-sm text-text-secondary transition-all duration-600 ease-premium hover:text-black"
         >
           Close
         </button>
 
-        <div className="mb-7 border-b border-border-light pb-5">
-          <p className="text-sm text-text-muted">
+        <div className="mb-7 border-b border-border-light pb-6">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
             {isEdit ? 'Edit variant' : 'Add variant'}
           </p>
-          <h2 className="mt-2 text-3xl font-medium leading-tight text-text-primary">
+          <h2 className="mt-2 font-serif text-3xl font-medium leading-tight text-text-primary">
             {isEdit ? 'Update variant details' : 'Create a new variant'}
           </h2>
         </div>
@@ -210,11 +190,8 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
                 min="0"
                 value={form.stock}
                 onChange={(e) => updateField('stock', e.target.value)}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
                 placeholder="0"
-                className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
-                style={inputStyle}
+                className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
                 disabled={submitting}
               />
             </FormField>
@@ -225,11 +202,8 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
                 min="0"
                 value={form.price}
                 onChange={(e) => updateField('price', e.target.value)}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
                 placeholder={product.price?.amount || '-'}
-                className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
-                style={inputStyle}
+                className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
                 disabled={submitting}
               />
             </FormField>
@@ -240,28 +214,25 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
               type="text"
               value={form.currency}
               onChange={(e) => updateField('currency', e.target.value.toUpperCase())}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm uppercase text-text-primary outline-none transition-all duration-300 focus:border-black"
-              style={inputStyle}
+              className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm uppercase text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
               disabled={submitting}
             />
           </FormField>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-text-primary">Attributes</label>
+              <label className="text-[13px] font-medium text-text-secondary">Attributes</label>
               <button
                 type="button"
                 onClick={addAttr}
-                className="rounded bg-black px-4 py-2 text-sm text-white transition-all duration-300 hover:bg-gray-800"
+                className="rounded-full bg-bg-dark px-4 py-2 text-sm font-medium text-white transition-all duration-600 ease-premium hover:bg-black"
               >
                 Add
               </button>
             </div>
 
             {errors.attributes && (
-              <p className="text-xs text-red-600">{errors.attributes}</p>
+              <p className="text-xs text-red-500">{errors.attributes}</p>
             )}
 
             {form.attributes.map((attr, idx) => (
@@ -270,29 +241,23 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
                   type="text"
                   value={attr.key}
                   onChange={(e) => updateAttr(idx, 'key', e.target.value)}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
                   placeholder="e.g. color"
-                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
-                  style={inputStyle}
+                  className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
                   disabled={submitting}
                 />
                 <input
                   type="text"
                   value={attr.value}
                   onChange={(e) => updateAttr(idx, 'value', e.target.value)}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
                   placeholder="e.g. red"
-                  className="h-11 w-full rounded border border-border-default bg-white px-4 text-sm text-text-primary outline-none transition-all duration-300 focus:border-black"
-                  style={inputStyle}
+                  className="h-11 w-full rounded-full border border-border-light bg-cream px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
                   disabled={submitting}
                 />
                 {form.attributes.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeAttr(idx)}
-                    className="text-sm text-red-600 transition-all duration-300 hover:text-red-700"
+                    className="text-sm text-red-500 transition-all duration-600 ease-premium hover:text-red-600"
                     disabled={submitting}
                   >
                     Remove
@@ -304,13 +269,13 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
 
           {!isEdit && (
             <div className="space-y-3">
-              <label className="text-sm font-medium text-text-primary">
+              <label className="text-[13px] font-medium text-text-secondary">
                 Variant Images ({imagePreviews.length}/{MAX_VARIANT_IMAGES})
               </label>
 
-              <label className="flex cursor-pointer items-center justify-between rounded border border-border-default bg-bg-secondary px-4 py-4">
-                <p className="text-sm text-text-primary">Upload images</p>
-                <span className="rounded bg-black px-4 py-2 text-sm text-white">
+              <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-border-light bg-warm-gray/30 px-5 py-5 transition-all duration-600 ease-premium hover:border-accent">
+                <p className="text-sm font-medium text-text-primary">Upload images</p>
+                <span className="rounded-full bg-bg-dark px-5 py-2.5 text-sm font-medium text-white">
                   Browse
                 </span>
                 <input
@@ -327,12 +292,12 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
               {imagePreviews.length > 0 && (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {imagePreviews.map((preview) => (
-                    <div key={preview.id} className="relative overflow-hidden rounded border border-border-light">
+                    <div key={preview.id} className="relative overflow-hidden rounded-2xl border border-border-light">
                       <img src={preview.url} alt="" className="h-24 w-full object-cover" />
                       <button
                         type="button"
                         onClick={() => removeImage(preview.id)}
-                        className="absolute right-2 top-2 rounded bg-black px-2 py-1 text-xs text-white"
+                        className="absolute right-2 top-2 rounded-full bg-bg-dark px-2.5 py-1 text-xs text-white"
                         disabled={submitting}
                       >
                         X
@@ -348,7 +313,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800 disabled:opacity-60"
+              className="btn-magnetic flex-1 rounded-full bg-bg-dark px-8 py-3 text-sm font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98] disabled:opacity-60"
             >
               {submitting ? (isEdit ? 'Saving...' : 'Adding...') : (isEdit ? 'Save Changes' : 'Add Variant')}
             </button>
@@ -356,7 +321,7 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="rounded border border-black px-8 py-3 text-sm font-normal text-black transition-all duration-300 hover:bg-black hover:text-white disabled:opacity-60"
+              className="rounded-full border border-border-light px-8 py-3 text-sm font-medium text-text-primary transition-all duration-600 ease-premium hover:border-bg-dark hover:bg-bg-dark hover:text-white disabled:opacity-60"
             >
               Cancel
             </button>
@@ -369,9 +334,9 @@ function VariantModal({ product, editingVariant, onClose, onSaved }) {
 
 function AttributeChip({ label, value }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded border border-border-light bg-bg-secondary px-3 py-1 text-xs text-text-primary">
+    <span className="inline-flex items-center gap-1 rounded-full border border-border-light bg-warm-gray/50 px-3 py-1 text-xs text-text-primary">
       <span className="text-text-muted">{label}</span>
-      <span>{value}</span>
+      <span className="font-medium">{value}</span>
     </span>
   );
 }
@@ -392,7 +357,7 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
       : null;
 
   return (
-    <article className="rounded border border-border-light bg-white px-5 py-4">
+    <article className="rounded-4xl border border-border-light bg-white px-6 py-5">
       {attrs.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-2">
           {attrs.map(([k, v]) => (
@@ -406,14 +371,14 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
           <div className="flex items-center gap-6">
             <div>
               <p className="text-sm text-text-muted">Stock</p>
-              <p className="mt-1 text-xl font-medium text-text-primary">
+              <p className="mt-1 font-serif text-xl font-medium text-text-primary">
                 {variant.stock ?? 0}
               </p>
             </div>
             {formatted && (
               <div>
                 <p className="text-sm text-text-muted">Price</p>
-                <p className="mt-1 text-xl font-medium text-text-primary">
+                <p className="mt-1 font-serif text-xl font-medium text-accent">
                   {formatted}
                 </p>
               </div>
@@ -430,25 +395,25 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
           <button
             type="button"
             onClick={() => onEdit(variant)}
-            className="rounded border border-black px-4 py-2 text-sm text-black transition-all duration-300 hover:bg-black hover:text-white"
+            className="rounded-full border border-border-light px-4 py-2 text-sm font-medium text-text-primary transition-all duration-600 ease-premium hover:border-bg-dark hover:bg-bg-dark hover:text-white"
           >
             Edit
           </button>
 
           {confirmDelete ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-red-600">Confirm?</span>
+              <span className="text-sm text-red-500">Confirm?</span>
               <button
                 type="button"
                 onClick={() => { onDelete(variant._id); setConfirmDelete(false); }}
-                className="rounded bg-red-600 px-4 py-2 text-sm text-white"
+                className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white"
               >
                 Yes
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="rounded border border-border-default px-4 py-2 text-sm text-text-secondary"
+                className="rounded-full border border-border-light px-4 py-2 text-sm text-text-secondary"
               >
                 No
               </button>
@@ -457,7 +422,7 @@ function VariantCard({ variant, productCurrency, onEdit, onDelete }) {
             <button
               type="button"
               onClick={() => setConfirmDelete(true)}
-              className="rounded border border-red-600 px-4 py-2 text-sm text-red-600"
+              className="rounded-full border border-red-400 px-4 py-2 text-sm font-medium text-red-500 transition-all duration-600 ease-premium hover:bg-red-500 hover:text-white"
             >
               Delete
             </button>
@@ -524,7 +489,7 @@ const SellerproductDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
+      <div className="min-h-screen flex items-center justify-center bg-cream">
         <p className="text-sm text-text-muted">Loading...</p>
       </div>
     );
@@ -532,12 +497,12 @@ const SellerproductDetails = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-bg-primary">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-cream">
         <p className="text-sm text-text-muted">Product not found</p>
         <button
           type="button"
           onClick={() => navigate('/Dashboard')}
-          className="rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
+          className="rounded-full bg-bg-dark px-8 py-3 text-sm font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black"
         >
           Back to Dashboard
         </button>
@@ -550,35 +515,37 @@ const SellerproductDetails = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-bg-primary px-4 py-8 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8">
+      <div className="min-h-screen bg-cream px-4 py-10 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-10">
           <button
             type="button"
             onClick={() => navigate('/Dashboard')}
-            className="self-start text-sm text-text-secondary transition-all duration-300 hover:text-black"
+            className="self-start text-sm font-medium text-text-secondary transition-all duration-600 ease-premium hover:text-black"
           >
-            Back to dashboard
+            ← Back to dashboard
           </button>
 
           <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="overflow-hidden rounded border border-border-light bg-bg-secondary">
-              {coverImage ? (
-                <img
-                  src={coverImage}
-                  alt={product.title}
-                  className="h-80 w-full object-cover lg:h-full"
-                />
-              ) : (
-                <div className="flex h-80 items-center justify-center text-sm text-text-muted lg:h-full">
-                  No image
-                </div>
-              )}
+            <div className="double-bezel">
+              <div className="double-bezel-inner overflow-hidden">
+                {coverImage ? (
+                  <img
+                    src={coverImage}
+                    alt={product.title}
+                    className="h-80 w-full object-cover lg:h-full"
+                  />
+                ) : (
+                  <div className="flex h-80 items-center justify-center text-sm text-text-muted lg:h-full">
+                    No image
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-col justify-between rounded border border-border-light bg-white px-6 py-7 md:px-8">
+            <div className="flex flex-col justify-between rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
               <div>
-                <p className="text-sm text-text-muted">Product details</p>
-                <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Product details</p>
+                <h1 className="mt-2 font-serif text-3xl font-medium leading-tight text-text-primary md:text-4xl">
                   {product.title}
                 </h1>
                 <p className="mt-4 text-base leading-7 text-text-secondary">
@@ -586,10 +553,10 @@ const SellerproductDetails = () => {
                 </p>
               </div>
 
-              <div className="mt-8 grid grid-cols-3 gap-4 border-t border-border-light pt-5">
+              <div className="mt-8 grid grid-cols-3 gap-4 border-t border-border-light pt-6">
                 <div>
                   <p className="text-sm text-text-muted">Base Price</p>
-                  <p className="mt-1 text-base font-medium text-text-primary">
+                  <p className="mt-1 text-base font-semibold text-accent">
                     {new Intl.NumberFormat('en-PK', {
                       style: 'currency',
                       currency: product.price?.currency || 'PKR',
@@ -599,13 +566,13 @@ const SellerproductDetails = () => {
                 </div>
                 <div>
                   <p className="text-sm text-text-muted">Images</p>
-                  <p className="mt-1 text-base font-medium text-text-primary">
+                  <p className="mt-1 text-base font-semibold text-text-primary">
                     {product.images?.length || 0}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-text-muted">Variants</p>
-                  <p className="mt-1 text-base font-medium text-text-primary">
+                  <p className="mt-1 text-base font-semibold text-text-primary">
                     {variants.length}
                   </p>
                 </div>
@@ -614,10 +581,10 @@ const SellerproductDetails = () => {
           </section>
 
           <section>
-            <div className="mb-5 flex items-center justify-between border-b border-border-light pb-4">
+            <div className="mb-6 flex items-center justify-between border-b border-border-light pb-5">
               <div>
-                <p className="text-sm text-text-muted">Variants</p>
-                <h2 className="mt-2 text-2xl font-medium text-text-primary">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Variants</p>
+                <h2 className="mt-2 font-serif text-2xl font-medium text-text-primary">
                   Manage product variants
                 </h2>
               </div>
@@ -625,14 +592,14 @@ const SellerproductDetails = () => {
               <button
                 type="button"
                 onClick={openAddModal}
-                className="rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
+                className="btn-magnetic rounded-full bg-bg-dark px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98]"
               >
                 Add Variant
               </button>
             </div>
 
             {variants.length === 0 ? (
-              <div className="rounded border border-dashed border-border-default bg-bg-secondary px-6 py-12 text-center">
+              <div className="rounded-4xl border border-dashed border-border-light bg-warm-gray/30 px-6 py-14 text-center">
                 <p className="text-sm text-text-muted">No variants yet</p>
                 <p className="mt-2 text-base text-text-secondary">
                   Add size, color, or any custom attribute combinations.
@@ -640,7 +607,7 @@ const SellerproductDetails = () => {
                 <button
                   type="button"
                   onClick={openAddModal}
-                  className="mt-6 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
+                  className="btn-magnetic mt-6 rounded-full bg-bg-dark px-8 py-3 text-sm font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98]"
                 >
                   Create First Variant
                 </button>

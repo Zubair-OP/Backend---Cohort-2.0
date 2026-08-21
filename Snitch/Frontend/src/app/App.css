@@ -2,13 +2,13 @@
 @import "tailwindcss";
 
 html {
-  background-color: #ffffff;
+  background-color: #FDFBF7;
 }
 
 body {
-  background-color: #ffffff;
-  color: #1a1a1a;
-  font-family: "Inter", system-ui, sans-serif;
+  background-color: #FDFBF7;
+  color: #1A1A1A;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 1.6;
@@ -18,16 +18,18 @@ body {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
+/* Premium transitions */
 button {
   transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease,
-    opacity 180ms ease,
-    transform 180ms ease;
+    background-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    color 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 600ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 600ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 button:not(:disabled) {
@@ -36,4 +38,89 @@ button:not(:disabled) {
 
 button:disabled {
   cursor: not-allowed;
+}
+
+/* Scroll reveal base */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  filter: blur(4px);
+  transition:
+    opacity 800ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 800ms cubic-bezier(0.32, 0.72, 0, 1),
+    filter 800ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Staggered reveal delays */
+.scroll-reveal-delay-1 { transition-delay: 100ms; }
+.scroll-reveal-delay-2 { transition-delay: 200ms; }
+.scroll-reveal-delay-3 { transition-delay: 300ms; }
+.scroll-reveal-delay-4 { transition-delay: 400ms; }
+
+/* Noise texture overlay */
+.noise-overlay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Double-bezel card base */
+.double-bezel {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 6px;
+  border-radius: calc(2rem - 0px);
+}
+
+.double-bezel-inner {
+  background: #FDFBF7;
+  border-radius: calc(2rem - 6px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Magnetic button hover */
+.btn-magnetic {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-magnetic:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Premium focus ring */
+*:focus-visible {
+  outline: 2px solid #C9A96E;
+  outline-offset: 2px;
 }

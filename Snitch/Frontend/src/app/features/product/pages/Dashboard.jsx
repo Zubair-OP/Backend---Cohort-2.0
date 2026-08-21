@@ -31,14 +31,14 @@ function ProductCard({ product }) {
 
   return (
     <Link to={`/seller-product/${product._id}`} className="block">
-      <article className="group overflow-hidden rounded border border-border-light bg-white transition-all duration-300 hover:border-black">
-        <div className="overflow-hidden bg-white">
-          <div className="aspect-[4/5] overflow-hidden bg-white">
+      <article className="group overflow-hidden rounded-4xl border border-border-light bg-white transition-all duration-600 ease-premium hover:border-accent hover:shadow-[0_8px_30px_-10px_rgba(201,169,110,0.15)]">
+        <div className="overflow-hidden bg-cream">
+          <div className="aspect-[4/5] overflow-hidden bg-cream">
             {coverImage ? (
               <img
                 src={coverImage}
                 alt={product.title}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                className="h-full w-full object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.04]"
                 loading="lazy"
                 decoding="async"
               />
@@ -50,14 +50,14 @@ function ProductCard({ product }) {
           </div>
         </div>
 
-        <div className="space-y-3 px-4 py-4">
+        <div className="space-y-3 px-5 py-5">
           <div className="flex items-center justify-between gap-3 text-sm text-text-muted">
             <p>Listed {formatDate(product.createdAt)}</p>
             <span>{product?.images?.length || 0} image{product?.images?.length === 1 ? '' : 's'}</span>
           </div>
 
           <div>
-            <h3 className="text-lg font-medium leading-7 text-text-primary">
+            <h3 className="font-serif text-lg font-medium leading-7 text-text-primary">
               {product.title}
             </h3>
             <p className="mt-2 line-clamp-2 text-sm leading-6 text-text-secondary">
@@ -66,7 +66,7 @@ function ProductCard({ product }) {
           </div>
 
           <div className="flex items-center justify-between border-t border-border-light pt-3">
-            <p className="text-base font-medium text-text-primary">
+            <p className="text-base font-semibold text-accent">
               {formatCurrency(amount, currency)}
             </p>
             <p className="text-sm text-text-secondary">Manage</p>
@@ -120,93 +120,96 @@ const Dashboard = () => {
       : (products || []).filter((p) => p.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
-      {/* Seller Console Navigation Header */}
-      <header className="sticky top-0 z-30 border-b border-border-light bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 md:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex cursor-pointer items-center gap-1 text-sm font-bold tracking-[0.25em] text-black" onClick={() => navigate('/')}>
-              <span className="border border-black px-1.5 py-0.5 text-xs">SN</span>
-              <span className="border border-black px-1.5 py-0.5 text-xs">ITCH</span>
-            </div>
-            <span className="rounded bg-black px-2.5 py-0.5 text-[10px] font-semibold tracking-wider text-white uppercase">
-              Seller Console
-            </span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => navigate('/')}
-              className="text-xs font-medium text-neutral-600 transition-colors hover:text-black"
-            >
-              View Storefront
-            </button>
-            <div className="h-4 w-px bg-neutral-200" />
-            <div className="flex items-center gap-3 text-xs">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 font-semibold text-neutral-800">
-                {sellerName.charAt(0).toUpperCase()}
+    <div className="min-h-screen bg-cream text-text-primary">
+      <header className="sticky top-0 z-30 px-4 pt-4 md:px-8">
+        <div className="mx-auto max-w-7xl">
+          <nav className="glass rounded-full px-5 py-3 md:px-8 md:py-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex cursor-pointer items-center gap-1 text-sm font-bold tracking-[0.25em] text-black" onClick={() => navigate('/')}>
+                  <span className="rounded-full border border-black/10 bg-white/50 px-2 py-0.5 text-xs">SN</span>
+                  <span className="text-xs tracking-[0.3em]">ITCH</span>
+                </div>
+                <span className="rounded-full bg-bg-dark px-3 py-1 text-[10px] font-semibold tracking-wider text-white uppercase">
+                  Seller Console
+                </span>
               </div>
-              <span className="hidden font-medium text-neutral-700 md:inline">
-                Hi, {sellerName}
-              </span>
-              <button
-                onClick={async () => {
-                  try {
-                    await handleLogout();
-                    toast.success('Logged out successfully.');
-                    navigate('/login');
-                  } catch {
-                    toast.error('Logout failed.');
-                  }
-                }}
-                className="font-medium text-red-600 transition-colors hover:text-red-700"
-              >
-                Logout
-              </button>
+
+              <div className="flex items-center gap-6">
+                <button
+                  onClick={() => navigate('/')}
+                  className="text-xs font-medium text-text-secondary transition-colors duration-600 ease-premium hover:text-black"
+                >
+                  View Storefront
+                </button>
+                <div className="h-4 w-px bg-border-light" />
+                <div className="flex items-center gap-3 text-xs">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 font-semibold text-accent">
+                    {sellerName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden font-medium text-text-secondary md:inline">
+                    Hi, {sellerName}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        await handleLogout();
+                        toast.success('Logged out successfully.');
+                        navigate('/login');
+                      } catch {
+                        toast.error('Logout failed.');
+                      }
+                    }}
+                    className="font-medium text-text-muted transition-colors duration-600 ease-premium hover:text-red-500"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          </nav>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 md:px-8 flex flex-col gap-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 flex flex-col gap-10">
         <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className="flex flex-col justify-between rounded border border-border-light bg-white px-6 py-7 md:px-8">
+          <div className="flex flex-col justify-between rounded-4xl border border-border-light bg-white px-7 py-8 md:px-9">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Merchant Portal</p>
-              <h1 className="mt-2 text-3xl font-medium leading-tight text-text-primary md:text-4xl">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Merchant Portal</p>
+              <h1 className="mt-2 font-serif text-3xl font-medium leading-tight text-text-primary md:text-4xl">
                 {sellerName}&apos;s product catalog
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-text-secondary">
                 Review your listed products, monitor catalog value, and keep the storefront aligned with the same clean Snitch presentation.
               </p>
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-7 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={() => navigate('/create-product')}
-                className="rounded bg-black px-6 py-2.5 text-xs font-normal text-white transition-all duration-300 hover:bg-gray-800"
+                className="btn-magnetic rounded-full bg-bg-dark px-6 py-2.5 text-xs font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98]"
               >
                 Add New Product
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="rounded border border-black px-6 py-2.5 text-xs font-normal text-black transition-all duration-300 hover:bg-black hover:text-white"
+                className="btn-magnetic rounded-full border border-border-light px-6 py-2.5 text-xs font-medium text-text-primary transition-all duration-600 ease-premium hover:border-bg-dark hover:bg-bg-dark hover:text-white"
               >
                 Browse Storefront
               </button>
             </div>
           </div>
 
-          <div className="flex flex-col justify-center rounded border border-border-light bg-neutral-50 px-6 py-7 md:px-8">
-            <div className="space-y-6">
+          <div className="flex flex-col justify-center rounded-4xl border border-border-light bg-warm-gray/50 px-7 py-8 md:px-9">
+            <div className="space-y-7">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Total Products</p>
-                <p className="mt-1 text-4xl font-semibold text-text-primary">{totalProducts}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Total Products</p>
+                <p className="mt-1.5 font-serif text-4xl font-semibold text-text-primary">{totalProducts}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Catalog Value</p>
-                <p className="mt-1 text-3xl font-semibold text-text-primary">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">Catalog Value</p>
+                <p className="mt-1.5 font-serif text-3xl font-semibold text-text-primary">
                   {formatCurrency(totalValue, primaryCurrency)}
                 </p>
               </div>
@@ -222,7 +225,7 @@ const Dashboard = () => {
             id="category-filter"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="rounded border border-border-light bg-white px-3 py-2 text-sm text-text-primary focus:border-black focus:outline-none"
+            className="rounded-full border border-border-light bg-white px-4 py-2.5 text-sm text-text-primary transition-all duration-600 ease-premium focus:border-accent focus:outline-none"
           >
             <option value="all">All Categories</option>
             {CATEGORIES.map((cat) => (
@@ -239,22 +242,22 @@ const Dashboard = () => {
         </div>
 
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="overflow-hidden rounded border border-border-light bg-white">
-                <div className="aspect-[4/5] animate-pulse bg-bg-secondary" />
-                <div className="space-y-3 px-4 py-4">
-                  <div className="h-4 w-24 animate-pulse rounded bg-neutral-200" />
-                  <div className="h-6 w-3/4 animate-pulse rounded bg-neutral-200" />
-                  <div className="h-12 animate-pulse rounded bg-neutral-100" />
+              <div key={index} className="overflow-hidden rounded-4xl border border-border-light bg-white">
+                <div className="aspect-[4/5] animate-pulse bg-warm-gray" />
+                <div className="space-y-3 px-5 py-5">
+                  <div className="h-4 w-24 animate-pulse rounded-full bg-warm-gray" />
+                  <div className="h-6 w-3/4 animate-pulse rounded-full bg-warm-gray" />
+                  <div className="h-12 animate-pulse rounded-2xl bg-warm-gray/50" />
                 </div>
               </div>
             ))}
           </div>
         ) : totalProducts === 0 ? (
-          <section className="rounded border border-border-light bg-bg-secondary px-6 py-16 text-center">
+          <section className="rounded-4xl border border-border-light bg-warm-gray/30 px-6 py-20 text-center">
             <p className="text-sm text-text-muted">Nothing listed yet</p>
-            <h2 className="mt-3 text-3xl font-medium text-text-primary">
+            <h2 className="mt-3 font-serif text-3xl font-medium text-text-primary">
               Your storefront is ready for its first product
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-text-secondary">
@@ -263,15 +266,15 @@ const Dashboard = () => {
             <button
               type="button"
               onClick={() => navigate('/create-product')}
-              className="mt-8 rounded bg-black px-8 py-3 text-sm font-normal text-white transition-all duration-300 hover:bg-gray-800"
+              className="btn-magnetic mt-8 rounded-full bg-bg-dark px-8 py-3 text-sm font-medium uppercase tracking-wider text-white transition-all duration-600 ease-premium hover:bg-black active:scale-[0.98]"
             >
               Create First Product
             </button>
           </section>
         ) : filteredProducts.length === 0 ? (
-          <section className="rounded border border-border-light bg-bg-secondary px-6 py-16 text-center">
+          <section className="rounded-4xl border border-border-light bg-warm-gray/30 px-6 py-20 text-center">
             <p className="text-sm text-text-muted">No products found</p>
-            <h2 className="mt-3 text-2xl font-medium text-text-primary">
+            <h2 className="mt-3 font-serif text-2xl font-medium text-text-primary">
               No products in &ldquo;{selectedCategory}&rdquo; category
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-text-secondary">
@@ -280,13 +283,13 @@ const Dashboard = () => {
             <button
               type="button"
               onClick={() => setSelectedCategory('all')}
-              className="mt-6 rounded border border-black px-6 py-2.5 text-sm text-text-primary transition-all duration-300 hover:bg-black hover:text-white"
+              className="btn-magnetic mt-6 rounded-full border border-border-light px-6 py-2.5 text-sm font-medium text-text-primary transition-all duration-600 ease-premium hover:border-bg-dark hover:bg-bg-dark hover:text-white"
             >
               Show all products
             </button>
           </section>
         ) : (
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {filteredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
