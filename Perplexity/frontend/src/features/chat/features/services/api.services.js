@@ -82,6 +82,8 @@ export const streamMessage = async (message, chatId, handlers = {}, signal = nul
         // ── Route to the correct handler ────────────────────────────────────────
         if (eventName === "start") {
             handlers.onStart?.(payload);
+        } else if (eventName === "thinking") {
+            handlers.onThinking?.(payload);
         } else if (eventName === "done") {
             handlers.onDone?.(payload);
         } else if (payload.error) {

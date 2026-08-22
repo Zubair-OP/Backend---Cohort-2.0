@@ -132,13 +132,23 @@ export function useChat() {
             }
           },
 
+          // Named event: model is in reasoning/thinking phase
+          onThinking: () => {
+            dispatch(
+              updateMessageById({
+                id: assistantMessageId,
+                changes: { content: "", isThinking: true },
+              })
+            );
+          },
+
           // Plain data token chunk: append to assistant message
           onChunk: ({ token }) => {
             assistantContent += token;
             dispatch(
               updateMessageById({
                 id: assistantMessageId,
-                changes: { content: assistantContent },
+                changes: { content: assistantContent, isThinking: false },
               })
             );
           },

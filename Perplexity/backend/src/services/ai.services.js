@@ -1,10 +1,10 @@
-import { ChatGroq } from "@langchain/groq";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage, AIMessage, ToolMessage, tool } from "langchain";
 import * as z from "zod";
 import { internetSearch, isInternetSearchAvailable } from "./internet.services.js";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
-const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "qwen/qwen3.6-27b";
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY?.trim();
+const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
 // Keep only recent messages so long conversations stay under the token limit.
 const MAX_HISTORY_MESSAGES = 12;
@@ -13,7 +13,7 @@ const THINK_OPEN = "<think>";
 const THINK_CLOSE = "</think>";
 
 function missingApiKeyError() {
-  const error = new Error("Missing GROQ_API_KEY in environment.");
+  const error = new Error("Missing GOOGLE_API_KEY in environment.");
   error.status = 500;
   return error;
 }
@@ -26,8 +26,8 @@ function wrapAiError(error, context) {
   return friendlyError;
 }
 
-let groqModel;
-let groqModelWithTools;
+let geminiModel;
+let geminiModelWithTools;
 
 const searchTool = tool(
   ({ query }) => internetSearch({ query }),
@@ -41,17 +41,17 @@ const searchTool = tool(
 );
 
 function getModel() {
-  if (!GROQ_API_KEY) {
+  if (!GOOGLE_API_KEY) {
     throw missingApiKeyError();
   }
 
-  groqModel ??= new ChatGroq({
-    apiKey: GROQ_API_KEY,
-    model: GROQ_MODEL,
+  geminiModel ??= new ChatGoogleGenerativeAI({
+    apiKey: GOOGLE_API_KEY,
+    model: GEMINI_MODEL,
     temperature: 0.6,
   });
 
-  return groqModel;
+  return geminiModel;
 }
 
 function getModelWithTools() {
@@ -59,8 +59,8 @@ function getModelWithTools() {
     return getModel();
   }
 
-  groqModelWithTools ??= getModel().bindTools([searchTool]);
-  return groqModelWithTools;
+  geminiModelWithTools ??= getModel().bindTools([searchTool]);
+  return geminiModelWithTools;
 }
 
 const MESSAGE_TYPES = { user: HumanMessage, ai: AIMessage };
@@ -122,6 +122,10 @@ function stripThinkingTags(text) {
 class ThinkingFilter {
   #buffer = "";
   #insideThink = false;
+
+  get isThinking() {
+    return this.#insideThink;
+  }
 
   push(chunk) {
     if (!chunk) return "";
@@ -188,18 +192,19 @@ export async function generateResponse(messages) {
     const context = [buildSystemPrompt(), ...buildChatContext(messages)];
     return stripThinkingTags(await invokeWithTools(context));
   } catch (error) {
-    throw wrapAiError(error, `Failed to generate response with ${GROQ_MODEL}`);
+    throw wrapAiError(error, `Failed to generate response with ${GEMINI_MODEL}`);
   }
 }
 
-export async function streamResponse(messages, { onToken } = {}) {
+export async function streamResponse(messages, { onToken, onThinking } = {}) {
   let fullText = "";
   const filter = new ThinkingFilter();
+  let thinkingNotified = false;
 
-  const emit = (text) => {
+  const emit = async (text) => {
     if (!text) return;
     fullText += text;
-    onToken?.(text);
+    await onToken?.(text);
   };
 
   const streamUntilToolCall = async (context) => {
@@ -208,10 +213,18 @@ export async function streamResponse(messages, { onToken } = {}) {
 
     for await (const chunk of stream) {
       collectedToolCalls.push(...(chunk.tool_calls ?? []));
-      emit(filter.push(typeof chunk.content === "string" ? chunk.content : ""));
+      const chunkText = typeof chunk.content === "string" ? chunk.content : "";
+
+      await emit(filter.push(chunkText));
+
+      // Notify once when the model enters the thinking/reasoning phase
+      if (!thinkingNotified && filter.isThinking) {
+        thinkingNotified = true;
+        onThinking?.();
+      }
     }
 
-    emit(filter.flush());
+    await emit(filter.flush());
     return collectedToolCalls;
   };
 
@@ -228,7 +241,7 @@ export async function streamResponse(messages, { onToken } = {}) {
 
     return stripThinkingTags(fullText) || "I could not generate a response right now.";
   } catch (error) {
-    throw wrapAiError(error, `Failed to stream response with ${GROQ_MODEL}`);
+    throw wrapAiError(error, `Failed to stream response with ${GEMINI_MODEL}`);
   }
 }
 
@@ -244,6 +257,6 @@ export async function generateChatTitle(message) {
 
     return stripThinkingTags(extractText(response));
   } catch (error) {
-    throw wrapAiError(error, `Failed to generate chat title with ${GROQ_MODEL}`);
+    throw wrapAiError(error, `Failed to generate chat title with ${GEMINI_MODEL}`);
   }
 }

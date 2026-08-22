@@ -3,8 +3,8 @@ import chatModel from "../model/chat.model.js";
 import messageModel from "../model/message.model.js";
 
 function writeSseEvent(res, event, data) {
-  res.write(`event: ${event}\n`);
-  res.write(`data: ${JSON.stringify(data)}\n\n`);
+  res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  if (typeof res.flush === "function") res.flush();
 }
 
 async function safeChatTitle(message) {
@@ -88,7 +88,10 @@ export async function HandleChatStream(req, res) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
     res.flushHeaders?.();
+    // Disable Nagle's algorithm so tiny SSE chunks are sent immediately
+    res.socket?.setNoDelay?.(true);
 
     let title = null;
     let chat = null;
@@ -122,8 +125,14 @@ export async function HandleChatStream(req, res) {
     const history = await messageModel.find({ chat: activeChatId }).sort({ createdAt: 1 });
 
     const aiText = await streamResponse(history, {
-      onToken(token) {
+      async onToken(token) {
         res.write(`data: ${JSON.stringify({ text: token })}\n\n`);
+        if (typeof res.flush === "function") res.flush();
+        // Small delay for a natural typewriter feel
+        await new Promise((r) => setTimeout(r, 30));
+      },
+      onThinking() {
+        writeSseEvent(res, "thinking", { status: "thinking" });
       },
     });
 

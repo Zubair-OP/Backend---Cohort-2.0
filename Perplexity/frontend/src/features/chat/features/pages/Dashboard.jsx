@@ -64,6 +64,7 @@ const Message = ({ message, isStreaming }) => {
   const isUser = message.role === "user";
   const sources = getSources(message);
   const hasSources = sources.length > 0;
+  const isThinking = message.isThinking && !message.content;
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"} animate-fade-in-up`}>
@@ -91,32 +92,39 @@ const Message = ({ message, isStreaming }) => {
               </div>
             </div>
           )}
-          <div className={`text-sm leading-7 text-[#d4d4d4] markdown-body ${isStreaming ? "streaming-cursor" : ""}`}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
-              code(props) {
-                const { children, className, ...rest } = props;
-                const match = /language-(\w+)/.exec(className || "");
-                const codeString = typeof children === "string" ? children.replace(/\n$/, "") : "";
-                if (match && codeString) {
-                  try {
-                    const highlighted = hljs.highlight(codeString, { language: match[1] }).value;
-                    return (
-                      <div className="my-4 rounded-xl border border-border bg-surface-1 overflow-hidden">
-                        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-2">
-                          <span className="text-[11px] font-mono font-medium text-fg-muted uppercase tracking-wider">{match[1]}</span>
-                          <CopyButton text={codeString} />
+          {isThinking ? (
+            <div className="flex items-center gap-2 text-sm text-fg-muted py-1">
+              <span className="inline-block w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+              <span className="animate-pulse">Thinking…</span>
+            </div>
+          ) : (
+            <div className={`text-sm leading-7 text-[#d4d4d4] markdown-body ${isStreaming ? "streaming-cursor" : ""}`}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+                code(props) {
+                  const { children, className, ...rest } = props;
+                  const match = /language-(\w+)/.exec(className || "");
+                  const codeString = typeof children === "string" ? children.replace(/\n$/, "") : "";
+                  if (match && codeString) {
+                    try {
+                      const highlighted = hljs.highlight(codeString, { language: match[1] }).value;
+                      return (
+                        <div className="my-4 rounded-xl border border-border bg-surface-1 overflow-hidden">
+                          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-2">
+                            <span className="text-[11px] font-mono font-medium text-fg-muted uppercase tracking-wider">{match[1]}</span>
+                            <CopyButton text={codeString} />
+                          </div>
+                          <pre className="p-4 overflow-x-auto text-[13px] leading-relaxed text-[#d4d4d4]">
+                            <code className={className} dangerouslySetInnerHTML={{ __html: highlighted }} />
+                          </pre>
                         </div>
-                        <pre className="p-4 overflow-x-auto text-[13px] leading-relaxed text-[#d4d4d4]">
-                          <code className={className} dangerouslySetInnerHTML={{ __html: highlighted }} />
-                        </pre>
-                      </div>
-                    );
-                  } catch { /* Fallback for unsupported languages */ }
-                }
-                return <code {...rest} className="bg-surface-4 text-[#e879f9] px-1.5 py-0.5 rounded text-[13px] font-mono">{children}</code>;
-              },
-            }}>{message.content}</ReactMarkdown>
-          </div>
+                      );
+                    } catch { /* Fallback for unsupported languages */ }
+                  }
+                  return <code {...rest} className="bg-surface-4 text-[#e879f9] px-1.5 py-0.5 rounded text-[13px] font-mono">{children}</code>;
+                },
+              }}>{message.content}</ReactMarkdown>
+            </div>
+          )}
         </div>
       )}
       {isUser && (

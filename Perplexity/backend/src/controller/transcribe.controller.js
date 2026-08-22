@@ -1,6 +1,16 @@
 import Groq from "groq-sdk";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq;
+function getGroqClient() {
+  if (!groq) {
+    const apiKey = process.env.GROQ_API_KEY?.trim();
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY is required for audio transcription. Add it to your .env file.");
+    }
+    groq = new Groq({ apiKey });
+  }
+  return groq;
+}
 
 const SUPPORTED_FORMATS = {
   "audio/webm": "webm",
@@ -24,7 +34,7 @@ export const transcribeAudio = async (req, res) => {
 
     const file = new File([req.file.buffer], `audio.${ext}`, { type: mimeType });
 
-    const transcription = await groq.audio.transcriptions.create({
+    const transcription = await getGroqClient().audio.transcriptions.create({
       file,
       model: "whisper-large-v3",
       response_format: "json",
