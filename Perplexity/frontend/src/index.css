@@ -40,6 +40,13 @@
   .animate-delay-300 {
     animation-delay: 300ms;
   }
+
+  .press-active {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .press-active:active {
+    transform: scale(0.97);
+  }
 }
 
 @layer base {
@@ -59,10 +66,10 @@
   }
 
   body {
-    font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background-color: #000000;
+    font-family: "Plus Jakarta Sans", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #0a0a0a;
     color: #f0f0f0;
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
   }
 
@@ -208,6 +215,7 @@
     color: #f0f0f0;
     line-height: 1.3;
     letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   .markdown-body h1 { font-size: 1.5rem; }

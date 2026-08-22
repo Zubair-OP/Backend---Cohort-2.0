@@ -43,15 +43,14 @@ export default {
       },
       fontFamily: {
         sans: [
-          "Inter",
+          "Plus Jakarta Sans",
           "SF Pro Display",
           "-apple-system",
           "BlinkMacSystemFont",
-          "Segoe UI",
           "sans-serif",
         ],
         display: [
-          "Inter",
+          "Space Grotesk",
           "SF Pro Display",
           "-apple-system",
           "BlinkMacSystemFont",

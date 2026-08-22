@@ -51,7 +51,7 @@ const TopBar = ({ user, sidebarCollapsed, onToggleSidebar }) => {
       <div className="flex items-center gap-1.5" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((o) => !o)}
-          className="w-8 h-8 rounded-full bg-surface-4 border border-border flex items-center justify-center text-xs font-semibold text-fg-primary hover:bg-surface-5 hover:border-border-hover transition-all duration-200 focus-ring"
+            className="w-8 h-8 rounded-full bg-surface-4 border border-border flex items-center justify-center text-xs font-semibold text-fg-primary hover:bg-surface-5 hover:border-border-hover transition-all duration-200 focus-ring press-active"
           aria-label="User menu"
           aria-expanded={dropdownOpen}
         >

@@ -1,260 +1,249 @@
-import { ChatGroq } from '@langchain/groq'
-import { HumanMessage, SystemMessage, AIMessage, ToolMessage, tool } from "langchain"
+import { ChatGroq } from "@langchain/groq";
+import { HumanMessage, SystemMessage, AIMessage, ToolMessage, tool } from "langchain";
 import * as z from "zod";
-import {internetSearch, isInternetSearchAvailable} from "./internet.services.js";
+import { internetSearch, isInternetSearchAvailable } from "./internet.services.js";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
 const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "qwen/qwen3.6-27b";
 
-// Keep only last N messages to avoid token limit errors on long conversations
+// Keep only recent messages so long conversations stay under the token limit.
 const MAX_HISTORY_MESSAGES = 12;
 
+const THINK_OPEN = "<think>";
+const THINK_CLOSE = "</think>";
+
 function missingApiKeyError() {
-    const error = new Error("Missing GROQ_API_KEY in environment.");
-    error.status = 500;
-    return error;
+  const error = new Error("Missing GROQ_API_KEY in environment.");
+  error.status = 500;
+  return error;
 }
 
-function wrapAiError(error, context = "AI request failed") {
-    console.error(`${context}:`, error?.message || error);
-    const friendlyError = new Error(context);
-    friendlyError.status = 502;
-    return friendlyError;
+// Log details server-side, surface only a generic message to clients.
+function wrapAiError(error, context) {
+  console.error(`${context}:`, error?.message || error);
+  const friendlyError = new Error(context);
+  friendlyError.status = 502;
+  return friendlyError;
 }
 
-let groqModel = null;
-
-function getGroqModel() {
-    if (!GROQ_API_KEY) {
-        throw missingApiKeyError();
-    }
-
-    if (!groqModel) {
-        groqModel = new ChatGroq({
-            model: GROQ_MODEL,
-            apiKey: GROQ_API_KEY,
-            temperature: 0.2,
-        });
-    }
-
-    return groqModel;
-}
-
-function toPlainText(result) {
-    if (!result) return "";
-
-    if (typeof result.content === "string") {
-        return result.content.trim();
-    }
-
-    if (Array.isArray(result.content)) {
-        return result.content
-            .map((part) => {
-                if (typeof part === "string") return part;
-                if (part?.type === "text" && typeof part.text === "string") return part.text;
-                return "";
-            })
-            .join(" ")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
-
-    if (typeof result.text === "string") {
-        return result.text.trim();
-    }
-
-    return String(result.content ?? "").trim();
-}
+let groqModel;
+let groqModelWithTools;
 
 const searchTool = tool(
-    internetSearch,
-    {
-        name: "internet_search",
-        description: "Use this tool to search the internet for up-to-date information.",
-        schema: z.object({
-            query: z.string().describe("The search query to find relevant information on the internet.")
-        })
-    }
-)
+  ({ query }) => internetSearch({ query }),
+  {
+    name: "internet_search",
+    description: "Search the internet for up-to-date information.",
+    schema: z.object({
+      query: z.string().describe("The search query to find relevant information."),
+    }),
+  }
+);
 
-function getAvailableTools() {
-    return isInternetSearchAvailable() ? [searchTool] : [];
+function getModel() {
+  if (!GROQ_API_KEY) {
+    throw missingApiKeyError();
+  }
+
+  groqModel ??= new ChatGroq({
+    apiKey: GROQ_API_KEY,
+    model: GROQ_MODEL,
+    temperature: 0.6,
+  });
+
+  return groqModel;
 }
 
-function trimMessages(messages) {
-    if (messages.length <= MAX_HISTORY_MESSAGES) return messages;
-    return messages.slice(-MAX_HISTORY_MESSAGES);
+function getModelWithTools() {
+  if (!isInternetSearchAvailable()) {
+    return getModel();
+  }
+
+  groqModelWithTools ??= getModel().bindTools([searchTool]);
+  return groqModelWithTools;
 }
+
+const MESSAGE_TYPES = { user: HumanMessage, ai: AIMessage };
 
 function buildChatContext(messages) {
-    return trimMessages(messages).map((msg) => {
-        if (msg.role == "user") {
-            return new HumanMessage(msg.content);
-        } else if (msg.role == "ai") {
-            return new AIMessage(msg.content);
-        }
-        return new SystemMessage(msg.content);
-    });
+  return messages.slice(-MAX_HISTORY_MESSAGES).map(({ role, content }) => {
+    const MessageType = MESSAGE_TYPES[role] ?? SystemMessage;
+    return new MessageType(content);
+  });
 }
 
 function buildSystemPrompt() {
-    return new SystemMessage(
-        `Today is ${new Date().toDateString()}. You are a helpful assistant. Give accurate and concise answers with reasoning. ` +
-        "For acronym questions, provide full form first and then one short explanation. " +
-        (isInternetSearchAvailable()
-            ? "Use the internet search tool only when up-to-date information is necessary."
-            : "Internet search is unavailable in this environment, so answer from your built-in knowledge only.")
-    );
+  const searchNote = isInternetSearchAvailable()
+    ? "Use the internet_search tool when up-to-date information is necessary."
+    : "Internet search is unavailable, answer from your built-in knowledge only.";
+
+  return new SystemMessage(
+    `Today is ${new Date().toDateString()}. You are a helpful assistant. ` +
+      "Give accurate and concise answers with reasoning. " +
+      "For acronym questions, give the full form first, then one short explanation. " +
+      searchNote
+  );
+}
+
+async function runToolCalls(toolCalls, appendToContext) {
+  for (const call of toolCalls) {
+    if (call.name !== "internet_search") continue;
+
+    let output;
+    try {
+      output = await internetSearch({ query: call.args.query });
+    } catch (error) {
+      output = `Internet search failed: ${error.message}`;
+    }
+
+    appendToContext(new ToolMessage({ tool_call_id: call.id, content: output }));
+  }
+}
+
+function extractText(result) {
+  const content = result?.content;
+
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => (typeof part === "string" ? part : part?.text ?? ""))
+      .join("");
+  }
+
+  return "";
+}
+
+function stripThinkingTags(text) {
+  return text ? text.replace(/<think>[\s\S]*?<\/think>/g, "").trim() : "";
+}
+
+// Reasoning models emit <think>...</think> around their chain-of-thought.
+// Tags can split across stream chunks, so filtering runs on a rolling buffer.
+class ThinkingFilter {
+  #buffer = "";
+  #insideThink = false;
+
+  push(chunk) {
+    if (!chunk) return "";
+
+    this.#buffer += chunk;
+    let emitable = "";
+
+    while (this.#buffer) {
+      if (!this.#insideThink) {
+        const start = this.#buffer.indexOf(THINK_OPEN);
+
+        if (start === -1) {
+          const safeEnd = this.#safeLength(this.#buffer);
+          emitable += this.#buffer.slice(0, safeEnd);
+          this.#buffer = this.#buffer.slice(safeEnd);
+          break;
+        }
+
+        emitable += this.#buffer.slice(0, start);
+        this.#buffer = this.#buffer.slice(start + THINK_OPEN.length);
+        this.#insideThink = true;
+      } else {
+        const end = this.#buffer.indexOf(THINK_CLOSE);
+        if (end === -1) break;
+
+        this.#buffer = this.#buffer.slice(end + THINK_CLOSE.length);
+        this.#insideThink = false;
+      }
+    }
+
+    return emitable;
+  }
+
+  flush() {
+    // Text still inside a think block when the stream ends is reasoning, not content.
+    const rest = this.#insideThink ? "" : this.#buffer;
+    this.#buffer = "";
+    return rest;
+  }
+
+  // Hold back a trailing partial "<think" until we know it is not a tag opening.
+  #safeLength(text) {
+    for (let keep = Math.min(THINK_OPEN.length - 1, text.length); keep > 0; keep--) {
+      if (THINK_OPEN.startsWith(text.slice(-keep))) return text.length - keep;
+    }
+    return text.length;
+  }
+}
+
+async function invokeWithTools(context) {
+  let result = await getModelWithTools().invoke(context);
+
+  if (result.tool_calls?.length) {
+    context.push(result);
+    await runToolCalls(result.tool_calls, (message) => context.push(message));
+    result = await getModelWithTools().invoke(context);
+  }
+
+  return extractText(result);
 }
 
 export async function generateResponse(messages) {
-    if (!GROQ_API_KEY) {
-        throw missingApiKeyError();
-    }
-
-    const chatContext = buildChatContext(messages);
-    const messagesToInvoke = [buildSystemPrompt(), ...chatContext];
-
-    try {
-        const tools = getAvailableTools();
-        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
-
-        let result = await model.invoke(messagesToInvoke);
-
-        if (result.tool_calls && result.tool_calls.length > 0) {
-            messagesToInvoke.push(result);
-            for (const tc of result.tool_calls) {
-                if (tc.name === "internet_search") {
-                    try {
-                        const searchOutput = await internetSearch({ query: tc.args.query });
-                        messagesToInvoke.push(new ToolMessage({
-                            tool_call_id: tc.id,
-                            content: searchOutput
-                        }));
-                    } catch (e) {
-                         messagesToInvoke.push(new ToolMessage({
-                            tool_call_id: tc.id,
-                            content: `Internet search failed: ${e.message}`
-                        }));
-                    }
-                }
-            }
-            result = await model.invoke(messagesToInvoke);
-        }
-
-        return toPlainText(result);
-    } catch (error) {
-        throw wrapAiError(error, `Failed to generate response with model ${GROQ_MODEL}`);
-    }
-
+  try {
+    const context = [buildSystemPrompt(), ...buildChatContext(messages)];
+    return stripThinkingTags(await invokeWithTools(context));
+  } catch (error) {
+    throw wrapAiError(error, `Failed to generate response with ${GROQ_MODEL}`);
+  }
 }
 
 export async function streamResponse(messages, { onToken } = {}) {
-    if (!GROQ_API_KEY) {
-        throw missingApiKeyError();
+  let fullText = "";
+  const filter = new ThinkingFilter();
+
+  const emit = (text) => {
+    if (!text) return;
+    fullText += text;
+    onToken?.(text);
+  };
+
+  const streamUntilToolCall = async (context) => {
+    const stream = await getModelWithTools().stream(context);
+    const collectedToolCalls = [];
+
+    for await (const chunk of stream) {
+      collectedToolCalls.push(...(chunk.tool_calls ?? []));
+      emit(filter.push(typeof chunk.content === "string" ? chunk.content : ""));
     }
 
-    const chatContext = buildChatContext(messages);
+    emit(filter.flush());
+    return collectedToolCalls;
+  };
 
-    let fullText = "";
-    let lastCompletedText = "";
-    const streamPlainText = async (model, messagesToStream) => {
-        const stream = await model.stream(messagesToStream);
-        let toolCalls = [];
+  try {
+    const context = [buildSystemPrompt(), ...buildChatContext(messages)];
 
-        async function processStream(incomingStream) {
-            for await (const chunk of incomingStream) {
-                if (chunk.tool_calls && chunk.tool_calls.length > 0) {
-                    toolCalls.push(...chunk.tool_calls);
-                }
+    const firstRoundToolCalls = await streamUntilToolCall(context);
 
-                const chunkText = chunk.content;
-                if (chunkText && typeof chunkText === "string") {
-                    const chunkSize = 2;
-                    const delayMs = 15;
-                    for (let i = 0; i < chunkText.length; i += chunkSize) {
-                        const slice = chunkText.slice(i, i + chunkSize);
-                        fullText += slice;
-                        onToken?.(slice);
-                        await new Promise(resolve => setTimeout(resolve, delayMs));
-                    }
-                    lastCompletedText = fullText.trim();
-                }
-            }
-        }
-
-        await processStream(stream);
-
-        if (toolCalls.length > 0) {
-            messagesToStream.push(new AIMessage({ content: "", tool_calls: toolCalls }));
-            for (const tc of toolCalls) {
-                if (tc.name === "internet_search") {
-                    try {
-                        onToken?.("\n\n*Searching the internet...*\n\n");
-                        const searchOutput = await internetSearch({ query: tc.args.query });
-                        messagesToStream.push(new ToolMessage({
-                            tool_call_id: tc.id,
-                            content: searchOutput
-                        }));
-                    } catch (e) {
-                        messagesToStream.push(new ToolMessage({
-                            tool_call_id: tc.id,
-                            content: `Internet search failed: ${e.message}`
-                        }));
-                    }
-                }
-            }
-
-            const followUpStream = await model.stream(messagesToStream);
-            await processStream(followUpStream);
-        }
-    };
-
-    try {
-        const tools = getAvailableTools();
-        const model = tools.length > 0 ? getGroqModel().bindTools(tools) : getGroqModel();
-        const messagesToStream = [buildSystemPrompt(), ...chatContext];
-        await streamPlainText(model, messagesToStream);
-
-        const streamedText = fullText.trim();
-        if (streamedText) {
-            return streamedText;
-        }
-
-        if (lastCompletedText) {
-            onToken?.(lastCompletedText);
-            return lastCompletedText;
-        }
-
-        const fallbackText = await generateResponse(messages);
-        if (fallbackText?.trim()) {
-            onToken?.(fallbackText);
-            return fallbackText.trim();
-        }
-
-        return "I could not generate a response right now.";
-    } catch (error) {
-        throw wrapAiError(error, `Failed to stream response with model ${GROQ_MODEL}`);
+    if (firstRoundToolCalls.length > 0) {
+      context.push(new AIMessage({ content: "", tool_calls: firstRoundToolCalls }));
+      await runToolCalls(firstRoundToolCalls, (message) => context.push(message));
+      await streamUntilToolCall(context);
     }
+
+    return stripThinkingTags(fullText) || "I could not generate a response right now.";
+  } catch (error) {
+    throw wrapAiError(error, `Failed to stream response with ${GROQ_MODEL}`);
+  }
 }
 
 export async function generateChatTitle(message) {
-    if (!GROQ_API_KEY) {
-        throw missingApiKeyError();
-    }
+  try {
+    const response = await getModel().invoke([
+      new SystemMessage(
+        "Generate a short 2-4 word title for this conversation. " +
+          "Return ONLY the title text - no quotes, no punctuation, no explanation, no XML tags."
+      ),
+      new HumanMessage(`First message: "${message}"`),
+    ]);
 
-    try {
-        const response = await getGroqModel().invoke([
-            new SystemMessage(
-                "You are a chat title generator. " +
-                "Return ONLY a 2-4 word title for the conversation — no quotes, no punctuation, no explanation, no prefix like 'Title:' or 'Here is a title'."
-            ),
-            new HumanMessage(`First message: "${message}"`)
-        ])
-
-        return toPlainText(response);
-    } catch (error) {
-        throw wrapAiError(error, `Failed to generate chat title with model ${GROQ_MODEL}`);
-    }
-
+    return stripThinkingTags(extractText(response));
+  } catch (error) {
+    throw wrapAiError(error, `Failed to generate chat title with ${GROQ_MODEL}`);
+  }
 }

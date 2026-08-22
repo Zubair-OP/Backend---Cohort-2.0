@@ -1,10 +1,10 @@
 .auth-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: #000000;
+  background: #0a0a0a;
   position: relative;
   overflow: hidden;
 }
@@ -116,6 +116,11 @@
   border-color: rgba(20, 184, 166, 0.4);
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.08);
+}
+
+.auth-input:focus-visible {
+  outline: 2px solid rgba(20, 184, 166, 0.5);
+  outline-offset: 2px;
 }
 
 .auth-button {

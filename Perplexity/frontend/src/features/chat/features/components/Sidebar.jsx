@@ -73,7 +73,7 @@ const Sidebar = ({
         <div className="px-3 pt-3 shrink-0">
           <button
             onClick={onNewChat}
-            className="group flex items-center justify-center gap-2 w-full rounded-xl border border-border bg-surface-3 px-4 py-2.5 text-sm font-medium text-fg-primary hover:bg-surface-4 hover:border-border-hover transition-all duration-200 focus-ring"
+            className="group flex items-center justify-center gap-2 w-full rounded-xl border border-border bg-surface-3 px-4 py-2.5 text-sm font-medium text-fg-primary hover:bg-surface-4 hover:border-border-hover transition-all duration-200 focus-ring press-active"
           >
             <PlusIcon className="w-4 h-4 text-fg-secondary group-hover:text-accent transition-colors duration-200" />
             New thread

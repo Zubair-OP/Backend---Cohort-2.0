@@ -20,13 +20,13 @@ const Dashboard = () => {
   } = useChat();
 
   return (
-    <div className="flex h-screen w-screen bg-surface-0 text-fg-primary overflow-hidden">
+    <div className="flex h-dvh w-screen bg-surface-0 text-fg-primary overflow-hidden">
       <Sidebar user={user} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((c) => !c)}
         chats={chats} onSelectChat={handleSelectChat} currentChatId={currentChatId}
         onNewChat={handleNewChat} onDeleteChat={handleDeleteChat} />
       <div className="flex flex-col flex-1 min-w-0 h-full">
         <TopBar user={user} sidebarCollapsed={sidebarCollapsed} onToggleSidebar={() => setSidebarCollapsed((c) => !c)} />
-        <main className="flex-1 overflow-y-auto flex flex-col min-h-0 pb-32 scrollbar-thin">
+        <main id="main-content" className="flex-1 overflow-y-auto flex flex-col min-h-0 pb-32 scrollbar-thin">
           {messages.length === 0 ? (
             <ChatWelcome user={user} onSend={handleSend} isLoading={isLoading} />
           ) : (
@@ -54,7 +54,7 @@ const CopyButton = ({ text }) => {
     });
   }, [text]);
   return (
-    <button onClick={handleCopy} className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] text-fg-muted hover:text-fg-secondary hover:bg-surface-4 transition-all duration-200 focus-ring" title="Copy code" aria-label={copied ? "Copied" : "Copy code"}>
+    <button onClick={handleCopy} className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] text-fg-muted hover:text-fg-secondary hover:bg-surface-4 transition-all duration-200 focus-ring press-active" title="Copy code" aria-label={copied ? "Copied" : "Copy code"}>
       {copied ? (<><CheckIcon className="w-3 h-3 text-accent" /><span className="text-accent">Copied</span></>) : (<><ClipboardDocumentIcon className="w-3 h-3" /><span>Copy</span></>)}
     </button>
   );

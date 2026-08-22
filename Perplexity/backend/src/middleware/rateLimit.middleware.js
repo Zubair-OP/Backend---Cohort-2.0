@@ -2,6 +2,9 @@ const rateLimitStore = new Map();
 
 function rateLimit({ windowMs = 15 * 60 * 1000, max = 100, message = "Too many requests" } = {}) {
   return (req, res, next) => {
+    // Skip rate limiting in development for easier testing
+    if (process.env.NODE_ENV !== "production") return next();
+
     const key = req.ip || req.connection.remoteAddress || "unknown";
     const now = Date.now();
     const windowStart = now - windowMs;
@@ -40,7 +43,7 @@ setInterval(() => {
 
 export const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 50,
   message: "Too many authentication attempts. Please try again later.",
 });
 
