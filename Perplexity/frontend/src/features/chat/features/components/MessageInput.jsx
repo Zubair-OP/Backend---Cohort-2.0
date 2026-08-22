@@ -7,6 +7,28 @@ import {
   StopIcon,
 } from "@heroicons/react/24/outline";
 
+const VoiceWaves = () => (
+  <div className="flex items-center gap-[2px] h-4 justify-center">
+    {[0, 1, 2, 3, 4].map((i) => (
+      <div
+        key={i}
+        className="w-[2.5px] bg-state-error rounded-full"
+        style={{
+          height: "4px",
+          animation: `soundWave 1s ease-in-out infinite`,
+          animationDelay: `${i * 0.15}s`,
+        }}
+      />
+    ))}
+    <style>{`
+      @keyframes soundWave {
+        0%, 100% { height: 4px; }
+        50% { height: 14px; }
+      }
+    `}</style>
+  </div>
+);
+
 const MessageInput = ({ onSend, onStop, isLoading }) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef(null);
@@ -72,100 +94,91 @@ const MessageInput = ({ onSend, onStop, isLoading }) => {
   const isStatus = !error && (recording || transcribing);
 
   return (
-    <div className="sticky bottom-0 w-full px-4 md:px-6 pb-4 pt-3 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f] to-transparent">
-      <div className="max-w-[760px] mx-auto">
-        <div className="flex items-center gap-2 rounded-[12px] border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-3 focus-within:border-[#20b2aa]">
-          <button
-            type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[#888888] hover:bg-[#1f1f1f] hover:text-white shrink-0"
-          >
-            <PaperClipIcon className="w-5 h-5" />
-          </button>
+    <div className="sticky bottom-0 w-full px-4 md:px-6 pb-5 pt-4 bg-gradient-to-t from-surface-0 via-surface-0/95 to-transparent">
+      <div className="max-w-chat mx-auto">
+        <div className="rounded-2xl bg-surface-2 border border-border shadow-elevated focus-within:border-accent/30 focus-within:shadow-glow transition-all duration-300 ease-out-expo">
+          <div className="flex items-end gap-1 p-2">
+            <button
+              type="button"
+              className="flex items-center justify-center w-9 h-9 rounded-xl text-fg-muted hover:text-fg-secondary hover:bg-surface-4 transition-all duration-200 shrink-0 mb-0.5 focus-ring"
+              aria-label="Attach file"
+            >
+              <PaperClipIcon className="w-[18px] h-[18px]" />
+            </button>
 
-          <textarea
-            ref={textareaRef}
-            value={message}
-            onChange={handleInput}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask anything..."
-            rows={1}
-            className="flex-1 resize-none bg-transparent py-2 text-white placeholder-[#555555] text-sm leading-6 outline-none min-h-[40px] max-h-[200px] scrollbar-hide"
-          />
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={handleInput}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask anything..."
+              rows={1}
+              className="flex-1 resize-none bg-transparent py-2.5 px-1 text-fg-primary placeholder-fg-muted text-sm leading-6 outline-none min-h-[40px] max-h-[200px] scrollbar-hide"
+              aria-label="Message input"
+            />
 
-          <button
-            type="button"
-            onClick={toggle}
-            disabled={transcribing}
-            className={`transition-colors duration-150 flex items-center justify-center shrink-0 w-9 h-9 rounded-full ${
-              recording
-                ? "bg-red-500/10 hover:bg-red-500/20 text-red-400"
-                : transcribing
-                ? "text-[#555555] cursor-not-allowed"
-                : "text-[#888888] hover:text-white hover:bg-[#1f1f1f]"
-            }`}
-            title={
-              recording
-                ? "Stop recording"
-                : transcribing
-                ? "Transcribing..."
-                : "Start voice input"
-            }
-          >
-            {recording ? (
-              <div className="flex items-center gap-[2px] h-4 justify-center">
-                <style>{`
-                  @keyframes soundWave {
-                    0%, 100% { height: 4px; }
-                    50% { height: 16px; }
-                  }
-                  .bar-1 { animation: soundWave 1s ease-in-out infinite; animation-delay: 0s; }
-                  .bar-2 { animation: soundWave 1s ease-in-out infinite; animation-delay: 0.2s; }
-                  .bar-3 { animation: soundWave 1s ease-in-out infinite; animation-delay: 0.4s; }
-                  .bar-4 { animation: soundWave 1s ease-in-out infinite; animation-delay: 0.1s; }
-                  .bar-5 { animation: soundWave 1s ease-in-out infinite; animation-delay: 0.3s; }
-                `}</style>
-                <div className="w-[2.5px] bg-red-500 rounded-full bar-1"></div>
-                <div className="w-[2.5px] bg-red-500 rounded-full bar-2"></div>
-                <div className="w-[2.5px] bg-red-500 rounded-full bar-3"></div>
-                <div className="w-[2.5px] bg-red-500 rounded-full bar-4"></div>
-                <div className="w-[2.5px] bg-red-500 rounded-full bar-5"></div>
-              </div>
-            ) : transcribing ? (
-              <div className="w-4 h-4 border-2 border-[#20b2aa] border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <MicrophoneIcon className="w-5 h-5" />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={isLoading ? onStop : handleSend}
-            disabled={!canSend && !isLoading}
-            title={isLoading ? "Stop generating" : "Send message"}
-            className={`
-              w-10 h-10 flex items-center justify-center rounded-full shrink-0 transition-all duration-150
-              ${canSend || isLoading
-                ? "bg-[#20b2aa] text-white hover:opacity-90"
-                : "bg-[#202020] text-[#666666] cursor-not-allowed"
+            <button
+              type="button"
+              onClick={toggle}
+              disabled={transcribing}
+              className={`flex items-center justify-center shrink-0 w-9 h-9 rounded-xl transition-all duration-200 mb-0.5 focus-ring ${
+                recording
+                  ? "bg-state-error/10 hover:bg-state-error/15 text-state-error animate-pulse-soft"
+                  : transcribing
+                  ? "text-fg-muted cursor-not-allowed"
+                  : "text-fg-muted hover:text-fg-secondary hover:bg-surface-4"
+              }`}
+              title={
+                recording
+                  ? "Stop recording"
+                  : transcribing
+                  ? "Transcribing..."
+                  : "Start voice input"
               }
-            `}
-          >
-            {isLoading ? (
-              <StopIcon className="w-4 h-4" />
-            ) : (
-              <PaperAirplaneIcon className="w-4 h-4" />
-            )}
-          </button>
+              aria-label={recording ? "Stop recording" : "Start voice input"}
+            >
+              {recording ? (
+                <VoiceWaves />
+              ) : transcribing ? (
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <MicrophoneIcon className="w-[18px] h-[18px]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={isLoading ? onStop : handleSend}
+              disabled={!canSend && !isLoading}
+              title={isLoading ? "Stop generating" : "Send message"}
+              aria-label={isLoading ? "Stop generating" : "Send message"}
+              className={`
+                w-9 h-9 flex items-center justify-center rounded-xl shrink-0 transition-all duration-200 mb-0.5 focus-ring
+                ${
+                  canSend || isLoading
+                    ? "bg-accent text-surface-0 hover:bg-accent-hover active:scale-95"
+                    : "bg-surface-4 text-fg-muted cursor-not-allowed"
+                }
+              `}
+            >
+              {isLoading ? (
+                <StopIcon className="w-4 h-4" />
+              ) : (
+                <PaperAirplaneIcon className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
 
         <p
-          className={`text-center text-[10px] mt-2 ${
+          className={`text-center text-[10px] mt-2 transition-colors duration-200 ${
             isError
-              ? "text-[#ff8d8d]"
+              ? "text-state-error"
               : isStatus
-              ? "text-[#8fe3d7]"
-              : "text-[#666666]"
+              ? "text-accent"
+              : "text-fg-muted"
           }`}
+          role={isError ? "alert" : undefined}
         >
           {statusText}
         </p>

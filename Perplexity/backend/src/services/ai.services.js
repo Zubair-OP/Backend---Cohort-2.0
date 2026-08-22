@@ -4,7 +4,7 @@ import * as z from "zod";
 import {internetSearch, isInternetSearchAvailable} from "./internet.services.js";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY?.trim();
-const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "meta-llama/llama-4-scout-17b-16e-instruct";
+const GROQ_MODEL = process.env.GROQ_MODEL?.trim() || "qwen/qwen3.6-27b";
 
 // Keep only last N messages to avoid token limit errors on long conversations
 const MAX_HISTORY_MESSAGES = 12;
@@ -16,12 +16,11 @@ function missingApiKeyError() {
 }
 
 function wrapAiError(error, context = "AI request failed") {
-        const rawMessage = error?.message || "Unknown AI provider error";
-        const friendlyError = new Error(`${context}: ${rawMessage}`);
-        friendlyError.status = 502;
-        return friendlyError;
+    console.error(`${context}:`, error?.message || error);
+    const friendlyError = new Error(context);
+    friendlyError.status = 502;
+    return friendlyError;
 }
-
 
 let groqModel = null;
 
@@ -66,7 +65,6 @@ function toPlainText(result) {
 
     return String(result.content ?? "").trim();
 }
-
 
 const searchTool = tool(
     internetSearch,

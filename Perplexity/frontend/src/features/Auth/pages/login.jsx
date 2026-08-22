@@ -1,38 +1,25 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../hooks/useAuth'
 import { useSelector } from 'react-redux'
 import './auth.css'
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
-
+  const [formData, setFormData] = useState({ email: '', password: '' })
   const { handleLogin } = useAuth()
   const { error, loading } = useSelector((state) => state.auth)
-
   const navigate = useNavigate()
+
   const handleChange = (event) => {
     const { name, value } = event.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-
     const result = await handleLogin(formData.email, formData.password)
     if (result.success) {
-      setFormData((prev) => ({
-        ...prev,
-        email: '',
-        password: ''
-      }))
+      setFormData({ email: '', password: '' })
       navigate('/')
     }
   }
@@ -40,38 +27,52 @@ const Login = () => {
   return (
     <section className="auth-page">
       <div className="auth-card">
-        <h1 className="auth-title">Welcome Back</h1>
-        <p className="auth-subtitle">Sign in to continue</p>
+        <div className="auth-logo">P</div>
+        <h1 className="auth-title">Welcome back</h1>
+        <p className="auth-subtitle">Sign in to continue researching</p>
 
         <form className="auth-form" onSubmit={handleSubmit}>
-          <label className="auth-label" htmlFor="login-email">Email</label>
-          <input
-            id="login-email"
-            className="auth-input"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="you@example.com"
-            required
-          />
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="login-email">Email</label>
+            <input
+              id="login-email"
+              className="auth-input"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              required
+              autoComplete="email"
+            />
+          </div>
 
-          <label className="auth-label" htmlFor="login-password">Password</label>
-          <input
-            id="login-password"
-            className="auth-input"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            required
-          />
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="login-password">Password</label>
+            <input
+              id="login-password"
+              className="auth-input"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+            />
+          </div>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
           <button className="auth-button" type="submit" disabled={loading}>
-            Sign In
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-surface-0/30 border-t-surface-0 rounded-full animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              "Sign in"
+            )}
           </button>
         </form>
 
