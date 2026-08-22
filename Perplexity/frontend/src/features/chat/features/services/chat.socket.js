@@ -8,7 +8,7 @@ export const InitializeSocket = () => {
         return socketInstance
     }
 
-    socketInstance = io(API_BASE_URL, {
+    socketInstance = io(API_BASE_URL || undefined, {
         withCredentials: true,
     })
 
