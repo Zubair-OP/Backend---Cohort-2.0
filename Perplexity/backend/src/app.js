@@ -62,9 +62,14 @@ app.use("/api/auth", authRateLimit, authRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/transcribe", transcribeRoutes);
 
-// 404 handler
+import path from "path";
+
+// SPA Fallback for client-side routing & 404 handler
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Not found" });
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ success: false, message: "Not found" });
+  }
+  res.sendFile(path.resolve("public", "index.html"));
 });
 
 // Global error handler — never leak internal details to the client
