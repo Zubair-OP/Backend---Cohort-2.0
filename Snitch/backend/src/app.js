@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import fs from 'fs';
 import authRoutes from './routes/auth.routes.js';
 import passport from 'passport';
 import productRoutes from './routes/product.routes.js';
@@ -21,6 +22,10 @@ const app = express();
 app.set('trust proxy', 1);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const staticDir = fs.existsSync(path.resolve(__dirname, '../public'))
+    ? path.resolve(__dirname, '../public')
+    : path.resolve(__dirname, '../dist');
 
 app.use(cors({
     origin: config.FRONTEND_URL,
@@ -68,7 +73,7 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, done) => {
     return done(null, profile);
 }));
-app.use(express.static(path.resolve(__dirname, '../public'), {
+app.use(express.static(staticDir, {
     maxAge: '1h',
     etag: true,
 }));
@@ -87,7 +92,7 @@ app.use('/api/chat', chatRoutes);
 app.use(sitemapRoutes);
 
 app.get('{*splat}', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../public/index.html'));
+    res.sendFile(path.resolve(staticDir, 'index.html'));
 });
 
 app.use((err, _req, res, _next) => {
