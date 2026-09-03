@@ -17,10 +17,28 @@ const formatCurrency = (amount, currency = 'PKR') =>
     maximumFractionDigits: 0,
   }).format(Number(amount) || 0);
 
+function getOptimizedImageUrl(url, width = 600, quality = 80) {
+  if (!url || typeof url !== 'string') return '';
+  if (url.includes('ik.imagekit.io')) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}tr=w-${width},q-${quality},f-auto`;
+  }
+  if (url.includes('images.unsplash.com')) {
+    const base = url.split('?')[0];
+    return `${base}?w=${width}&q=${quality}&auto=format&fit=crop`;
+  }
+  return url;
+}
+
 function ProductCard({ product, onClick }) {
   const coverImage = product?.images?.[0]?.url;
   const amount = product?.price?.amount;
   const currency = product?.price?.currency || 'PKR';
+
+  const optimizedSrc = coverImage ? getOptimizedImageUrl(coverImage, 600, 80) : '';
+  const srcSet = coverImage
+    ? `${getOptimizedImageUrl(coverImage, 360, 80)} 360w, ${getOptimizedImageUrl(coverImage, 600, 80)} 600w`
+    : undefined;
 
   return (
     <article onClick={onClick} className="group cursor-pointer">
@@ -29,11 +47,15 @@ function ProductCard({ product, onClick }) {
           <div className="aspect-[3/4] overflow-hidden bg-cream">
             {coverImage ? (
               <img
-                src={coverImage}
+                src={optimizedSrc}
+                srcSet={srcSet}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 alt={product?.title || 'Product'}
                 className="h-full w-full object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.04]"
                 loading="lazy"
                 decoding="async"
+                width="300"
+                height="400"
               />
             ) : (
               <div className="flex h-full items-center justify-center bg-warm-gray text-xs text-text-muted">
@@ -216,71 +238,91 @@ const Home = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative mx-4 mt-4 overflow-hidden rounded-4xl md:mx-8 md:mt-6" style={{ minHeight: '70vh' }}>
-        <img
-          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2670&auto=format&fit=crop"
-          alt="Featured collection"
-          className="absolute inset-0 h-full w-full object-cover object-top"
-          fetchpriority="high"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
-        <div className="relative flex min-h-[70vh] flex-col justify-end px-6 pb-10 pt-20 md:px-12 md:pb-14">
-          <ScrollReveal>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
-              Spring / Summer 2026
-            </p>
-          </ScrollReveal>
-          <ScrollReveal delay={1}>
-            <h1 className="mt-4 max-w-2xl font-serif text-4xl font-medium leading-[1.1] text-white md:text-6xl lg:text-7xl">
-              Clean essentials built for everyday wear.
-            </h1>
-          </ScrollReveal>
-          <ScrollReveal delay={2}>
-            <div className="mt-6 flex flex-wrap gap-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">
-              <span>{totalProducts} curated styles</span>
-              <span>{categoryCount || 1} categories</span>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Filter Bar */}
-      <section className="py-10 md:py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-8">
-          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      {/* Main Landmark for Accessibility */}
+      <main id="main-content">
+        {/* Hero Section */}
+        <section className="relative mx-4 mt-4 overflow-hidden rounded-4xl md:mx-8 md:mt-6" style={{ minHeight: '70vh' }}>
+          <img
+            src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1024&q=75&auto=format&fit=crop"
+            srcSet="
+              https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=640&q=75&auto=format&fit=crop 640w,
+              https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1024&q=75&auto=format&fit=crop 1024w,
+              https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=75&auto=format&fit=crop 1600w
+            "
+            sizes="100vw"
+            alt="Featured collection"
+            className="absolute inset-0 h-full w-full object-cover object-top"
+            fetchpriority="high"
+            decoding="async"
+            width="1600"
+            height="900"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+          <div className="relative flex min-h-[70vh] flex-col justify-end px-6 pb-10 pt-20 md:px-12 md:pb-14">
             <ScrollReveal>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
-                  Discover
-                </p>
-                <h2 className="mt-2 font-serif text-2xl font-medium text-text-primary md:text-3xl">
-                  Browse the collection
-                </h2>
-              </div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60">
+                Spring / Summer 2026
+              </p>
             </ScrollReveal>
             <ScrollReveal delay={1}>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products"
-                  className="h-11 rounded-full border border-border-light bg-white px-5 text-sm text-text-primary outline-none placeholder:text-text-muted transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
-                />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="h-11 rounded-full border border-border-light bg-white px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent"
-                >
-                  <option value="latest">Newest first</option>
-                  <option value="price-low">Price: low to high</option>
-                  <option value="price-high">Price: high to low</option>
-                </select>
+              <h1 className="mt-4 max-w-2xl font-serif text-4xl font-medium leading-[1.1] text-white md:text-6xl lg:text-7xl">
+                Clean essentials built for everyday wear.
+              </h1>
+            </ScrollReveal>
+            <ScrollReveal delay={2}>
+              <div className="mt-6 flex flex-wrap gap-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">
+                <span>{totalProducts} curated styles</span>
+                <span>{categoryCount || 1} categories</span>
               </div>
             </ScrollReveal>
           </div>
+        </section>
+
+        {/* Filter Bar */}
+        <section className="py-10 md:py-16">
+          <div className="mx-auto max-w-6xl px-4 md:px-8">
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <ScrollReveal>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
+                    Discover
+                  </p>
+                  <h2 className="mt-2 font-serif text-2xl font-medium text-text-primary md:text-3xl">
+                    Browse the collection
+                  </h2>
+                </div>
+              </ScrollReveal>
+              <ScrollReveal delay={1}>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <label htmlFor="search-products" className="sr-only">
+                    Search products
+                  </label>
+                  <input
+                    id="search-products"
+                    aria-label="Search products"
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products"
+                    className="h-11 rounded-full border border-border-light bg-white px-5 text-sm text-text-primary outline-none placeholder:text-text-muted transition-all duration-600 ease-premium focus:border-accent focus:ring-2 focus:ring-accent/10"
+                  />
+                  <label htmlFor="sort-by-select" className="sr-only">
+                    Sort products
+                  </label>
+                  <select
+                    id="sort-by-select"
+                    aria-label="Sort products"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="h-11 rounded-full border border-border-light bg-white px-5 text-sm text-text-primary outline-none transition-all duration-600 ease-premium focus:border-accent"
+                  >
+                    <option value="latest">Newest first</option>
+                    <option value="price-low">Price: low to high</option>
+                    <option value="price-high">Price: high to low</option>
+                  </select>
+                </div>
+              </ScrollReveal>
+            </div>
 
           <ScrollReveal delay={2}>
             <div className="flex flex-wrap gap-2">
@@ -373,11 +415,15 @@ const Home = () => {
                   <div className="aspect-[4/3] lg:aspect-auto lg:min-h-[380px]">
                     {featuredProduct?.images?.[0]?.url ? (
                       <img
-                        src={featuredProduct.images[0].url}
+                        src={getOptimizedImageUrl(featuredProduct.images[0].url, 800, 80)}
+                        srcSet={`${getOptimizedImageUrl(featuredProduct.images[0].url, 480, 80)} 480w, ${getOptimizedImageUrl(featuredProduct.images[0].url, 800, 80)} 800w`}
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         alt={featuredProduct?.title || 'Featured'}
                         className="h-full w-full object-cover"
                         loading="lazy"
                         decoding="async"
+                        width="600"
+                        height="450"
                       />
                     ) : (
                       <div className="h-full w-full bg-warm-gray" />
@@ -462,11 +508,12 @@ const Home = () => {
           </ScrollReveal>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-border-light bg-cream py-8">
         <div className="mx-auto max-w-6xl px-4 text-center md:px-6">
-          <p className="text-[11px] tracking-[0.2em] text-text-muted uppercase">
+          <p className="text-[11px] tracking-[0.2em] text-text-secondary uppercase">
             &copy; 2026 Snitch. All rights reserved.
           </p>
         </div>

@@ -74,8 +74,15 @@ passport.use(new GoogleStrategy({
     return done(null, profile);
 }));
 app.use(express.static(staticDir, {
-    maxAge: '1h',
-    etag: true,
+    maxAge: '1y',
+    immutable: true,
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        } else if (filePath.includes('assets')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+    },
 }));
 
 app.use(generalLimiter);
@@ -92,6 +99,7 @@ app.use('/api/chat', chatRoutes);
 app.use(sitemapRoutes);
 
 app.get('{*splat}', (req, res) => {
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(path.resolve(staticDir, 'index.html'));
 });
 

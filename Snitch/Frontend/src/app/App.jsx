@@ -1,12 +1,13 @@
 import './App.css'
 import { RouterProvider } from 'react-router'
 import AppRoutes  from './app.routes'
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore, lazy, Suspense } from 'react'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { HelmetProvider } from 'react-helmet-async'
-import ChatWidget from './features/chat/components/ChatWidget'
 import { useAuth } from './features/auth/hook/useAuth'
+
+const ChatWidget = lazy(() => import('./features/chat/components/ChatWidget'))
 
 function App() {
   const { handleGetme } = useAuth();
@@ -28,7 +29,11 @@ function App() {
     <HelmetProvider>
         <RouterProvider router={AppRoutes} />
         <ToastContainer position="top-right" autoClose={3000} />
-        {shouldShowChat ? <ChatWidget /> : null}
+        {shouldShowChat ? (
+          <Suspense fallback={null}>
+            <ChatWidget />
+          </Suspense>
+        ) : null}
     </HelmetProvider>
   )
 }

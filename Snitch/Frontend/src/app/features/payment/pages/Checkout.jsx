@@ -13,7 +13,13 @@ import {
 import { toast } from 'react-toastify';
 import { usePayment } from '../hook/usePayment';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+let stripePromise = null;
+const getStripePromise = () => {
+    if (!stripePromise && import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+        stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+    }
+    return stripePromise;
+};
 
 const formatCurrency = (amount, currency = 'PKR') =>
     new Intl.NumberFormat('en-PK', { style: 'currency', currency, maximumFractionDigits: 0 }).format(Number(amount) || 0);
@@ -204,7 +210,7 @@ const Checkout = () => {
                     <div className="double-bezel">
                         <div className="double-bezel-inner p-5">
                             <Elements
-                                stripe={stripePromise}
+                                stripe={getStripePromise()}
                                 options={{
                                     clientSecret,
                                     appearance: {

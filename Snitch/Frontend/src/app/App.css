@@ -40,21 +40,19 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Scroll reveal base */
+/* Scroll reveal base - GPU composited */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(40px);
-  filter: blur(4px);
+  transform: translateY(30px);
+  will-change: opacity, transform;
   transition:
-    opacity 800ms cubic-bezier(0.32, 0.72, 0, 1),
-    transform 800ms cubic-bezier(0.32, 0.72, 0, 1),
-    filter 800ms cubic-bezier(0.32, 0.72, 0, 1);
+    opacity 700ms cubic-bezier(0.32, 0.72, 0, 1),
+    transform 700ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }
 
 /* Staggered reveal delays */

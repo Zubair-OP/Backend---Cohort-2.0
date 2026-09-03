@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- Primary SEO -->
-    <title>Snitch — Premium Everyday Clothing for Men & Women | Shop Pakistan</title>
+    <title>Snitch | Premium Everyday Clothing for Men & Women | Shop Pakistan</title>
     <meta name="description" content="Shop Snitch's curated collection of premium everyday clothing. Shirts, pants, hoodies, caps, and Kameez Shalwar designed for comfort and style. Free delivery across Pakistan." />
     <meta name="keywords" content="Snitch clothing, premium shirts Pakistan, men pants online, hoodies Pakistan, caps online, Kameez Shalwar, everyday wear, streetwear Pakistan, online clothing store Pakistan" />
     <meta name="author" content="Snitch" />
@@ -16,7 +16,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://snitch.store/" />
-    <meta property="og:title" content="Snitch — Premium Everyday Clothing for Men & Women" />
+    <meta property="og:title" content="Snitch | Premium Everyday Clothing for Men & Women" />
     <meta property="og:description" content="Shop curated essentials — shirts, pants, hoodies, caps & Kameez Shalwar. Designed for comfort, built for everyday wear." />
     <meta property="og:image" content="https://snitch.store/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
@@ -27,7 +27,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://snitch.store/" />
-    <meta name="twitter:title" content="Snitch — Premium Everyday Clothing" />
+    <meta name="twitter:title" content="Snitch | Premium Everyday Clothing" />
     <meta name="twitter:description" content="Shop curated essentials — shirts, pants, hoodies, caps & Kameez Shalwar. Designed for comfort, built for everyday wear." />
     <meta name="twitter:image" content="https://snitch.store/og-image.jpg" />
 
@@ -36,13 +36,40 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#1A1A1A" />
 
-    <!-- Fonts -->
+    <!-- Preconnect CDNs -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://ik.imagekit.io" />
+
+    <!-- Preload LCP Hero Image -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="image"
+      href="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=640&q=75&auto=format&fit=crop"
+      imagesrcset="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=640&q=75&auto=format&fit=crop 640w, https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1024&q=75&auto=format&fit=crop 1024w, https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=75&auto=format&fit=crop 1600w"
+      imagesizes="100vw"
+      fetchpriority="high"
     />
+
+    <!-- Non-blocking Fonts -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
 
     <!-- Organization Schema -->
     <script type="application/ld+json">

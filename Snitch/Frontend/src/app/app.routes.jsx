@@ -1,25 +1,38 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router';
-import Register from './features/auth/pages/Register';
-import Login from './features/auth/pages/Login';
 import Home from './features/product/pages/Home';
-import Dashboard from './features/product/pages/Dashboard';
 import Protected from './components/Protected';
-import CreateProduct from './features/product/pages/CreateProduct';
-import ProductDetail from './features/product/pages/ProductDetail';
-import ProductDetails from './features/product/pages/ProductDetails';
-import SellerproductDetails from './features/product/pages/SellerproductDetails';
-import Cart from './features/cart/pages/Cart';
-import Checkout from './features/payment/pages/Checkout';
-import PaymentSuccess from './features/payment/pages/PaymentSuccess';
+
+const Register = lazy(() => import('./features/auth/pages/register'));
+const Login = lazy(() => import('./features/auth/pages/Login'));
+const Dashboard = lazy(() => import('./features/product/pages/Dashboard'));
+const CreateProduct = lazy(() => import('./features/product/pages/CreateProduct'));
+const ProductDetails = lazy(() => import('./features/product/pages/ProductDetails'));
+const SellerproductDetails = lazy(() => import('./features/product/pages/SellerproductDetails'));
+const Cart = lazy(() => import('./features/cart/pages/Cart'));
+const Checkout = lazy(() => import('./features/payment/pages/Checkout'));
+const PaymentSuccess = lazy(() => import('./features/payment/pages/PaymentSuccess'));
+
+const PageFallback = () => (
+  <div className="flex min-h-screen items-center justify-center bg-cream">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+  </div>
+);
+
+const withSuspense = (Component) => (
+  <Suspense fallback={<PageFallback />}>
+    <Component />
+  </Suspense>
+);
 
 const AppRoutes = createBrowserRouter([
   {
     path: '/register',
-    element: <Register />
+    element: withSuspense(Register)
   },
   {
     path: '/login',
-    element: <Login />
+    element: withSuspense(Login)
   },
   {
     path: '/',
@@ -27,32 +40,32 @@ const AppRoutes = createBrowserRouter([
   },
   {
     path: '/Dashboard',
-    element: <Protected role="seller"><Dashboard /></Protected>
+    element: <Protected role="seller">{withSuspense(Dashboard)}</Protected>
   },
   {
     path:'/create-product',
-    element: <Protected role="seller"><CreateProduct /></Protected>
+    element: <Protected role="seller">{withSuspense(CreateProduct)}</Protected>
   },
   {
     path: '/product/:id',
-    element : <ProductDetails />
+    element: withSuspense(ProductDetails)
   },
   {
     path: '/seller-product/:Productid',
-    element: <Protected role="seller"><SellerproductDetails /></Protected>
+    element: <Protected role="seller">{withSuspense(SellerproductDetails)}</Protected>
   },
   {
     path: '/cart',
-    element: <Cart />
+    element: withSuspense(Cart)
   },
   {
     path: '/checkout',
-    element: <Checkout />
+    element: withSuspense(Checkout)
   },
   {
     path: '/payment-success',
-    element: <PaymentSuccess />
+    element: withSuspense(PaymentSuccess)
   }
-])
+]);
 
 export default AppRoutes;
