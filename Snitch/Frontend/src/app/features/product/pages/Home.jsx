@@ -130,7 +130,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-cream font-sans text-text-primary antialiased noise-overlay">
       <SEO
-        title="Snitch — Premium Everyday Clothing"
+        title="Snitch | Premium Everyday Clothing"
         description="Shop curated essentials — shirts, pants, hoodies, caps & Kameez Shalwar. Designed for comfort, built for everyday wear. Free delivery across Pakistan."
         url="https://snitch.store"
       />

@@ -5,7 +5,7 @@ const SITE_URL = 'https://snitch.store';
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 const defaults = {
-  title: `${SITE_NAME} — Premium Everyday Clothing for Men & Women | Shop Pakistan`,
+  title: `${SITE_NAME} | Premium Everyday Clothing for Men & Women | Shop Pakistan`,
   description: `Shop Snitch's curated collection of premium everyday clothing. Shirts, pants, hoodies, caps, and Kameez Shalwar designed for comfort and style. Free delivery across Pakistan.`,
   image: DEFAULT_IMAGE,
   url: SITE_URL,
